@@ -1,8 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace SadnessMonday.FancyPhysics
-{
+namespace SadnessMonday.BetterPhysics {
     [RequireComponent(typeof(Rigidbody))]
     [DisallowMultipleComponent]
     public class BetterRigidbody : MonoBehaviour

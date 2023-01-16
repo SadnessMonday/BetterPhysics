@@ -1,4 +1,4 @@
-namespace SadnessMonday.FancyPhysics {
+namespace SadnessMonday.BetterPhysics {
     public enum LimitType {
         None,
         Omnidirectional,

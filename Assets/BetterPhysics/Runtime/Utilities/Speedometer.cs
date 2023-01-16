@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SadnessMonday.FancyPhysics
+namespace SadnessMonday.BetterPhysics
 {
     public class Speedometer : MonoBehaviour
     {

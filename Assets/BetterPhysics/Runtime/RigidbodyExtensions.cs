@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SadnessMonday.FancyPhysics {
+namespace SadnessMonday.BetterPhysics {
     public static class RigidbodyExtensions {
         public static Vector3 Forward(this Rigidbody rb) => rb.rotation * Vector3.forward;
         public static Vector3 Left(this Rigidbody rb) => rb.rotation * Vector3.left;

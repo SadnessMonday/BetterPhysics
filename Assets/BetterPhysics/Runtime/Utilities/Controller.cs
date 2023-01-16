@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace SadnessMonday.FancyPhysics
+namespace SadnessMonday.BetterPhysics
 {
     [RequireComponent(typeof(BetterRigidbody))]
     public class Controller : MonoBehaviour

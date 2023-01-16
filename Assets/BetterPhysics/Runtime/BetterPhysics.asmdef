@@ -1,6 +1,6 @@
 {
-    "name": "SadnessMonday.FancyPhysics",
-    "rootNamespace": "SadnessMonday.FancyPhysics",
+    "name": "SadnessMonday.BetterPhysics",
+    "rootNamespace": "SadnessMonday.BetterPhysics",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
