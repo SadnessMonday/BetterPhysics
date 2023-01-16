@@ -1,22 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SadnessMonday.BetterPhysics
 {
     public class Speedometer : MonoBehaviour
     {
+        [SerializeField]
         BetterRigidbody brb;
+
+#if TEXTMESHPRO_PRESENT
+        [SerializeField]
+        TMPro.TMP_Text speed;
+        [SerializeField]
+        TMPro.TMP_Text localVelocity;
+        [SerializeField]
+        TMPro.TMP_Text worldVelocity;
+#else
+        [SerializeField]
+        Text speed;
+        [SerializeField]
+        Text localVelocity;
+        [SerializeField]
+        Text worldVelocity;
+#endif
         void Awake() {
-            brb = FindObjectOfType<BetterRigidbody>();
+            if (brb == null) brb = GetComponent<BetterRigidbody>();
         }
 
-        void OnGUI() {
-            GUI.Label(new Rect(10, 10, 500, 20), $"Speed: {brb.Speed:F4}");
-            GUI.Label(new Rect(10, 30, 500, 20), $"Local Velocity: {brb.LocalVelocity.ToString("F4")}");
-            GUI.Label(new Rect(10, 50, 500, 20), $"World Velocity: {brb.Velocity:F4}");
-
-            // print($"Speed: {brb.Speed:F4} Local Velocity: {brb.LocalVelocity.ToString("F4")} World Velocity: {brb.Velocity:F4}");
+        void LateUpdate() {
+            if (speed) speed.text = brb.Speed.ToString("F4");
+            if (localVelocity) localVelocity.text = brb.LocalVelocity.ToString("F4");
+            if (worldVelocity) worldVelocity.text = brb.Velocity.ToString("F4");
         }
     }
 }
