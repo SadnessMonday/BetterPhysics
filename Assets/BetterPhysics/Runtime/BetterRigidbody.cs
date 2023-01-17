@@ -31,6 +31,8 @@ namespace SadnessMonday.BetterPhysics {
 
         void Awake() {
             rb = GetComponent<Rigidbody>();
+
+            // TODO maybe this should actually happen elsewhere
             foreach (Collider c in GetComponentsInChildren<Collider>()) {
                 c.hasModifiableContacts = true;
             }
@@ -152,6 +154,15 @@ namespace SadnessMonday.BetterPhysics {
 
         #region Unity Messages
 
+        void OnValidate() {
+            if (!TryGetComponent(out rb)) {
+                rb = gameObject.AddComponent<Rigidbody>();
+            }
+            
+            // Don't show the real Rigidbody in the inspector!
+            rb.hideFlags = HideFlags.HideInInspector;
+        }
+
         void OnEnable() {
             Physics.ContactModifyEvent += ModifyContacts;
         }
@@ -161,7 +172,8 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         void ModifyContacts(PhysicsScene scene, NativeArray<ModifiableContactPair> pairs) {
-
+            var pair = pairs[0];
+            // pair.SetMaxImpulse
         }
 
         #endregion
