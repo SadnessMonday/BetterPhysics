@@ -1,0 +1,16 @@
+{
+    "name": "SadnessMonday.BetterPhysics.Samples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7002a6504f67e4ae9a50c0e365d2c40a"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

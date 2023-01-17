@@ -1,0 +1,18 @@
+{
+    "name": "SadnessMonday.BetterPhysics.Editor",
+    "rootNamespace": "SadnessMonday.BetterPhysics.Editor",
+    "references": [
+        "GUID:7002a6504f67e4ae9a50c0e365d2c40a"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

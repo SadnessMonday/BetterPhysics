@@ -1,4 +1,5 @@
 using System;
+using Unity.Collections;
 using UnityEngine;
 
 namespace SadnessMonday.BetterPhysics {
@@ -146,6 +147,22 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public Action WakeUp => rb.WakeUp;
+
+        #endregion
+
+        #region Unity Messages
+
+        void OnEnable() {
+            Physics.ContactModifyEvent += ModifyContacts;
+        }
+
+        void OnDisable() {
+            Physics.ContactModifyEvent -= ModifyContacts;
+        }
+
+        void ModifyContacts(PhysicsScene scene, NativeArray<ModifiableContactPair> pairs) {
+
+        }
 
         #endregion
 

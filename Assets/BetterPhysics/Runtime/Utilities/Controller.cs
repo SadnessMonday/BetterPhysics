@@ -4,6 +4,7 @@ using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using static UnityEngine.Object;
 
 namespace SadnessMonday.BetterPhysics
 {

@@ -9,22 +9,13 @@ namespace SadnessMonday.BetterPhysics
     {
         [SerializeField]
         BetterRigidbody brb;
-
-#if TEXTMESHPRO_PRESENT
-        [SerializeField]
-        TMPro.TMP_Text speed;
-        [SerializeField]
-        TMPro.TMP_Text localVelocity;
-        [SerializeField]
-        TMPro.TMP_Text worldVelocity;
-#else
         [SerializeField]
         Text speed;
         [SerializeField]
         Text localVelocity;
         [SerializeField]
         Text worldVelocity;
-#endif
+        
         void Awake() {
             if (brb == null) brb = GetComponent<BetterRigidbody>();
         }
