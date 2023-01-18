@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 #endif
 using static UnityEngine.Object;
 
-namespace SadnessMonday.BetterPhysics
+namespace SadnessMonday.BetterPhysics.Utilities
 {
     [RequireComponent(typeof(BetterRigidbody))]
     public class Controller : MonoBehaviour

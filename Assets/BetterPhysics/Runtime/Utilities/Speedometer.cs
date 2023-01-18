@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SadnessMonday.BetterPhysics
+namespace SadnessMonday.BetterPhysics.Utilities
 {
     public class Speedometer : MonoBehaviour
     {

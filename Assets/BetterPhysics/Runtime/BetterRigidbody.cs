@@ -17,6 +17,8 @@ namespace SadnessMonday.BetterPhysics {
         [Tooltip("Per-axis limits. Negative numbers mean unlimited")]
         public Vector3 HardVectorLimit = -Vector3.one;
 
+        internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
+
         public LimitType SoftLimitType;
         public LimitType HardLimitType;
 
@@ -28,15 +30,6 @@ namespace SadnessMonday.BetterPhysics {
             }
         }
         public float Speed => rb.velocity.magnitude;
-
-        void Awake() {
-            rb = GetComponent<Rigidbody>();
-
-            // TODO maybe this should actually happen elsewhere
-            foreach (Collider c in GetComponentsInChildren<Collider>()) {
-                c.hasModifiableContacts = true;
-            }
-        }
 
         #region Rigidbody property pass-through
 
@@ -165,18 +158,35 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public Action WakeUp => rb.WakeUp;
+        public CustomCollisionData CustomCollisionData { get; set; }
 
         #endregion
 
         #region Unity Messages
 
-        void OnValidate() {
+        void Awake() {
+            EnsureRigidbody();
+            // TODO maybe this should actually happen elsewhere
+            foreach (Collider c in GetComponentsInChildren<Collider>()) {
+                c.hasModifiableContacts = true;
+            }
+        }
+
+        private void EnsureRigidbody() {
             if (!TryGetComponent(out rb)) {
                 rb = gameObject.AddComponent<Rigidbody>();
             }
 
-            // Don't show the real Rigidbody in the inspector!
+            if (ReferenceEquals(null, rb)) {
+                throw new Exception(
+                    "Problem creating BetterRigidbody. There may be incompatible components present, such as 2D physics components");
+            }
+
             rb.hideFlags = HideFlags.HideInInspector;
+        }
+        
+        void OnValidate() {
+            EnsureRigidbody();
         }
 
         void OnEnable() {
