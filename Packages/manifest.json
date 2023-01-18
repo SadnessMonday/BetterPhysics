@@ -2,6 +2,7 @@
   "dependencies": {
     "com.unity.collections": "1.2.4",
     "com.unity.feature.development": "1.0.1",
+    "com.unity.ide.rider": "3.0.18",
     "com.unity.probuilder": "5.0.6",
     "com.unity.timeline": "1.7.2",
     "com.unity.ugui": "1.0.0",

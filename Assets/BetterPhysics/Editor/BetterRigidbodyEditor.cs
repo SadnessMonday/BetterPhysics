@@ -9,6 +9,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
     [CustomEditor(typeof(BetterRigidbody))]
     public class BetterRigidbodyEditor : UnityEditor.Editor
     {
+        private static GUIContent LimitContent = new GUIContent("Limit:", "Negative means unlimited.");
         private bool showAdvanced;
 
         public override void OnInspectorGUI()
@@ -25,12 +26,12 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 case LimitType.None:
                     break;
                 case LimitType.Omnidirectional:
-                    brb.SoftScalarLimit = EditorGUILayout.FloatField("Limit:", brb.SoftScalarLimit);
+                    brb.SoftScalarLimit = EditorGUILayout.FloatField(LimitContent, brb.SoftScalarLimit);
                     break;
                 case LimitType.LocalAxes:
                     // fallthrough
                 case LimitType.WorldAxes:
-                    brb.SoftVectorLimit = EditorGUILayout.Vector3Field("Limit:", brb.SoftVectorLimit);
+                    brb.SoftVectorLimit = EditorGUILayout.Vector3Field(LimitContent, brb.SoftVectorLimit);
                     break;
             }
 
@@ -39,12 +40,12 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 case LimitType.None:
                     break;
                 case LimitType.Omnidirectional:
-                    brb.HardScalarLimit = EditorGUILayout.FloatField("Limit:", brb.HardScalarLimit);
+                    brb.HardScalarLimit = EditorGUILayout.FloatField(LimitContent, brb.HardScalarLimit);
                     break;
                 case LimitType.LocalAxes:
                     // fallthrough
                 case LimitType.WorldAxes:
-                    brb.HardVectorLimit = EditorGUILayout.Vector3Field("Limit:", brb.HardVectorLimit);
+                    brb.HardVectorLimit = EditorGUILayout.Vector3Field(LimitContent, brb.HardVectorLimit);
                     break;
             }
 

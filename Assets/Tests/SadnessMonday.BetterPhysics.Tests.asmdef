@@ -1,10 +1,10 @@
 {
-    "name": "SadnessMonday.FancyPhysics.Tests",
-    "rootNamespace": "SadnessMonday.FancyPhysics",
+    "name": "SadnessMonday.BetterPhysics.Tests",
+    "rootNamespace": "SadnessMonday.BetterPhysics.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "SadnessMonday.FancyPhysics"
+        "SadnessMonday.BetterPhysics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -347,7 +347,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh32674
+  m_Name: pb_Mesh24014
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -896,11 +896,11 @@ MonoBehaviour:
   SoftScalarLimit: 5
   SoftVectorLimit: {x: -1, y: -1, z: -1}
   HardVectorLimit: {x: -1, y: -1, z: -1}
-  SoftLimitType: 3
-  HardLimitType: 2
+  SoftLimitType: 2
+  HardLimitType: 0
 --- !u!54 &885889692
 Rigidbody:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 2
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
