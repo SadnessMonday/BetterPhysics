@@ -431,7 +431,11 @@ MonoBehaviour:
   buttonPrefab: {fileID: 6323321569922600175, guid: cf592e6a314a142b5a0150f61e484552, type: 3}
   buttonParent: {fileID: 1526009640}
   sceneInfos:
-  - title: 
+  - title: Omni
+    sceneName: 
+  - title: Beta
+    sceneName: 
+  - title: Chino
     sceneName: 
 --- !u!1 &897730494
 GameObject:

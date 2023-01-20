@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using SadnessMonday.BetterPhysics;
+using SadnessMonday.BetterPhysics.Layers;
 using UnityEngine;
 using UnityEditor;
 
@@ -18,40 +20,50 @@ namespace SadnessMonday.BetterPhysics.Editor {
             var serializedObject = new SerializedObject(brb);
             var softLimitTypeProp = serializedObject.FindProperty("SoftLimitType");
 
-            // Draw the default inspector
-            EditorGUI.BeginChangeCheck();
+            using (new EditorGUI.DisabledGroupScope(true)) {
+                var scriptAsset = (MonoScript)EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour(brb), typeof(MonoScript), false);
+            }
 
-            brb.SoftLimitType = (LimitType)EditorGUILayout.EnumPopup("Soft Limit Type:", brb.SoftLimitType);
-            switch(brb.SoftLimitType) {
+            var layerField = serializedObject.FindProperty("physicsLayer");
+            layerField.intValue = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
+
+            var softLimitField = serializedObject.FindProperty("softLimitType");
+            LimitType softLimitType = (LimitType)EditorGUILayout.EnumPopup("Soft Limit Type:", (LimitType)softLimitField.enumValueIndex);
+            softLimitField.enumValueIndex = (int)softLimitType;
+            switch(softLimitType) {
                 case LimitType.None:
                     break;
                 case LimitType.Omnidirectional:
-                    brb.SoftScalarLimit = EditorGUILayout.FloatField(LimitContent, brb.SoftScalarLimit);
+                    var softLimitScalarField = serializedObject.FindProperty("softScalarLimit");
+                    softLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, softLimitScalarField.floatValue);
                     break;
                 case LimitType.LocalAxes:
                     // fallthrough
                 case LimitType.WorldAxes:
-                    brb.SoftVectorLimit = EditorGUILayout.Vector3Field(LimitContent, brb.SoftVectorLimit);
+                    var softLimitVectorField = serializedObject.FindProperty("softVectorLimit");
+                    softLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, softLimitVectorField.vector3Value);
                     break;
             }
 
-            brb.HardLimitType = (LimitType)EditorGUILayout.EnumPopup("Hard Limit Type:", brb.HardLimitType);
-            switch(brb.HardLimitType) {
+            var hardLimitField = serializedObject.FindProperty("hardLimitType");
+            LimitType hardLimitType = (LimitType)EditorGUILayout.EnumPopup("Hard Limit Type:", (LimitType)hardLimitField.enumValueIndex);
+            hardLimitField.enumValueIndex = (int)hardLimitType;
+            switch(hardLimitType) {
                 case LimitType.None:
                     break;
                 case LimitType.Omnidirectional:
-                    brb.HardScalarLimit = EditorGUILayout.FloatField(LimitContent, brb.HardScalarLimit);
+                    var hardLimitScalarField = serializedObject.FindProperty("hardScalarLimit");
+                    hardLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, hardLimitScalarField.floatValue);
                     break;
                 case LimitType.LocalAxes:
-                    // fallthrough
+                // fallthrough
                 case LimitType.WorldAxes:
-                    brb.HardVectorLimit = EditorGUILayout.Vector3Field(LimitContent, brb.HardVectorLimit);
+                    var hardLimitVectorField = serializedObject.FindProperty("hardVectorLimit");
+                    hardLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, hardLimitVectorField.vector3Value);
                     break;
             }
 
-            if (EditorGUI.EndChangeCheck()) {
-                EditorUtility.SetDirty(target);
-            }
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }

@@ -132,12 +132,12 @@ namespace SadnessMonday.BetterPhysics.Tests
             }
 
             public void Prepare(BetterRigidbody brb) {
-                brb.HardLimitType = HardLimitType;
-                brb.SoftLimitType = SoftLimitType;
-                brb.HardScalarLimit = HardScalarLimit;
-                brb.SoftScalarLimit = SoftScalarLimit;
-                brb.HardVectorLimit = HardVectorLimit;
-                brb.SoftVectorLimit = SoftVectorLimit;
+                brb.hardLimitType = HardLimitType;
+                brb.softLimitType = SoftLimitType;
+                brb.hardScalarLimit = HardScalarLimit;
+                brb.softScalarLimit = SoftScalarLimit;
+                brb.hardVectorLimit = HardVectorLimit;
+                brb.softVectorLimit = SoftVectorLimit;
                 
                 brb.rotation = Quaternion.Euler(Orientation);
                 if (_hasStartLocalVelocity) {
