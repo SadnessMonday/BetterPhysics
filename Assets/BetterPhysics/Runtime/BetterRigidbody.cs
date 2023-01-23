@@ -166,6 +166,7 @@ namespace SadnessMonday.BetterPhysics {
 
         // TODO we probably want to do a better passthrough here.
         public Vector3 AddExplosionForce(float explosionForce, Vector3 explosionPosition, float explosionRadius,
+            float upwardsModifier,
             ForceMode mode = ForceMode.Force) {
             Vector3 myPos = this.position;
 
@@ -174,7 +175,15 @@ namespace SadnessMonday.BetterPhysics {
             float interpolant = Mathf.InverseLerp(0, explosionRadius, distance);
             float forceAmount = Mathf.Lerp(explosionForce, 0, interpolant);
 
-            Vector3 direction = (myPos - explosionPosition).normalized;
+            Vector3 direction = myPos - explosionPosition;
+            if (upwardsModifier == 0) {
+                // normalize
+                direction /= distance;
+            }
+            else {
+                direction.y += upwardsModifier;
+                direction.Normalize();
+            }
 
             return AddForceWithoutLimit(direction * forceAmount, mode);
         }

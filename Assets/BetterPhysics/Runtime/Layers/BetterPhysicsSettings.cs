@@ -115,7 +115,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         private void InitLayerInteractions() {
-            _interactionsLookup.Clear();
+            ResetAllLayerInteractions();
             foreach (var interaction in interactionsStorage) {
                 Vector2Int coord = new(interaction.actor, interaction.receiver);
                 if (!LayerIsDefined(coord.x) || !LayerIsDefined(coord.y)) {
@@ -169,6 +169,10 @@ namespace SadnessMonday.BetterPhysics.Layers {
          */
         public bool ResetLayerInteraction(int actor, int receiver) {
             return _interactionsLookup.Remove(new Vector2Int(actor, receiver));
+        }
+
+        public void ResetAllLayerInteractions() {
+            _interactionsLookup.Clear();
         }
     }
 }

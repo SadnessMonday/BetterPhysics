@@ -7,11 +7,13 @@ namespace SadnessMonday.BetterPhysics.Utilities {
         private BetterRigidbody _brb;
         private Renderer _renderer;
 
-        public Color[] colors = {
+        static readonly Color[] Colors = {
             Color.red,
             Color.blue, 
             Color.green,
-            Color.magenta, 
+            Color.magenta,
+            Color.yellow,
+            Color.cyan,
         };
 
         private void Awake() {
@@ -20,7 +22,7 @@ namespace SadnessMonday.BetterPhysics.Utilities {
         }
 
         private void OnEnable() {
-            UpdateColor(colors[_brb.PhysicsLayer]);
+            UpdateColor(Colors[_brb.PhysicsLayer]);
             _brb.OnPhysicsLayerChanged += WhenPhysicsLayerChanges;
         }
 
@@ -29,7 +31,7 @@ namespace SadnessMonday.BetterPhysics.Utilities {
         }
 
         private void WhenPhysicsLayerChanges(BetterRigidbody source, int oldlayer, int newlayer) {
-            UpdateColor(colors[newlayer]);
+            UpdateColor(Colors[newlayer]);
         }
 
         void UpdateColor(Color c) {

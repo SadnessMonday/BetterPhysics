@@ -52,17 +52,17 @@ namespace SadnessMonday.BetterPhysics {
                 int bodyBId = pair.otherBodyInstanceID;
                 
                 if (!_rigidbodyLayerMapping.TryGetValue(bodyAId, out int layerA)) {
-                    Debug.Log($"Body A {bodyAId} is not a registered BRB");
+                    // Debug.Log($"Body A {bodyAId} is not a registered BRB");
                     // Body A is not a registered BRB, we can ignore this contact.
                     continue;
                 }
                 
                 if (!_rigidbodyLayerMapping.TryGetValue(bodyBId, out int layerB)) {
-                    Debug.Log($"Body B {bodyBId} is not a registered BRB");
+                    // Debug.Log($"Body B {bodyBId} is not a registered BRB");
                     // Body B is not a registered BRB, we can ignore this contact.
                     continue;
                 }
-                Debug.Log($"Found body {bodyAId} on layer {layerA} and {bodyBId} on {layerB}");
+                // Debug.Log($"Found body {bodyAId} on layer {layerA} and {bodyBId} on {layerB}");
                 
                 float aToBMultiplier = 1;
                 if (_perRigidbodyData.TryGetValue(bodyAId, out var bodyAInteractions)
@@ -72,9 +72,9 @@ namespace SadnessMonday.BetterPhysics {
                 else if (_settings.TryGetLayerInteraction(layerA, layerB, out LayerInteraction aToBInteraction)) {
                     aToBMultiplier = aToBInteraction.impulseMultiplier;
                 }
-                else {
-                    Debug.Log($"Found nothing for {layerA} to {layerB}");
-                }
+                // else {
+                //     Debug.Log($"Found nothing for {layerA} to {layerB}");
+                // }
 
                 float bToAMultiplier = 1;
                 if (_perRigidbodyData.TryGetValue(bodyBId, out var bodyBInteractions)
@@ -84,20 +84,20 @@ namespace SadnessMonday.BetterPhysics {
                 else if (_settings.TryGetLayerInteraction(layerB, layerA, out LayerInteraction bToAInteraction)) {
                     bToAMultiplier = bToAInteraction.impulseMultiplier;
                 }
-                else {
-                    Debug.Log($"Found nothing for {layerB} to {layerA}");
-                }
+                // else {
+                //     Debug.Log($"Found nothing for {layerB} to {layerA}");
+                // }
 
                 // ReSharper disable CompareOfFloatsByEqualityOperator
                 if (aToBMultiplier == 1 && bToAMultiplier == 1) {
-                    Debug.Log("Found nothing for either layer");
+                    // Debug.Log("Found nothing for either layer");
                     continue;
                 }
                 // ReSharper restore CompareOfFloatsByEqualityOperator
 
-                Debug.Log($"Instance {bodyAId} of layer {layerA} collided with {bodyBId} of {layerB}." +
-                          $" {layerA} to {layerB} modifier was {aToBMultiplier} and " +
-                          $"{layerB} to {layerA} was {bToAMultiplier}");
+                // Debug.Log($"Instance {bodyAId} of layer {layerA} collided with {bodyBId} of {layerB}." +
+                //           $" {layerA} to {layerB} modifier was {aToBMultiplier} and " +
+                //           $"{layerB} to {layerA} was {bToAMultiplier}");
                 
                 var massProperties = pair.massProperties;
                 massProperties.inverseMassScale = aToBMultiplier;
@@ -115,7 +115,7 @@ namespace SadnessMonday.BetterPhysics {
             _rigidbodyLayerMapping[rbInstanceId] = body.PhysicsLayer;
             _perRigidbodyData[rbInstanceId] = body.SerializedInteractions;
             
-            Debug.Log($"Registering {rbInstanceId} to layer {body.PhysicsLayer}");
+            // Debug.Log($"Registering {rbInstanceId} to layer {body.PhysicsLayer}");
         }
 
         public void UnRegister(BetterRigidbody body) {
