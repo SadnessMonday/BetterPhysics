@@ -26,7 +26,7 @@ namespace SadnessMonday.BetterPhysics.Utilities
             // Application.targetFrameRate = 30;
         }
 
-        Vector2 moveInput;
+        Vector3 moveInput;
         float rotateInput;
 
         // Update is called once per frame
@@ -36,18 +36,18 @@ namespace SadnessMonday.BetterPhysics.Utilities
 
 #if ENABLE_INPUT_SYSTEM
             Keyboard k = Keyboard.current;
-            if (k[Key.W]) moveInput += Vector2.up;
-            if (k[Key.A]) moveInput += Vector2.left;
-            if (k[Key.S]) moveInput += Vector2.down;
-            if (k[Key.D]) moveInput += Vector2.right;
+            if (k[Key.W]) moveInput += Vector3.forward;
+            if (k[Key.A]) moveInput += Vector3.left;
+            if (k[Key.S]) moveInput += Vector3.back;
+            if (k[Key.D]) moveInput += Vector3.right;
 
             if (k[Key.O]) rotateInput -= 1;
             if (k[Key.P]) rotateInput += 1;
 #else
-            if (Input.GetKey(KeyCode.W)) moveInput += Vector2.up;
-            if (Input.GetKey(KeyCode.A)) moveInput += Vector2.left;
-            if (Input.GetKey(KeyCode.S)) moveInput += Vector2.down;
-            if (Input.GetKey(KeyCode.D)) moveInput += Vector2.right;
+            if (Input.GetKey(KeyCode.W)) moveInput += Vector3.forward;
+            if (Input.GetKey(KeyCode.A)) moveInput += Vector3.left;
+            if (Input.GetKey(KeyCode.S)) moveInput += Vector3.back;
+            if (Input.GetKey(KeyCode.D)) moveInput += Vector3.right;
 
             if (Input.GetKey(KeyCode.O)) rotateInput -= 1;
             if (Input.GetKey(KeyCode.P)) rotateInput += 1;

@@ -13,16 +13,10 @@ MonoBehaviour:
   m_Name: BetterPhysicsSettings
   m_EditorClassIdentifier: 
   layerNamesStorage:
-  - Layer Zero
-  - Layer One
-  - Layer Two
+  - Player
+  - Enemy
+  - Platform
   interactionsStorage:
   - actor: 0
     receiver: 1
-    impulseMultiplier: 0
-  - actor: 1
-    receiver: 2
-    impulseMultiplier: 0
-  - actor: 2
-    receiver: 0
     impulseMultiplier: 0

@@ -24,6 +24,7 @@ namespace SadnessMonday.BetterPhysics {
         public Vector3 hardVectorLimit = -Vector3.one;
 
         internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
+        internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();
 
         public LimitType softLimitType;
         public LimitType hardLimitType;
