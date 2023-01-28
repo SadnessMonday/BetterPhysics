@@ -5,8 +5,8 @@ using UnityEngine.Serialization;
 namespace SadnessMonday.BetterPhysics.Samples {
     
     [RequireComponent(typeof(BetterRigidbody))]
-    public class DumbFollower : MonoBehaviour {
-        public delegate void DeathHandler(DumbFollower source);
+    public class BasicFollower : MonoBehaviour {
+        public delegate void DeathHandler(BasicFollower source);
 
         public event DeathHandler OnDeath;
         

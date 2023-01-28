@@ -105,7 +105,7 @@ namespace SadnessMonday.BetterPhysics {
                 massProperties.otherInverseMassScale = bToAMultiplier;
                 massProperties.otherInverseInertiaScale = bToAMultiplier;
                 pair.massProperties = massProperties;
-                    
+
                 contactPairs[i] = pair;
             }
         }

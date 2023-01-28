@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SadnessMonday.BetterPhysics;
 using SadnessMonday.BetterPhysics.Layers;
 using UnityEngine;
 using UnityEditor;
@@ -179,6 +175,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 var scriptAsset = (MonoScript)EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
             }
 
+
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("l"));
             layerField.intValue = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
 
             LimitType softLimitType = (LimitType)EditorGUILayout.EnumPopup("Soft Limit Type:", (LimitType)softLimitField.enumValueIndex);
@@ -276,6 +274,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 EditorGUILayout.PropertyField(m_ExcludeLayers, Styles.excludeLayers);
                 EditorGUI.indentLevel--;
             }
+            
             EditorGUILayout.EndFadeGroup();
         }
     }

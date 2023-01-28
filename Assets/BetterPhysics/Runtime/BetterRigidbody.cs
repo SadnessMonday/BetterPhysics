@@ -23,6 +23,8 @@ namespace SadnessMonday.BetterPhysics {
         [Tooltip("Per-axis limits. Negative numbers mean unlimited")]
         public Vector3 hardVectorLimit = -Vector3.one;
 
+        public Limits l;
+
         internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
         internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();
 
@@ -36,7 +38,7 @@ namespace SadnessMonday.BetterPhysics {
 
         public Vector3 LocalVelocity {
             get => Quaternion.Inverse(rb.rotation) * rb.velocity;
-            set { rb.velocity = rb.rotation * value; }
+            set => rb.velocity = rb.rotation * value;
         }
 
         public float Speed => rb.velocity.magnitude;

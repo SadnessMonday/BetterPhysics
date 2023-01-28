@@ -52,6 +52,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1776347875811430693, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 1c79854a13800c643a7ee62a1d1e3697, type: 2}
+    - target: {fileID: 1776347875811430694, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
+      propertyPath: softLimitType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1776347875811430694, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
+      propertyPath: softScalarLimit
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1776347875811430698, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1776347875811430698, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
+      propertyPath: m_AngularDrag
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 1776347875811430698, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
       propertyPath: m_Constraints
       value: 0
@@ -85,6 +105,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56e866534cec64bfba39a3b5c7a992c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ForceMultiplier: 5
+  ForceMultiplier: 10
   RotateSpeed: 50
   UseLocalForces: 0

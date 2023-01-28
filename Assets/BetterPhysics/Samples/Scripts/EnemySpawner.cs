@@ -5,13 +5,13 @@ using Random = UnityEngine.Random;
 
 namespace SadnessMonday.BetterPhysics.Samples {
     public class EnemySpawner : MonoBehaviour {
-        [SerializeField] private DumbFollower enemyPrefab;
+        [SerializeField] private BasicFollower enemyPrefab;
         [SerializeField] private Transform target;
         [SerializeField] private float enemiesPerSecond;
         [SerializeField] private int maxEnemies;
         [SerializeField] private Transform[] spawnPoints;
 
-        private HashSet<DumbFollower> livingEnemies = new();
+        private HashSet<BasicFollower> livingEnemies = new();
         private float timer;
 
         private void FixedUpdate() {
@@ -32,18 +32,18 @@ namespace SadnessMonday.BetterPhysics.Samples {
 
         void SpawnEnemy() {
             Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-            DumbFollower newEnemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
+            BasicFollower newEnemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
             newEnemy.target = target;
             
             newEnemy.OnDeath += WhenAnEnemyDies;
             livingEnemies.Add(newEnemy);
         }
 
-        private void WhenAnEnemyDies(DumbFollower source) {
+        private void WhenAnEnemyDies(BasicFollower source) {
             RemoveEnemy(source);
         }
 
-        public void RemoveEnemy(DumbFollower enemy) {
+        public void RemoveEnemy(BasicFollower enemy) {
             enemy.OnDeath -= RemoveEnemy;
             livingEnemies.Remove(enemy);
         }
