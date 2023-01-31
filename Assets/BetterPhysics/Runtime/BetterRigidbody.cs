@@ -49,6 +49,36 @@ namespace SadnessMonday.BetterPhysics {
             return ContactModificationManager.Instance.TryGetCustomInteraction(this, receiverLayer, out interaction);
         }
 
+        public Vector3 Back {
+            get => rb.rotation * Vector3.back;
+            set => rotation = Quaternion.FromToRotation(Vector3.back, value);
+        }
+
+        public Vector3 Forward {
+            get => rb.rotation * Vector3.forward;
+            set => rotation = Quaternion.LookRotation(value);
+        }
+
+        public Vector3 Left {
+            get => rb.rotation * Vector3.left;
+            set => rotation = Quaternion.FromToRotation(Vector3.left, value);
+        }
+
+        public Vector3 Right {
+            get => rb.rotation * Vector3.right;
+            set => rotation = Quaternion.FromToRotation(Vector3.right, value);
+        }
+
+        public Vector3 Down {
+            get => rb.rotation * Vector3.down;
+            set => rotation = Quaternion.FromToRotation(Vector3.down, value);
+        }
+
+        public Vector3 Up {
+            get => rb.rotation * Vector3.up;
+            set => rotation = Quaternion.FromToRotation(Vector3.up, value);
+        }
+
         #region Rigidbody property pass-through
 
         public float angularDrag {
