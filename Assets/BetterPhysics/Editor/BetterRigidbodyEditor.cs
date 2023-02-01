@@ -172,7 +172,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
         {
 
             using (new EditorGUI.DisabledGroupScope(true)) {
-                var scriptAsset = (MonoScript)EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
+                EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
             }
 
 
