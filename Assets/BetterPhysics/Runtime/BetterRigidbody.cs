@@ -279,8 +279,21 @@ namespace SadnessMonday.BetterPhysics {
             return AddRelativeForce(new Vector3(x, y, z), mode);
         }
 
-        // TODO AddRelativeTorque
-        // TODO AddTorque
+        public void AddRelativeTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
+            rb.AddRelativeTorque(x, y, z, mode);
+        }
+        
+        public void AddRelativeTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
+            rb.AddRelativeTorque(torque, mode);
+        }
+
+        public void AddTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
+            rb.AddTorque(x, y, z, mode);
+        }
+
+        public void AddTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
+            rb.AddTorque(torque, mode);
+        }
 
         public Func<Vector3, Vector3> ClosestPointOnBounds => rb.ClosestPointOnBounds;
         public Func<Vector3, Vector3> GetPointVelocity => rb.GetPointVelocity;
