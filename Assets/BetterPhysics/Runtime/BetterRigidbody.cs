@@ -23,7 +23,7 @@ namespace SadnessMonday.BetterPhysics {
         [Tooltip("Per-axis limits. Negative numbers mean unlimited")]
         public Vector3 hardVectorLimit = -Vector3.one;
 
-        public Limits l;
+        public Limits limits;
 
         internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
         internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();

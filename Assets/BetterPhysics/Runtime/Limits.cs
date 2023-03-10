@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SadnessMonday.BetterPhysics {
     [Serializable]
     public struct Limits {
-        [SerializeField] bool symmetrical;
+        [SerializeField] bool asymmetrical;
         [SerializeField] Vector3 min;
         [SerializeField] Vector3 max;
         [SerializeField] bool xLimited;
@@ -15,7 +15,7 @@ namespace SadnessMonday.BetterPhysics {
         public static Limits Default {
             get {
                 Limits l = default;
-                l.symmetrical = true;
+                l.asymmetrical = false;
                 return l;
             }
         }
