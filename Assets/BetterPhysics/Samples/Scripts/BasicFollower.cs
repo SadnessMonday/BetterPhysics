@@ -22,6 +22,8 @@ namespace SadnessMonday.BetterPhysics.Samples {
         }
 
         private void Start() {
+            rb.softLimit = Limits.Default;
+            rb.softLimit.
             rb.softLimitType = LimitType.Omnidirectional;
             rb.softScalarLimit = maxSpeed;
         }

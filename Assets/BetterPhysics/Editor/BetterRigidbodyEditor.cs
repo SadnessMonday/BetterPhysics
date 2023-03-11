@@ -175,38 +175,39 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
             }
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("limits"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("softLimit"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("hardLimit"));
             layerField.intValue = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
 
-            LimitType softLimitType = (LimitType)EditorGUILayout.EnumPopup("Soft Limit Type:", (LimitType)softLimitField.enumValueIndex);
-            softLimitField.enumValueIndex = (int)softLimitType;
-            switch(softLimitType) {
-                case LimitType.None:
-                    break;
-                case LimitType.Omnidirectional:
-                    softLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, softLimitScalarField.floatValue);
-                    break;
-                case LimitType.LocalAxes:
-                    // fallthrough
-                case LimitType.WorldAxes:
-                    softLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, softLimitVectorField.vector3Value);
-                    break;
-            }
-
-            LimitType hardLimitType = (LimitType)EditorGUILayout.EnumPopup("Hard Limit Type:", (LimitType)hardLimitField.enumValueIndex);
-            hardLimitField.enumValueIndex = (int)hardLimitType;
-            switch(hardLimitType) {
-                case LimitType.None:
-                    break;
-                case LimitType.Omnidirectional:
-                    hardLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, hardLimitScalarField.floatValue);
-                    break;
-                case LimitType.LocalAxes:
-                // fallthrough
-                case LimitType.WorldAxes:
-                    hardLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, hardLimitVectorField.vector3Value);
-                    break;
-            }
+            // LimitType softLimitType = (LimitType)EditorGUILayout.EnumPopup("Soft Limit Type:", (LimitType)softLimitField.enumValueIndex);
+            // softLimitField.enumValueIndex = (int)softLimitType;
+            // switch(softLimitType) {
+            //     case LimitType.None:
+            //         break;
+            //     case LimitType.Omnidirectional:
+            //         softLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, softLimitScalarField.floatValue);
+            //         break;
+            //     case LimitType.LocalAxes:
+            //         // fallthrough
+            //     case LimitType.WorldAxes:
+            //         softLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, softLimitVectorField.vector3Value);
+            //         break;
+            // }
+            //
+            // LimitType hardLimitType = (LimitType)EditorGUILayout.EnumPopup("Hard Limit Type:", (LimitType)hardLimitField.enumValueIndex);
+            // hardLimitField.enumValueIndex = (int)hardLimitType;
+            // switch(hardLimitType) {
+            //     case LimitType.None:
+            //         break;
+            //     case LimitType.Omnidirectional:
+            //         hardLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, hardLimitScalarField.floatValue);
+            //         break;
+            //     case LimitType.LocalAxes:
+            //     // fallthrough
+            //     case LimitType.WorldAxes:
+            //         hardLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, hardLimitVectorField.vector3Value);
+            //         break;
+            // }
 
             showBaseRigidbodySettings = EditorGUILayout.Foldout(showBaseRigidbodySettings, "Base Rigidbody Settings");
             if (showBaseRigidbodySettings) {

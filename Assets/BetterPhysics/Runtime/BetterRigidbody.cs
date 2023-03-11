@@ -13,23 +13,16 @@ namespace SadnessMonday.BetterPhysics {
 
         public event PhysicsLayerChangeHandler OnPhysicsLayerChanged;
 
+        public Limits softLimit;
+        public Limits hardLimit;
+        
         Rigidbody rb;
-        public float hardScalarLimit = 10f;
-        public float softScalarLimit = 5f;
-
-        [Tooltip("Per-axis limits. Negative numbers mean unlimited")]
-        public Vector3 softVectorLimit = -Vector3.one;
-
-        [Tooltip("Per-axis limits. Negative numbers mean unlimited")]
-        public Vector3 hardVectorLimit = -Vector3.one;
-
-        public Limits limits;
 
         internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
         internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();
 
-        public LimitType softLimitType;
-        public LimitType hardLimitType;
+        // public LimitType softLimitType;
+        // public LimitType hardLimitType;
 
         public Vector3 Velocity {
             get => rb.velocity;
