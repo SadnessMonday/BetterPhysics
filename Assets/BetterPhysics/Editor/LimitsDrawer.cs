@@ -66,15 +66,13 @@ namespace SadnessMonday.BetterPhysics.Editor {
             bool symmetrical = symmetryProp.boolValue;
             
             // Draw rows
-            SerializedProperty xLimitedProp = property.FindPropertyRelative("xLimited");
-            SerializedProperty yLimitedProp = property.FindPropertyRelative("yLimited");
-            SerializedProperty zLimitedProp = property.FindPropertyRelative("zLimited");
-            DrawRow(row1Rect, xLimitedProp, minProp, maxProp, "x", 0, symmetrical);
-            DrawRow(row2Rect, yLimitedProp, minProp, maxProp, "y", 1, symmetrical);
-            DrawRow(row3Rect, zLimitedProp, minProp, maxProp,"z", 2, symmetrical);
+            SerializedProperty axisLimitedProp = property.FindPropertyRelative("axisLimited");
+            DrawRow(row1Rect, axisLimitedProp, minProp, maxProp, "x", 0, symmetrical);
+            DrawRow(row2Rect, axisLimitedProp, minProp, maxProp, "y", 1, symmetrical);
+            DrawRow(row3Rect, axisLimitedProp, minProp, maxProp,"z", 2, symmetrical);
         }
 
-        void DrawRow(Rect position, SerializedProperty limitedProp, SerializedProperty minProp, SerializedProperty maxProp, string label, int component, bool asymmetrical) {
+        void DrawRow(Rect position, SerializedProperty axisLimitedProp, SerializedProperty minProp, SerializedProperty maxProp, string label, int component, bool asymmetrical) {
             Rect checkboxRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.y, 20f, position.height);
             Rect labelRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth - 5f, position.height);
 
@@ -97,11 +95,11 @@ namespace SadnessMonday.BetterPhysics.Editor {
             EditorGUI.LabelField(labelRect, label);
 
             // Draw checkbox
-            bool isActive = limitedProp.boolValue;
-            isActive = EditorGUI.Toggle(checkboxRect, isActive);
-            limitedProp.boolValue = isActive;
+            Bool3 isActive = (Bool3)axisLimitedProp.boxedValue;
+            isActive[component] = EditorGUI.Toggle(checkboxRect, isActive[component]);
+            axisLimitedProp.boxedValue = isActive;
 
-            if (!isActive) return;
+            if (!isActive[component]) return;
 
             // Draw second value field if asymmetrical checkbox is enabled
             if (asymmetrical) {

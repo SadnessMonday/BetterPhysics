@@ -175,8 +175,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
             }
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("softLimit"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("hardLimit"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("softLimits"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("hardLimits"));
             layerField.intValue = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
 
             // LimitType softLimitType = (LimitType)EditorGUILayout.EnumPopup("Soft Limit Type:", (LimitType)softLimitField.enumValueIndex);
