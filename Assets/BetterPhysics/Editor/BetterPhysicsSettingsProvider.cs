@@ -72,7 +72,35 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 _settings.Update();
             }
             
+            DrawMatrix();
+            
             _settings.ApplyModifiedProperties();
+        }
+
+        void DrawMatrix() {
+            // Define the labels for the rows and columns
+            GUIContent[] layerLabels = new GUIContent[]
+            {
+                new GUIContent("Default"),
+                new GUIContent("Layer 1"),
+                new GUIContent("Layer 2"),
+                new GUIContent("Layer 3")
+            };
+
+            // Define the matrix values
+            bool[,] layerMatrix = new bool[4, 4]
+            {
+                { true, true, true, true },
+                { true, true, true, true },
+                { true, true, true, true },
+                { true, true, true, true }
+            };
+
+            // Create the LayerMatrixControl
+            LayerMatrixControl matrixControl = new LayerMatrixControl(layerMatrix, layerLabels, layerLabels);
+
+            // Draw the matrix
+            matrixControl.Draw();
         }
 
         // Register the SettingsProvider
