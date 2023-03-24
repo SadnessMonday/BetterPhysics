@@ -4,8 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SadnessMonday.BetterPhysics.Tests
-{
+namespace SadnessMonday.BetterPhysics.Tests {
     public class BetterRigidbodyTests {
         private const float MarginOfError = 0.005f;
         private const float RootTwo = 1.41421356237f;
@@ -25,14 +24,12 @@ namespace SadnessMonday.BetterPhysics.Tests
             public Vector3 ExpectedVelocity = Vector3.zero;
             public bool ExpectsLocalVelocity { get; private set; } = false;
             public bool ExpectsWorldVelocity { get; private set; } = false;
-            
+
             private bool _hasStartLocalVelocity = false;
             private bool _hasStartWorldVelocity = false;
             private bool _hasLocalForce = false;
             private bool _hasWorldForce = false;
             
-            public Vector3 ExpectedChange => ExpectedVelocity - (ExpectsLocalVelocity ? StartLocalVel : StartVel);
-
             public AddForceTestArgs() {
                 this._testNumber = _testNo++;
             }
@@ -43,7 +40,7 @@ namespace SadnessMonday.BetterPhysics.Tests
                 SoftLimits = limits;
                 return this;
             }
-            
+
             public AddForceTestArgs WithHardLimits(Limits limits) {
                 HardLimits = limits;
                 return this;
@@ -53,7 +50,7 @@ namespace SadnessMonday.BetterPhysics.Tests
                 ForceMode = mode;
                 return this;
             }
-            
+
             public AddForceTestArgs WithStartVel(Vector3 startVel) {
                 if (_hasStartLocalVelocity) throw new Exception("Can only have one type of starting velocity");
                 StartVel = startVel;
@@ -72,7 +69,7 @@ namespace SadnessMonday.BetterPhysics.Tests
                 // clear out local force
                 _hasLocalForce = false;
                 LocalForceVec = Vector3.zero;
-                
+
                 ForceVec = forceVec;
                 _hasWorldForce = true;
                 return this;
@@ -82,7 +79,7 @@ namespace SadnessMonday.BetterPhysics.Tests
                 // clear out world force
                 _hasWorldForce = false;
                 ForceVec = Vector3.zero;
-                
+
                 LocalForceVec = forceVec;
                 _hasLocalForce = true;
                 return this;
@@ -98,7 +95,7 @@ namespace SadnessMonday.BetterPhysics.Tests
                 ExpectsLocalVelocity = true;
                 return this;
             }
-            
+
             public AddForceTestArgs WithExpectedVelocity(Vector3 expectedVel) {
                 ExpectedVelocity = expectedVel;
                 ExpectsWorldVelocity = true;
@@ -108,11 +105,12 @@ namespace SadnessMonday.BetterPhysics.Tests
             public void Prepare(BetterRigidbody brb) {
                 brb.softLimits = SoftLimits;
                 brb.hardLimits = HardLimits;
-                
+
                 brb.rotation = Quaternion.Euler(Orientation);
                 if (_hasStartLocalVelocity) {
                     brb.LocalVelocity = StartLocalVel;
                 }
+
                 if (_hasStartWorldVelocity) {
                     brb.Velocity = StartVel;
                 }
@@ -137,65 +135,76 @@ namespace SadnessMonday.BetterPhysics.Tests
                 .WithSoftLimits(Limits.SymmetricalWorldLimits(limit))
                 .WithForceVec(Vector3.one * 10);
         }
-        
+
         static AddForceTestArgs SoftLocalArgs(Vector3 limit) {
             return new AddForceTestArgs()
                 .WithOrientation(Vector3.one)
                 .WithSoftLimits(Limits.SymmetricalLocalLimits(limit))
                 .WithLocalForceVec(Vector3.one * 10);
         }
+
         static AddForceTestArgs[] AddForceCases() {
             _testNo = 1;
             return new[] {
                 // Omnidirectional tests
-                SoftScalarArgs(float.NegativeInfinity).WithExpectedVelocity(Vector3.right * 10),
                 SoftScalarArgs(float.PositiveInfinity).WithExpectedVelocity(Vector3.right * 10),
                 SoftScalarArgs(float.NaN).WithExpectedVelocity(Vector3.right * 10),
-                SoftScalarArgs(-1).WithExpectedVelocity(Vector3.right * 10),
                 SoftScalarArgs(0).WithExpectedVelocity(Vector3.zero),
                 SoftScalarArgs(5).WithExpectedVelocity(Vector3.right * 5),
-                SoftScalarArgs(5).WithForceVec(new(10, 10, 0)) // 7
+                SoftScalarArgs(5).WithForceVec(new(10, 10, 0)) // 5
                     .WithExpectedVelocity(new(SineFortyFive * 5, SineFortyFive * 5, 0)),
                 SoftScalarArgs(5).WithStartVel(Vector3.left * 10).WithExpectedVelocity(Vector3.zero),
                 SoftScalarArgs(5).WithStartVel(Vector3.left * 5).WithExpectedVelocity(Vector3.right * 5),
                 SoftScalarArgs(5).WithStartVel(Vector3.zero).WithExpectedVelocity(Vector3.right * 5),
                 SoftScalarArgs(5).WithStartVel(Vector3.right * 10).WithExpectedVelocity(Vector3.right * 10),
                 // World axis tests 
-                SoftWorldArgs(Vector3.one * float.NegativeInfinity).WithExpectedVelocity(Vector3.one * 10), //12
-                SoftWorldArgs(Vector3.one * float.PositiveInfinity).WithExpectedVelocity(Vector3.one * 10),
+                SoftWorldArgs(Vector3.one * float.PositiveInfinity).WithExpectedVelocity(Vector3.one * 10), // 10
                 SoftWorldArgs(Vector3.one * float.NaN).WithExpectedVelocity(Vector3.one * 10),
-                SoftWorldArgs(-Vector3.one).WithExpectedVelocity(Vector3.one * 10),
-                SoftWorldArgs(Vector3.zero).WithExpectedVelocity(Vector3.zero), // this one
+                SoftWorldArgs(Vector3.zero).WithExpectedVelocity(Vector3.zero), // 12
                 SoftWorldArgs(Vector3.one * 5).WithExpectedVelocity(Vector3.one * 5),
                 SoftWorldArgs(Vector3.one * 5).WithStartVel(Vector3.one * -10).WithExpectedVelocity(Vector3.zero),
                 SoftWorldArgs(Vector3.one * 5).WithStartVel(Vector3.one * -5).WithExpectedVelocity(Vector3.one * 5),
                 SoftWorldArgs(Vector3.one * 5).WithStartVel(Vector3.zero).WithExpectedVelocity(Vector3.one * 5),
                 SoftWorldArgs(Vector3.one * 5).WithStartVel(Vector3.one * 10).WithExpectedVelocity(Vector3.one * 10),
                 // Local axis tests
-                SoftLocalArgs(Vector3.one * float.NegativeInfinity).WithExpectedLocalVelocity(Vector3.one * 10), //22
                 SoftLocalArgs(Vector3.one * float.PositiveInfinity).WithExpectedLocalVelocity(Vector3.one * 10),
                 SoftLocalArgs(Vector3.one * float.NaN).WithExpectedLocalVelocity(Vector3.one * 10),
-                SoftLocalArgs(-Vector3.one).WithExpectedLocalVelocity(Vector3.one * 10),
                 SoftLocalArgs(Vector3.zero).WithExpectedLocalVelocity(Vector3.zero),
                 SoftLocalArgs(Vector3.one * 5).WithExpectedLocalVelocity(Vector3.one * 5),
-                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.one * -10).WithExpectedLocalVelocity(Vector3.zero),
-                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.one * -5).WithExpectedLocalVelocity(Vector3.one * 5),
-                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.zero).WithExpectedLocalVelocity(Vector3.one * 5),
-                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.one * 10).WithExpectedLocalVelocity(Vector3.one * 10),
-                
+                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.one * -10)
+                    .WithExpectedLocalVelocity(Vector3.zero),
+                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.one * -5)
+                    .WithExpectedLocalVelocity(Vector3.one * 5),
+                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.zero)
+                    .WithExpectedLocalVelocity(Vector3.one * 5),
+                SoftLocalArgs(Vector3.one * 5).WithStartLocalVel(Vector3.one * 10)
+                    .WithExpectedLocalVelocity(Vector3.one * 10),
+
                 // Adding zero is a no-op, even if we're past our limit already
-                SoftScalarArgs(5).WithStartVel(Vector3.zero).WithForceVec(Vector3.zero).WithExpectedVelocity(Vector3.zero), // 32
-                SoftScalarArgs(5).WithStartVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero).WithExpectedVelocity(Vector3.one * 10), 
-                SoftScalarArgs(5).WithStartVel(Vector3.one * 10).WithForceVec(Vector3.zero).WithExpectedVelocity(Vector3.one * 10),
-                SoftScalarArgs(5).WithStartVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero).WithExpectedVelocity(Vector3.one * 10),
-                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.zero).WithForceVec(Vector3.zero).WithExpectedVelocity(Vector3.zero),
-                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.zero).WithLocalForceVec(Vector3.zero).WithExpectedVelocity(Vector3.zero),
-                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.one * 10).WithForceVec(Vector3.zero).WithExpectedVelocity(Vector3.one * 10),
-                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero).WithExpectedVelocity(Vector3.one * 10),
-                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.zero).WithForceVec(Vector3.zero).WithExpectedLocalVelocity(Vector3.zero),
-                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.zero).WithLocalForceVec(Vector3.zero).WithExpectedLocalVelocity(Vector3.zero),
-                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.one * 10).WithForceVec(Vector3.zero).WithExpectedLocalVelocity(Vector3.one * 10),
-                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero).WithExpectedLocalVelocity(Vector3.one * 10),
+                SoftScalarArgs(5).WithStartVel(Vector3.zero).WithForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.zero), // 26
+                SoftScalarArgs(5).WithStartVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.one * 10),
+                SoftScalarArgs(5).WithStartVel(Vector3.one * 10).WithForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.one * 10),
+                SoftScalarArgs(5).WithStartVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.one * 10),
+                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.zero).WithForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.zero),
+                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.zero).WithLocalForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.zero),
+                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.one * 10).WithForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.one * 10),
+                SoftWorldArgs(Vector3.one).WithStartVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero)
+                    .WithExpectedVelocity(Vector3.one * 10),
+                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.zero).WithForceVec(Vector3.zero)
+                    .WithExpectedLocalVelocity(Vector3.zero),
+                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.zero).WithLocalForceVec(Vector3.zero)
+                    .WithExpectedLocalVelocity(Vector3.zero),
+                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.one * 10).WithForceVec(Vector3.zero)
+                    .WithExpectedLocalVelocity(Vector3.one * 10),
+                SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero)
+                    .WithExpectedLocalVelocity(Vector3.one * 10),
             };
         }
 
@@ -205,27 +214,41 @@ namespace SadnessMonday.BetterPhysics.Tests
 
             return brb;
         }
-        
+
         // A Test behaves as an ordinary method
         [Test]
         [TestCaseSource(nameof(AddForceCases))]
         public void AddForceTest(AddForceTestArgs args) {
             BetterRigidbody brb = PrepareBody();
-            
             // set up limits etc
             args.Prepare(brb);
-            Vector3 velocityChange = args.ApplyForce(brb);
+            Vector3 oldWorldVelocity = brb.Velocity;
+            Vector3 reportedWorldVelocityChange = args.ApplyForce(brb);
+            Vector3 newWorldVelocity = brb.Velocity;
+            Vector3 actualWorldVelocityChange = newWorldVelocity - oldWorldVelocity;
             
-            AreEqual(args.ExpectedChange, velocityChange);
+            Assert.AreEqual(actualWorldVelocityChange, reportedWorldVelocityChange);
             
-            Vector3 expected = args.ExpectedVelocity;
             if (args.ExpectsLocalVelocity) {
-                AreEqual(args.ExpectedVelocity, brb.LocalVelocity);
+                Assert.AreEqual(args.ExpectedVelocity, brb.LocalVelocity);
             }
+
             if (args.ExpectsWorldVelocity) {
-                AreEqual(args.ExpectedVelocity, brb.velocity);
+                Assert.AreEqual(args.ExpectedVelocity, brb.velocity);
             }
-            AreEqual(brb.velocity, brb.Velocity);
+
+            Assert.AreEqual(brb.velocity, brb.Velocity);
+        }
+
+        [Test]
+        public void InvalidLimitsTest() {
+            Type eType = typeof(ArgumentException);
+            Assert.Throws(eType, () => SoftScalarArgs(float.NegativeInfinity));
+            Assert.Throws(eType, () => SoftScalarArgs(-1));
+            Assert.Throws(eType, () => SoftLocalArgs(-Vector3.one));
+            Assert.Throws(eType, () => SoftWorldArgs(-Vector3.one));
+            Assert.Throws(eType, () => SoftLocalArgs(Vector3.one * float.NegativeInfinity));
+            Assert.Throws(eType, () => SoftWorldArgs(Vector3.one * float.NegativeInfinity));
         }
 
         private static void AreEqual(Vector3 expected, Vector3 actual, float tolerance = MarginOfError) {

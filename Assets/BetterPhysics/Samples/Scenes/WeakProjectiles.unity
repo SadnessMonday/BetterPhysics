@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641234, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657838, g: 0.49641228, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -129,7 +129,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-1266
+  m_Name: pb_Mesh-78776
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -416,19 +416,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 876ffa78adccc459cb6894456c545f77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hardScalarLimit: 10
-  softScalarLimit: 5
-  softVectorLimit: {x: -1, y: -1, z: -1}
-  hardVectorLimit: {x: -1, y: -1, z: -1}
-  l:
-    symmetrical: 0
+  softLimits:
+    limitType: 2
+    scalarLimit: 0
+    asymmetrical: 1
+    min: {x: -5, y: 0, z: -25}
+    max: {x: 15, y: 0, z: 100}
+    axisLimited:
+      x: 1
+      y: 0
+      z: 1
+  hardLimits:
+    limitType: 0
+    scalarLimit: 0
+    asymmetrical: 0
     min: {x: 0, y: 0, z: 0}
     max: {x: 0, y: 0, z: 0}
-    xLimited: 0
-    yLimited: 0
-    zLimited: 0
-  softLimitType: 0
-  hardLimitType: 0
+    axisLimited:
+      x: 0
+      y: 0
+      z: 0
   layerInteractions: []
   physicsLayer: 0
 --- !u!54 &1032619235
@@ -528,7 +535,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1032619233}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 8547471881871753710, guid: 25a22f4f8b00c4c3590350f5be39aa7f, type: 3}
 --- !u!4 &1032619239
 Transform:
   m_ObjectHideFlags: 0
@@ -556,12 +563,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8e0b9ba5da024ca4a22670c843859bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 4
 --- !u!1 &1039986348 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6131817763582631458, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
   m_PrefabInstance: {fileID: 6131817763221090446}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1039986358
+--- !u!114 &1039986363
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -570,13 +578,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1039986348}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d43e860425c4c97b085919bf5765eb5, type: 3}
+  m_Script: {fileID: 11500000, guid: c8e0b9ba5da024ca4a22670c843859bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  desiredSpeed: 15
-  acceleration: 5
-  angularAcceleration: 10
+  speed: 4
 --- !u!1 &1988599008
 GameObject:
   m_ObjectHideFlags: 0
@@ -675,7 +680,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-1280
+  m_Name: pb_Mesh-78790
   serializedVersion: 11
   m_SubMeshes:
   - serializedVersion: 2
@@ -834,6 +839,55 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &2066461634
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2066461636}
+  - component: {fileID: 2066461635}
+  m_Layer: 0
+  m_Name: Launcher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2066461635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066461634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39206428aa6bc4e5fa785362d77bb65a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabs: []
+  launchSpeed: 0
+  lifeSpan: 10
+  launchOnStart: 0
+  launchOnStartIndex: 0
+--- !u!4 &2066461636
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066461634}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &6131817763221090446
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -849,6 +903,94 @@ PrefabInstance:
     - target: {fileID: 6131817763582631458, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
       propertyPath: m_Name
       value: Missile
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: l.xLimited
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: l.yLimited
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: l.zLimited
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.max.y
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.min.y
+      value: -15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: l.symmetrical
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: l.asymmetrical
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.xLimited
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.yLimited
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.zLimited
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.limitType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: softLimits.max.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: softLimits.min.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.scalarLimit
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: limits.asymmetrical
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: hardLimits.limitType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: softLimits.limitType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: softLimits.asymmetrical
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: softLimits.axisLimited.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: softLimits.axisLimited.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6131817763582631459, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
+      propertyPath: softLimits.axisLimited.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6131817763582631486, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
       propertyPath: m_RootOrder
@@ -900,7 +1042,7 @@ PrefabInstance:
       objectReference: {fileID: 524301667}
     - target: {fileID: 6131817763853815488, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
       propertyPath: m_VersionIndex
-      value: 2789
+      value: 2804
       objectReference: {fileID: 0}
     - target: {fileID: 6131817763853815492, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
       propertyPath: m_Mesh
@@ -924,7 +1066,7 @@ PrefabInstance:
       objectReference: {fileID: 1996875658}
     - target: {fileID: 6131817763991003638, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
       propertyPath: m_VersionIndex
-      value: 422
+      value: 437
       objectReference: {fileID: 0}
     - target: {fileID: 6131817763991003642, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
       propertyPath: m_Mesh
@@ -944,5 +1086,5 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6131817763582631458, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1039986358}
+      addedObject: {fileID: 1039986363}
   m_SourcePrefab: {fileID: 100100000, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}

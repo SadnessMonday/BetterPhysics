@@ -11,8 +11,17 @@ namespace SadnessMonday.BetterPhysics.Editor {
     public class BetterRigidbodyEditor : UnityEditor.Editor
     {
         private static GUIContent LimitContent = new GUIContent("Limit:", "Negative means unlimited.");
+        private GUIStyle rtStyle;
+        private const string SpeedLimitsLabelPrefix = "Speed Limits";
+        private const string SoftLimitSpecifier = "<b>Soft</b>";
+        private const string HardLimitSpecifier = "<b>Hard</b>";
+        private const string BothLimits = SpeedLimitsLabelPrefix + " [" + SoftLimitSpecifier + ", " + HardLimitSpecifier + "]";
+        private const string SoftLimitOnly = SpeedLimitsLabelPrefix + " [" + SoftLimitSpecifier + "]";
+        private const string HardLimitOnly = SpeedLimitsLabelPrefix + " [" + HardLimitSpecifier + "]";
+        
         private bool showAdvanced;
         private bool showBaseRigidbodySettings;
+        private bool showSpeedLimits = false;
 
         private SerializedProperty layerField;
         private SerializedProperty softLimitField;
@@ -170,44 +179,20 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
         public override void OnInspectorGUI()
         {
-
+            // annoyingly this can't be done in OnEnable because it's apparently too early.
+            if (rtStyle == null) {
+                rtStyle = new GUIStyle(EditorStyles.foldout) {
+                    richText = true
+                };
+            }
+            
             using (new EditorGUI.DisabledGroupScope(true)) {
                 EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
             }
-
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("softLimits"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("hardLimits"));
+            
             layerField.intValue = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
-
-            // LimitType softLimitType = (LimitType)EditorGUILayout.EnumPopup("Soft Limit Type:", (LimitType)softLimitField.enumValueIndex);
-            // softLimitField.enumValueIndex = (int)softLimitType;
-            // switch(softLimitType) {
-            //     case LimitType.None:
-            //         break;
-            //     case LimitType.Omnidirectional:
-            //         softLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, softLimitScalarField.floatValue);
-            //         break;
-            //     case LimitType.LocalAxes:
-            //         // fallthrough
-            //     case LimitType.WorldAxes:
-            //         softLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, softLimitVectorField.vector3Value);
-            //         break;
-            // }
-            //
-            // LimitType hardLimitType = (LimitType)EditorGUILayout.EnumPopup("Hard Limit Type:", (LimitType)hardLimitField.enumValueIndex);
-            // hardLimitField.enumValueIndex = (int)hardLimitType;
-            // switch(hardLimitType) {
-            //     case LimitType.None:
-            //         break;
-            //     case LimitType.Omnidirectional:
-            //         hardLimitScalarField.floatValue = EditorGUILayout.FloatField(LimitContent, hardLimitScalarField.floatValue);
-            //         break;
-            //     case LimitType.LocalAxes:
-            //     // fallthrough
-            //     case LimitType.WorldAxes:
-            //         hardLimitVectorField.vector3Value = EditorGUILayout.Vector3Field(LimitContent, hardLimitVectorField.vector3Value);
-            //         break;
-            // }
+            
+            DrawLimitsSection();
 
             showBaseRigidbodySettings = EditorGUILayout.Foldout(showBaseRigidbodySettings, "Base Rigidbody Settings");
             if (showBaseRigidbodySettings) {
@@ -262,7 +247,36 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
             serializedObject.ApplyModifiedProperties();
         }
-        
+
+        private void DrawLimitsSection() {
+            var softLimitsProperty = serializedObject.FindProperty("softLimits");
+            var hardLimitsProperty = serializedObject.FindProperty("hardLimits");
+
+            string limitsFoldoutText = SpeedLimitsLabelPrefix;
+            if (!showSpeedLimits) {
+                // potentially show extra info
+                Limits softLimits = (Limits)softLimitsProperty.boxedValue;
+                Limits hardLimits = (Limits)hardLimitsProperty.boxedValue;
+                bool hasSoftLimit = softLimits.LimitType != LimitType.None;
+                bool hasHardLimit = hardLimits.LimitType != LimitType.None;
+                if (hasSoftLimit && hasHardLimit) {
+                    limitsFoldoutText = BothLimits;
+                }
+                else if (hasSoftLimit) {
+                    limitsFoldoutText = SoftLimitOnly;
+                }
+                else if (hasHardLimit) {
+                    limitsFoldoutText = HardLimitOnly;
+                }
+            }
+            
+            showSpeedLimits = EditorGUILayout.Foldout(showSpeedLimits, limitsFoldoutText, rtStyle);
+            if (showSpeedLimits) {
+                EditorGUILayout.PropertyField(softLimitsProperty);
+                EditorGUILayout.PropertyField(hardLimitsProperty);
+            }
+        }
+
         private void ShowLayerOverridesProperties()
         {
             // Show Layer Overrides.

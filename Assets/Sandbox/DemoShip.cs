@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
+using SadnessMonday.BetterPhysics;
 using UnityEngine;
 
-public class DemoShip : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+public class DemoShip : MonoBehaviour {
+    private BetterRigidbody brb;
+    [SerializeField] private float speed = 4f;
+
+    private void Awake() {
+        brb = GetComponent<BetterRigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    private void Start() {
+        brb.AddRelativeForceWithoutLimit(Vector3.forward * speed, ForceMode.VelocityChange);
     }
 }

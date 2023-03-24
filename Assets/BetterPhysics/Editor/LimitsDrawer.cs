@@ -1,10 +1,15 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace SadnessMonday.BetterPhysics.Editor {
     [CustomPropertyDrawer(typeof(Limits))]
     public class LimitsDrawer : PropertyDrawer {
+        private const float LabelWidth = 40;
+        const float Between = 5;
+        const float Buffer = 20;
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
             EditorGUI.BeginProperty(position, label, property);
 
@@ -52,9 +57,13 @@ namespace SadnessMonday.BetterPhysics.Editor {
             float rowHeight = EditorGUIUtility.singleLineHeight;
             
             // Draw symmetry checkbox
-            SerializedProperty symmetryProp = property.FindPropertyRelative("asymmetrical");
-            Rect symmetryRect = new Rect(position.x, posY += rowHeight, position.width, rowHeight);
-            EditorGUI.PropertyField(symmetryRect, symmetryProp, new GUIContent("Asymmetrical"));
+            SerializedProperty asymmetricalProp = property.FindPropertyRelative("asymmetrical");
+            Rect asymmetricalRect = new Rect(position.x, posY += rowHeight, position.width, rowHeight);
+            EditorGUI.PropertyField(asymmetricalRect, asymmetricalProp, new GUIContent("Asymmetrical"));
+            bool asymmetrical = asymmetricalProp.boolValue;
+
+            Rect HeadersRect = new Rect(position.x, posY += rowHeight, position.width, rowHeight);
+            DrawHeaders(HeadersRect, asymmetrical);
             
             // Calculate row positions
             Rect row1Rect = new Rect(position.x, posY += rowHeight, position.width, rowHeight);
@@ -63,40 +72,68 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
             SerializedProperty minProp = property.FindPropertyRelative("min");
             SerializedProperty maxProp = property.FindPropertyRelative("max");
-            bool symmetrical = symmetryProp.boolValue;
             
             // Draw rows
             SerializedProperty axisLimitedProp = property.FindPropertyRelative("axisLimited");
-            DrawRow(row1Rect, axisLimitedProp, minProp, maxProp, "x", 0, symmetrical);
-            DrawRow(row2Rect, axisLimitedProp, minProp, maxProp, "y", 1, symmetrical);
-            DrawRow(row3Rect, axisLimitedProp, minProp, maxProp,"z", 2, symmetrical);
+            DrawRow(row1Rect, axisLimitedProp, minProp, maxProp, "x", 0, asymmetrical);
+            DrawRow(row2Rect, axisLimitedProp, minProp, maxProp, "y", 1, asymmetrical);
+            DrawRow(row3Rect, axisLimitedProp, minProp, maxProp,"z", 2, asymmetrical);
         }
 
-        void DrawRow(Rect position, SerializedProperty axisLimitedProp, SerializedProperty minProp, SerializedProperty maxProp, string label, int component, bool asymmetrical) {
-            Rect checkboxRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.y, 20f, position.height);
-            Rect labelRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth - 5f, position.height);
-
+        private void DrawHeaders(Rect headersRect, bool asymmetrical) {
+            Rect labelRect = GetAxisLabelRect(headersRect);
+            
             Rect minValueRect;
             Rect maxValueRect;
+            float remainingSpace = headersRect.width - LabelWidth;
+            float halfRemainingSpace = (remainingSpace - Between) / 2;
             if (asymmetrical) {
-                minValueRect = new Rect(position.x + EditorGUIUtility.labelWidth + 20f, position.y, (position.width - EditorGUIUtility.labelWidth) / 2f - 25f, position.height);
+                minValueRect = new Rect(labelRect.xMax + Buffer, headersRect.y,  halfRemainingSpace, headersRect.height);
                 maxValueRect =
                     new Rect(
-                        position.x + EditorGUIUtility.labelWidth + (position.width - EditorGUIUtility.labelWidth) / 2f +
-                        5f, position.y, (position.width - EditorGUIUtility.labelWidth) / 2f - 25f, position.height);
+                        minValueRect.xMax + Between, headersRect.y, halfRemainingSpace, headersRect.height);
             }
             else {
                 minValueRect = Rect.zero;
-                maxValueRect = new Rect(position.x + EditorGUIUtility.labelWidth + 20f, position.y,
-                    position.width - EditorGUIUtility.labelWidth - 25f, position.height);
+                maxValueRect = new Rect(labelRect.xMax + Buffer, headersRect.y,
+                    remainingSpace - Buffer, headersRect.height);
+            }
+            
+            EditorGUI.LabelField(minValueRect, "Minimum");
+            EditorGUI.LabelField(maxValueRect, "Maximum");
+        }
+
+        Rect GetAxisLabelRect(Rect containingRect) {
+            Rect labelRect = new Rect(containingRect.x, containingRect.y, LabelWidth, containingRect.height);
+            return labelRect;
+        }
+        
+        void DrawRow(Rect position, SerializedProperty axisLimitedProp, SerializedProperty minProp, SerializedProperty maxProp, string label, int component, bool asymmetrical) {
+            Rect labelRect = GetAxisLabelRect(position);
+            // Rect checkboxRect = new Rect(position.x + labelWidth, position.y, 20f, position.height);
+
+            float remainingSpace = position.width - LabelWidth;
+            float halfRemainingSpace = (remainingSpace - Between) / 2;
+            Rect minValueRect;
+            Rect maxValueRect;
+            if (asymmetrical) {
+                minValueRect = new Rect(labelRect.xMax + Buffer, position.y,  halfRemainingSpace, position.height);
+                maxValueRect =
+                    new Rect(
+                        minValueRect.xMax + Between, position.y, halfRemainingSpace, position.height);
+            }
+            else {
+                minValueRect = Rect.zero;
+                maxValueRect = new Rect(labelRect.xMax + Buffer, position.y,
+                    remainingSpace - Buffer, position.height);
             }
 
             // Draw label
-            EditorGUI.LabelField(labelRect, label);
+            // EditorGUI.LabelField(labelRect, label);
 
             // Draw checkbox
             Bool3 isActive = (Bool3)axisLimitedProp.boxedValue;
-            isActive[component] = EditorGUI.Toggle(checkboxRect, isActive[component]);
+            isActive[component] = EditorGUI.ToggleLeft(labelRect, label, isActive[component]);
             axisLimitedProp.boxedValue = isActive;
 
             if (!isActive[component]) return;
@@ -131,7 +168,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                     return EditorGUIUtility.singleLineHeight * 2;
                 case LimitType.WorldAxes:
                 case LimitType.LocalAxes:
-                    return EditorGUIUtility.singleLineHeight * 5;
+                    return EditorGUIUtility.singleLineHeight * 6;
                 default:
                     return EditorGUIUtility.singleLineHeight * 1;
             }

@@ -4,7 +4,6 @@ using System.Linq;
 using SadnessMonday.BetterPhysics.Layers;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SadnessMonday.BetterPhysics {
     [RequireComponent(typeof(Rigidbody))]
@@ -432,8 +431,7 @@ namespace SadnessMonday.BetterPhysics {
             // Do the math in local space
             Vector3 expectedLocalChange = RigidbodyExtensions.CalculateVelocityChange(localForce, rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limited, min, max);
-            print(
-                $"Current local vel is {localVelocity}, Expected local change is {expectedLocalChange}, Clamped new local velocity is {newLocalVelocity}");
+            // Debug.Log($"Current local vel is {localVelocity:F8}, Expected local change is {expectedLocalChange:F8}, Clamped new local velocity is {newLocalVelocity:F8}");
 
             // Convert back to worldspace
             Vector3 newWorldVelocity = rotation * newLocalVelocity;
@@ -542,7 +540,6 @@ namespace SadnessMonday.BetterPhysics {
                 
                 float axisMin = min[i];
                 float axisMax = max[i];
-                int directionOfChange = expectedAxisChange > 0 ? 1 : -1;
                 
                 float clampA, clampB;
                 if (currentAxisVelocity < axisMin) {
@@ -558,37 +555,7 @@ namespace SadnessMonday.BetterPhysics {
                     clampB = axisMax;
                 }
 
-                expectedNewVelocity = DirectionalClamp(expectedNewVelocity, clampA, clampB);
-                //
-                // // Is the expected speed outside of the limits?
-                // if (expectedMagnitude > axisMax || expectedMagnitude < axisMin) {
-                //     // was current also outside of the axis limit?
-                //     if (currentAxisMagnitude > axisMax || currentAxisMagnitude < axisMin) {
-                //         // did current have same sign as expected?
-                //         if (currentAxisSign == expectedSign) {
-                //             // Use whichever out of current/expected is closer to 0
-                //             newVelocity[i] = expectedSign * Mathf.Min(currentAxisMagnitude, expectedMagnitude);
-                //         }
-                //         else {
-                //             // Use sign(expected) * axisLimit
-                //             newVelocity[i] = 
-                //             if (expectedSign > 0) {
-                //                 newVelocity[i] = axisMax;
-                //             }
-                //             else {
-                //                 newVelocity[i] = axisMin;
-                //             }
-                //         }
-                //     }
-                //     else {
-                //         // Use sign(expected) * axisLimit
-                //         newVelocity[i] = axisLimit * expectedSign;
-                //     }
-                // }
-                // else {
-                //     // Use expected speed, since it's within limits
-                //     newVelocity[i] = expectedNewVelocity;
-                // }
+                newVelocity[i] = DirectionalClamp(expectedNewVelocity, clampA, clampB);
             }
 
             // Debug.Log($"curr: {currentVelocity}, expectedChange: {expectedChange}, limits: {limits}, new: {newVelocity}");
@@ -681,7 +648,7 @@ namespace SadnessMonday.BetterPhysics {
             float speedLimit, ForceMode mode = ForceMode.Force) {
             // velocityChange is how much we would be adding to the velocity if we were to just add it normally.
             Vector3 velocityChange = RigidbodyExtensions.CalculateVelocityChange(force, rb.mass, mode);
-            if (speedLimit < 0) {
+            if (speedLimit < 0 || float.IsPositiveInfinity(speedLimit)) {
                 // Speed limit < 0 counts as no limit.
                 return velocityChange;
             }
@@ -710,5 +677,9 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         #endregion
+
+        public void AddRelativeForceWithLimits() {
+            throw new NotImplementedException();
+        }
     }
 }

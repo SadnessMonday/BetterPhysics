@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using SadnessMonday.BetterPhysics.Layers;
 using Unity.Collections;

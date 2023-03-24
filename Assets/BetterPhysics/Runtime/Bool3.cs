@@ -6,6 +6,12 @@ namespace SadnessMonday.BetterPhysics {
     public struct Bool3 {
         public bool x, y, z;
 
+        public Bool3(bool x = false, bool y = false, bool z = false) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
         public bool this[int axis] {
             get {
                 switch (axis) {
@@ -36,5 +42,8 @@ namespace SadnessMonday.BetterPhysics {
                 }
             }
         }
+
+        public static readonly Bool3 True = new() {x = true, y = true, z = true};
+        public static readonly Bool3 False = default;
     }
 }

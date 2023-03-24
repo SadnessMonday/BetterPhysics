@@ -6,19 +6,26 @@ namespace SadnessMonday.BetterPhysics.Layers {
     public struct LayerInteraction {
         public const float DefaultImpulseMultiplier = 1f;
         
-        public int actor;
-        public int receiver;
+        public readonly int actor;
+        public readonly int receiver;
         public float impulseMultiplier;
 
-        public LayerInteraction(int actor, int receiver) {
+        public LayerInteraction(int actor, int receiver, float impulseMultiplier = DefaultImpulseMultiplier) {
             this.actor = actor;
             this.receiver = receiver;
+            this.impulseMultiplier = DefaultImpulseMultiplier;
+        }
 
-            impulseMultiplier = DefaultImpulseMultiplier;
+        public static LayerInteraction CreateKinematicInteraction(int kinematicLayer, int dynamicLayer) {
+            return new LayerInteraction(kinematicLayer, dynamicLayer, 0);
         }
         
         public void ResetToDefault() {
             impulseMultiplier = DefaultImpulseMultiplier;
+        }
+
+        public static LayerInteraction CreateKinematicInteraction(PhysicsLayer kinematicLayer, PhysicsLayer dynamicLayer) {
+            return CreateKinematicInteraction(kinematicLayer.Number, dynamicLayer.Number);
         }
     }
 

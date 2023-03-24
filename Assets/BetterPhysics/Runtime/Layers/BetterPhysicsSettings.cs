@@ -94,9 +94,16 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
         public void Reset() {
             layerNamesStorage.Clear();
-            layerNamesStorage.Add("Default");
-            
             interactionsStorage.Clear();
+            
+            // Create 
+            layerNamesStorage.AddRange(PhysicsLayer.GetBuiltinLayers().Select(l => l.Name));
+            
+            // TODO actually we should be able to do something like "ANY LAYER" as the other side.
+            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.DefaultLayer, PhysicsLayer.FeatherLayer));
+            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.UnstoppableLayer, PhysicsLayer.FeatherLayer));
+            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.FeatherLayer, PhysicsLayer.FeatherLayer));
+            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.UnstoppableLayer, PhysicsLayer.DefaultLayer));
         }
 
         public void Init() {
