@@ -4,24 +4,28 @@ using UnityEngine.Serialization;
 namespace SadnessMonday.BetterPhysics.Layers {
     [Serializable]
     public struct LayerInteraction {
-        public const float DefaultImpulseMultiplier = 1f;
-        
+        public enum InteractionType : short {
+            Default, // the default, unmodified reaction
+            Feather, // A feather interaction means the actor will not affect the receiver at all.
+            Kinematic // A kinematic interaction means the receiver will not affect the actor at all.
+        }
+
         public readonly int actor;
         public readonly int receiver;
-        public float impulseMultiplier;
+        public InteractionType interactionType;
 
-        public LayerInteraction(int actor, int receiver, float impulseMultiplier = DefaultImpulseMultiplier) {
+        public LayerInteraction(int actor, int receiver, InteractionType interactionType = InteractionType.Default) {
             this.actor = actor;
             this.receiver = receiver;
-            this.impulseMultiplier = DefaultImpulseMultiplier;
+            this.interactionType = interactionType;
         }
 
         public static LayerInteraction CreateKinematicInteraction(int kinematicLayer, int dynamicLayer) {
-            return new LayerInteraction(kinematicLayer, dynamicLayer, 0);
+            return new LayerInteraction(kinematicLayer, dynamicLayer, InteractionType.Kinematic);
         }
         
         public void ResetToDefault() {
-            impulseMultiplier = DefaultImpulseMultiplier;
+            interactionType = InteractionType.Default;
         }
 
         public static LayerInteraction CreateKinematicInteraction(PhysicsLayer kinematicLayer, PhysicsLayer dynamicLayer) {
@@ -31,19 +35,17 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
     [Serializable]
     public struct OneWayLayerInteraction {
-        public const float DefaultImpulseMultiplier = 1f;
-        
         public int receiver;
-        public float impulseMultiplier;
+        public LayerInteraction.InteractionType interactionType;
 
         public OneWayLayerInteraction(int receiver) {
             this.receiver = receiver;
 
-            impulseMultiplier = DefaultImpulseMultiplier;
+            interactionType = LayerInteraction.InteractionType.Default;
         }
         
         public void ResetToDefault() {
-            impulseMultiplier = DefaultImpulseMultiplier;
+            interactionType = LayerInteraction.InteractionType.Default;
         }
     }
 }

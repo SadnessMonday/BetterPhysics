@@ -14,8 +14,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
     public class BetterPhysicsSettings : ScriptableObject {
         private const string DefaultSettingsAssetName = "BetterPhysicsSettings";
         private static BetterPhysicsSettings _instance;
-
-        private const int MaxLayerCount = sizeof(long);
+        public int DefinedLayerCount => layerNamesStorage.Count;
 
         public static BetterPhysicsSettings Instance {
             get {
@@ -137,7 +136,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
             }
         }
 
-        public int NameToLayerIndex(string layerName) {
+        public int LayerNameToIndex(string layerName) {
             if (!_layerNamesLookup.TryGetValue(layerName, out int result)) {
                 throw new ArgumentException($"Layer '{layerName}' has not been defined in BetterPhysics settings");
             }
@@ -158,20 +157,25 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public bool LayerIsDefined(long layer) {
             return layer >= 0 && layer < layerNamesStorage.Count;
         }
-
+        
         public bool TryGetLayerInteraction(int actor, int receiver, out LayerInteraction interaction) {
             return _interactionsLookup.TryGetValue(new Vector2Int(actor, receiver), out interaction);
         }
 
-        public void SetLayerIteraction(int actor, int receiver, float impulseMultiplier = 1) {
-            LayerInteraction interaction = new LayerInteraction(actor, receiver);
-            interaction.impulseMultiplier = impulseMultiplier;
+        public void SetLayerIteraction(int actor, int receiver, LayerInteraction.InteractionType interactionType) {
+            Vector2Int key = new Vector2Int(actor, receiver);
+            if (interactionType == LayerInteraction.InteractionType.Default) {
+                _interactionsLookup.Remove(key);
+                return;
+            }
             
-            _interactionsLookup[new Vector2Int(actor, receiver)] = interaction;
+            LayerInteraction interaction = new LayerInteraction(actor, receiver);
+            interaction.interactionType = interactionType;
+            _interactionsLookup[key] = interaction;
         }
 
         /**
-         * Resets the
+         * Resets the interaction between actor and receiver to default
          */
         public bool ResetLayerInteraction(int actor, int receiver) {
             return _interactionsLookup.Remove(new Vector2Int(actor, receiver));

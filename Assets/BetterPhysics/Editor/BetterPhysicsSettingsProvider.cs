@@ -6,7 +6,6 @@ using UnityEngine;
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #elif UNITY_2018_4_OR_NEWER
-using UnityEngine.Experimental.UIElements;
 #endif
 
 namespace SadnessMonday.BetterPhysics.Editor {
@@ -21,16 +20,6 @@ namespace SadnessMonday.BetterPhysics.Editor {
         class Styles {
             public static readonly GUIContent LayerNamesStorage = new("Layers", "Set up your layer names here");
             public static readonly GUIContent InteractionsStorage = new("Interactions", "Set up your custom interactions here");
-
-            // public static GUIContent ScriptRoot = new GUIContent("Script Root", SmartNSSettings.SCRIPT_ROOT_TOOLTIP);
-            // public static GUIContent NamespacePrefix = new GUIContent("Namespace Prefix", SmartNSSettings.NAMESPACE_PREFIX_TOOLTIP);
-            // public static GUIContent UniversalNamespace = new GUIContent("Universal Namespace", SmartNSSettings.UNIVERSAL_NAMESPACE_TOOLTIP);
-            // public static GUIContent IndentUsingSpaces = new GUIContent("Indent using Spaces", SmartNSSettings.INDENT_USING_SPACES_TOOLTIP);
-            // public static GUIContent NumberOfSpaces = new GUIContent("Number of Spaces", SmartNSSettings.NUMBER_OF_SPACES_TOOLTIP);
-            // //public static GUIContent DefaultScriptCreationDirectory = new GUIContent("Default Script Creation Directory", "(Experimental) If you specify a path here, any scripts created directly within 'Assets' will instead be created in the folder you specify. (No need to prefix this with 'Assets'.)");
-            // public static GUIContent UpdateNamespacesWhenMovingScripts = new GUIContent("Update Namespaces When Moving Scripts", SmartNSSettings.UPDATE_NAMESPACES_WHEN_MOVING_SCRIPTS_TOOLTIP);
-            // public static GUIContent DirectoryIgnoreList = new GUIContent("Directory Deny List (One directory per line)", SmartNSSettings.DIRECTORY_IGNORE_LIST_TOOLTIP);
-            // public static GUIContent EnableDebugLogging = new GUIContent("Enable Debug Logging", SmartNSSettings.ENABLE_DEBUG_LOGGING_TOOLTIP);
         }
 
         public BetterPhysicsSettingsProvider(string path, SettingsScope scope = SettingsScope.Project)
@@ -63,44 +52,17 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
             EditorGUILayout.PropertyField(_settings.FindProperty("layerNamesStorage"), Styles.LayerNamesStorage);
             
-            _interactionsScrollPos = EditorGUILayout.BeginScrollView(_interactionsScrollPos, GUILayout.Height(120));
-            EditorGUILayout.PropertyField(_settings.FindProperty("interactionsStorage"), Styles.InteractionsStorage);
-            EditorGUILayout.EndScrollView();
-
+            // _interactionsScrollPos = EditorGUILayout.BeginScrollView(_interactionsScrollPos, GUILayout.Height(120));
+            // EditorGUILayout.PropertyField(_settings.FindProperty("interactionsStorage"), Styles.InteractionsStorage);
+            // EditorGUILayout.EndScrollView();
+                 
+            LayerInteractionMatrixGUI.Draw(new GUIContent("Layer Interactions"), BetterPhysics.GetLayerInteraction, BetterPhysics.SetLayerInteraction);
             if (GUILayout.Button("Reset Better Physics Settings")) {
                 ((BetterPhysicsSettings)_settings.targetObject).Reset();
                 _settings.Update();
             }
             
-            DrawMatrix();
-            
             _settings.ApplyModifiedProperties();
-        }
-
-        void DrawMatrix() {
-            // Define the labels for the rows and columns
-            GUIContent[] layerLabels = new GUIContent[]
-            {
-                new GUIContent("Default"),
-                new GUIContent("Layer 1"),
-                new GUIContent("Layer 2"),
-                new GUIContent("Layer 3")
-            };
-
-            // Define the matrix values
-            bool[,] layerMatrix = new bool[4, 4]
-            {
-                { true, true, true, true },
-                { true, true, true, true },
-                { true, true, true, true },
-                { true, true, true, true }
-            };
-
-            // Create the LayerMatrixControl
-            LayerMatrixControl matrixControl = new LayerMatrixControl(layerMatrix, layerLabels, layerLabels);
-
-            // Draw the matrix
-            matrixControl.Draw();
         }
 
         // Register the SettingsProvider

@@ -63,25 +63,46 @@ namespace SadnessMonday.BetterPhysics {
                 }
                 // Debug.Log($"Found body {bodyAId} on layer {layerA} and {bodyBId} on {layerB}");
                 
-                float aToBMultiplier = 1;
+                int aToBMultiplier = 1;
+                int bToAMultiplier = 1;
+                
                 if (_perRigidbodyData.TryGetValue(bodyAId, out var bodyAInteractions)
                     && bodyAInteractions.TryGetValue(layerB, out OneWayLayerInteraction owInteractionA)) {
-                    aToBMultiplier = owInteractionA.impulseMultiplier;
+                    if (owInteractionA.interactionType == LayerInteraction.InteractionType.Feather) {
+                        aToBMultiplier = 0;
+                    }
+                    else if (owInteractionA.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                        bToAMultiplier = 0;
+                    }
                 }                
                 else if (_settings.TryGetLayerInteraction(layerA, layerB, out LayerInteraction aToBInteraction)) {
-                    aToBMultiplier = aToBInteraction.impulseMultiplier;
+                    if (aToBInteraction.interactionType == LayerInteraction.InteractionType.Feather) {
+                        aToBMultiplier = 0;
+                    }
+                    else if (aToBInteraction.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                        bToAMultiplier = 0;
+                    }
                 }
                 // else {
                 //     Debug.Log($"Found nothing for {layerA} to {layerB}");
                 // }
 
-                float bToAMultiplier = 1;
                 if (_perRigidbodyData.TryGetValue(bodyBId, out var bodyBInteractions)
                     && bodyBInteractions.TryGetValue(layerB, out OneWayLayerInteraction owInteractionB)) {
-                    bToAMultiplier = owInteractionB.impulseMultiplier;
+                    if (owInteractionB.interactionType == LayerInteraction.InteractionType.Feather) {
+                        bToAMultiplier = 0;
+                    }
+                    else if (owInteractionB.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                        aToBMultiplier = 0;
+                    }
                 }                
                 else if (_settings.TryGetLayerInteraction(layerB, layerA, out LayerInteraction bToAInteraction)) {
-                    bToAMultiplier = bToAInteraction.impulseMultiplier;
+                    if (bToAInteraction.interactionType == LayerInteraction.InteractionType.Feather) {
+                        bToAMultiplier = 0;
+                    }
+                    else if (bToAInteraction.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                        aToBMultiplier = 0;
+                    }
                 }
                 // else {
                 //     Debug.Log($"Found nothing for {layerB} to {layerA}");

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: BetterPhysicsSettings
   m_EditorClassIdentifier: 
   layerNamesStorage:
-  - Player
-  - Enemy
-  - Platform
+  - Default
+  - Unstoppable
+  - Feather
   interactionsStorage:
-  - actor: 0
-    receiver: 1
-    impulseMultiplier: 0
+  - interactionType: 2
+  - interactionType: 2
+  - interactionType: 2
+  - interactionType: 2

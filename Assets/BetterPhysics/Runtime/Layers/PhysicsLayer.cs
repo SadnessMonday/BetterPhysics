@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SadnessMonday.BetterPhysics.Layers {
-    [SerializeField]
+    [Serializable]
     public struct PhysicsLayer : IEquatable<PhysicsLayer> {
         public readonly int Number;
         public readonly string Name;
 
+        public const int MaxLayerCount = 64;
         public const string DefaultLayerName = "Default";
         public const string UnstoppableLayerName = "Unstoppable";
         public const string FeatherLayerName = "Feather";
@@ -60,7 +61,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
             
             long mask = 0;
             foreach (var name in layerNames) {
-                int index = settings.NameToLayerIndex(name);
+                int index = settings.LayerNameToIndex(name);
                 mask |= 1L << index;
             }
 
