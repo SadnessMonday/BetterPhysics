@@ -1,5 +1,7 @@
+using System.Linq;
 using SadnessMonday.BetterPhysics.Layers;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 // This package changed in 2019.1
@@ -50,6 +52,25 @@ namespace SadnessMonday.BetterPhysics.Editor {
             EditorGUILayout.HelpBox("These layers are used for custom interactions between BetterRigidbodies.", MessageType.None);
             EditorGUIUtility.labelWidth = 245.0f;
 
+            var layerNameList = new ReorderableList(_settings, _settings.FindProperty("layerNamesStorage"));
+
+            layerNameList.onCanRemoveCallback += list => list.count > InteractionLayer.BuiltinLayerCount;
+            layerNameList.onCanAddCallback += list => list.count < InteractionLayer.MaxLayerCount;
+            // layerNameList.onAddCallback += list => {
+            //     string layerName = $"User Layer {list.count - 1}";
+            //     var element = list.serializedProperty.GetArrayElementAtIndex(list.count - 1);
+            //     element.stringValue = layerName;
+            // };
+
+            layerNameList.drawElementCallback += (rect, index, active, focused) => {
+                var element = layerNameList.serializedProperty.GetArrayElementAtIndex(index);
+                bool isBuiltinLayer = index < InteractionLayer.BuiltinLayerCount;
+                EditorGUI.BeginDisabledGroup(isBuiltinLayer);
+                EditorGUI.PropertyField(rect, element, new GUIContent($"{(isBuiltinLayer ? "Builtin Layer" : "User Layer")} {index}"));
+                EditorGUI.EndDisabledGroup();
+            };
+            
+            layerNameList.DoLayoutList();
             EditorGUILayout.PropertyField(_settings.FindProperty("layerNamesStorage"), Styles.LayerNamesStorage);
             
             // _interactionsScrollPos = EditorGUILayout.BeginScrollView(_interactionsScrollPos, GUILayout.Height(120));

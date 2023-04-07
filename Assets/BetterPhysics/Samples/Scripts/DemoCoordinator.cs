@@ -14,9 +14,13 @@ namespace SadnessMonday.BetterPhysics.Samples {
 
         private IEnumerator Start() {
             BetterPhysicsSettings.Instance.ResetAllLayerInteractions();
-            BetterPhysicsSettings.Instance.SetLayerIteraction(0, 1, 0);
-            BetterPhysicsSettings.Instance.SetLayerIteraction(1, 2, 0);
-            BetterPhysicsSettings.Instance.SetLayerIteraction(2, 0, 0);
+            var red = InteractionLayer.GetOrCreateLayer("Red");
+            var green = InteractionLayer.GetOrCreateLayer("Green");
+            var blue = InteractionLayer.GetOrCreateLayer("Blue");
+
+            BetterPhysicsSettings.Instance.SetLayerInteraction(red, green, InteractionType.Kinematic);
+            BetterPhysicsSettings.Instance.SetLayerInteraction(green, blue, InteractionType.Kinematic);
+            BetterPhysicsSettings.Instance.SetLayerInteraction(blue, red, InteractionType.Kinematic);
             
             label.text = "Red vs Red\nNormal interaction";
             yield return SpawnThenWait(0, 0, 5);

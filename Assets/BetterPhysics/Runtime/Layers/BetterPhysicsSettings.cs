@@ -82,8 +82,8 @@ namespace SadnessMonday.BetterPhysics.Layers {
         [SerializeField] internal List<string> layerNamesStorage = new();
         private Dictionary<string, int> _layerNamesLookup = new();
 
-        [SerializeField] private List<LayerInteraction> interactionsStorage = new();
-        private Dictionary<Vector2Int, LayerInteraction> _interactionsLookup = new();
+        [SerializeField] private List<InteractionConfiguration> interactionsStorage = new();
+        private Dictionary<Vector2Int, InteractionConfiguration> _interactionsLookup = new();
 
         public IReadOnlyList<string> AllLayerNames => layerNamesStorage;
 
@@ -96,13 +96,13 @@ namespace SadnessMonday.BetterPhysics.Layers {
             interactionsStorage.Clear();
             
             // Create 
-            layerNamesStorage.AddRange(PhysicsLayer.GetBuiltinLayers().Select(l => l.Name));
+            layerNamesStorage.AddRange(InteractionLayer.GetBuiltinLayerNames());
             
             // TODO actually we should be able to do something like "ANY LAYER" as the other side.
-            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.DefaultLayer, PhysicsLayer.FeatherLayer));
-            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.UnstoppableLayer, PhysicsLayer.FeatherLayer));
-            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.FeatherLayer, PhysicsLayer.FeatherLayer));
-            interactionsStorage.Add(LayerInteraction.CreateKinematicInteraction(PhysicsLayer.UnstoppableLayer, PhysicsLayer.DefaultLayer));
+            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.DefaultLayer, InteractionLayer.FeatherLayer));
+            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.UnstoppableLayer, InteractionLayer.FeatherLayer));
+            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.FeatherLayer, InteractionLayer.FeatherLayer));
+            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.UnstoppableLayer, InteractionLayer.DefaultLayer));
         }
 
         public void Init() {
@@ -122,7 +122,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         private void InitLayerInteractions() {
             ResetAllLayerInteractions();
             foreach (var interaction in interactionsStorage) {
-                Vector2Int coord = new(interaction.actor, interaction.receiver);
+                Vector2Int coord = interaction.Key();
                 if (!LayerIsDefined(coord.x) || !LayerIsDefined(coord.y)) {
                     Debug.LogWarning($"Found interaction involving an undefined layer: {interaction}");
                     continue;
@@ -136,12 +136,22 @@ namespace SadnessMonday.BetterPhysics.Layers {
             }
         }
 
-        public int LayerNameToIndex(string layerName) {
+        public bool TryGetLayerFromName(string layerName, out InteractionLayer output) {
+            if (_layerNamesLookup.TryGetValue(layerName, out int index)) {
+                output = new InteractionLayer(index);
+                return true;
+            }
+
+            output = InteractionLayer.InvalidLayer;
+            return false;
+        }
+
+        public InteractionLayer LayerFromName(string layerName) {
             if (!_layerNamesLookup.TryGetValue(layerName, out int result)) {
                 throw new ArgumentException($"Layer '{layerName}' has not been defined in BetterPhysics settings");
             }
             
-            return result;
+            return new InteractionLayer(result);
         }
 
         public string LayerIndexToName(int layerIndex) {
@@ -154,35 +164,59 @@ namespace SadnessMonday.BetterPhysics.Layers {
             return _layerNamesLookup.ContainsKey(layer);
         }
 
-        public bool LayerIsDefined(long layer) {
+        public bool LayerIsDefined(int layer) {
             return layer >= 0 && layer < layerNamesStorage.Count;
         }
         
-        public bool TryGetLayerInteraction(int actor, int receiver, out LayerInteraction interaction) {
-            return _interactionsLookup.TryGetValue(new Vector2Int(actor, receiver), out interaction);
+        public bool TryGetLayerInteraction(InteractionLayer actor, InteractionLayer receiver, out InteractionConfiguration interactionConfiguration) {
+            return TryGetLayerInteraction(actor.KeyWith(receiver), out interactionConfiguration);
         }
 
-        public void SetLayerIteraction(int actor, int receiver, LayerInteraction.InteractionType interactionType) {
-            Vector2Int key = new Vector2Int(actor, receiver);
-            if (interactionType == LayerInteraction.InteractionType.Default) {
+        internal bool TryGetLayerInteraction(int actor, int receiver, out InteractionConfiguration interactionConfiguration) {
+            return TryGetLayerInteraction(new Vector2Int(actor, receiver), out interactionConfiguration);
+        }
+
+        internal bool TryGetLayerInteraction(Vector2Int key, out InteractionConfiguration interactionConfiguration) {
+            return _interactionsLookup.TryGetValue(key, out interactionConfiguration);
+        }
+
+        public void SetLayerInteraction(Vector2Int key, InteractionType interactionType) {
+            if (interactionType == InteractionType.Default) {
                 _interactionsLookup.Remove(key);
                 return;
             }
             
-            LayerInteraction interaction = new LayerInteraction(actor, receiver);
-            interaction.interactionType = interactionType;
-            _interactionsLookup[key] = interaction;
+            InteractionConfiguration interactionConfiguration = new InteractionConfiguration(InteractionLayer.FromIndex(key.x), InteractionLayer.FromIndex(key.y));
+            interactionConfiguration.interactionType = interactionType;
+            _interactionsLookup[key] = interactionConfiguration;
+        }
+        
+        public void SetLayerInteraction(InteractionLayer actor, InteractionLayer receiver, InteractionType interactionType) {
+            Vector2Int key = actor.KeyWith(receiver);
+            SetLayerInteraction(key, interactionType);
         }
 
         /**
          * Resets the interaction between actor and receiver to default
          */
-        public bool ResetLayerInteraction(int actor, int receiver) {
-            return _interactionsLookup.Remove(new Vector2Int(actor, receiver));
+        public bool ResetLayerInteraction(InteractionLayer actor, InteractionLayer receiver) {
+            return _interactionsLookup.Remove(actor.KeyWith(receiver));
         }
 
         public void ResetAllLayerInteractions() {
             _interactionsLookup.Clear();
+        }
+
+        public InteractionLayer AddLayer(string name) {
+            if (TryGetLayerFromName(name, out InteractionLayer layer)) {
+                return layer;
+            }
+
+            var index = layerNamesStorage.Count;
+            _layerNamesLookup[name] = index;
+            layerNamesStorage.Add(name);
+
+            return new InteractionLayer(index);
         }
     }
 }

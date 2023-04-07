@@ -37,7 +37,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
             guiViewCurrentProp = guiView.GetProperty("current", BindingFlags.Static | BindingFlags.Public);
             MarkHotRegionMethod = guiView.GetMethod("MarkHotRegion", BindingFlags.Instance | BindingFlags.NonPublic);
 
-            InteractionTypeCount = Enum.GetNames(typeof(LayerInteraction.InteractionType)).Length;
+            InteractionTypeCount = Enum.GetNames(typeof(InteractionType)).Length;
         }
 
         static class Styles {
@@ -50,9 +50,9 @@ namespace SadnessMonday.BetterPhysics.Editor {
         private static Color highlightColor =
             EditorGUIUtility.isProSkin ? new Color(1, 1, 1, 0.2f) : new Color(0, 0, 0, 0.2f);
 
-        public delegate LayerInteraction.InteractionType GetValueFunc(int layerA, int layerB);
+        public delegate InteractionType GetValueFunc(int layerA, int layerB);
 
-        public delegate void SetValueFunc(int layerA, int layerB, LayerInteraction.InteractionType val);
+        public delegate void SetValueFunc(int layerA, int layerB, InteractionType val);
 
         // Get the styled used when hovering over the rows/columns.
         public static GUIStyle GetHoverStyle() {
@@ -226,8 +226,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
                             //     setValue(i, j, toggle);
                             GUI.backgroundColor = GetColor(val);
                             if (GUI.Button(thisRect, tooltip)) {
-                                LayerInteraction.InteractionType newType =
-                                    (LayerInteraction.InteractionType)(((int)val + 1) % InteractionTypeCount);
+                                InteractionType newType =
+                                    (InteractionType)(((int)val + 1) % InteractionTypeCount);
                                 setValue(i, j, newType);
                             }
                             // var newVal = (LayerInteraction.InteractionType)EditorGUI.EnumPopup(thisRect, tooltip, val);
@@ -248,7 +248,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 // Made the buttons span the entire matrix of layers
                 if (GUILayout.Button("Reset All", GUILayout.MinWidth(checkboxSize * BetterPhysics.DefinedLayerCount),
                         GUILayout.ExpandWidth(false)))
-                    SetAllLayerCollisions(LayerInteraction.InteractionType.Default, setValue);
+                    SetAllLayerCollisions(InteractionType.Default, setValue);
 
                 // if (GUILayout.Button("Disable All", GUILayout.MinWidth((checkboxSize * activeLayerCount) / 2),
                 //         GUILayout.ExpandWidth(false)))
@@ -262,18 +262,18 @@ namespace SadnessMonday.BetterPhysics.Editor {
             }
         }
 
-        private static Color GetColor(LayerInteraction.InteractionType interactionType) {
+        private static Color GetColor(InteractionType interactionType) {
             switch (interactionType) {
-                case LayerInteraction.InteractionType.Feather:
+                case InteractionType.Feather:
                     return FeatherInteractionColor;
-                case LayerInteraction.InteractionType.Kinematic:
+                case InteractionType.Kinematic:
                     return KinematicInteractionColor;
                 default:
                     return DefaultInteractionColor;
             }
         }
 
-        static void SetAllLayerCollisions(LayerInteraction.InteractionType flag, SetValueFunc setValue) {
+        static void SetAllLayerCollisions(InteractionType flag, SetValueFunc setValue) {
             for (int i = 0; i < BetterPhysics.DefinedLayerCount; ++i)
             for (int j = i; j < BetterPhysics.DefinedLayerCount; ++j)
                 setValue(i, j, flag);

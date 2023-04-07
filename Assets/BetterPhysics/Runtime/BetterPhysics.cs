@@ -1,3 +1,4 @@
+using System;
 using Palmmedia.ReportGenerator.Core;
 using SadnessMonday.BetterPhysics.Layers;
 
@@ -7,22 +8,39 @@ namespace SadnessMonday.BetterPhysics {
 
         public static int DefinedLayerCount => BetterPhysicsSettings.Instance.DefinedLayerCount;
         
-        public static LayerInteraction.InteractionType GetLayerInteraction(int actor, int receiver) {
-            BetterPhysicsSettings.Instance.TryGetLayerInteraction(actor, receiver, out LayerInteraction result);
+        public static InteractionType GetLayerInteraction(int actor, int receiver) {
+            BetterPhysicsSettings.Instance.TryGetLayerInteraction(actor, receiver, out InteractionConfiguration result);
             return result.interactionType;
         }
 
-        public static void SetLayerInteraction(int actor, int receiver,
-            LayerInteraction.InteractionType interactionType) {
-            BetterPhysicsSettings.Instance.SetLayerIteraction(actor, receiver, interactionType);
+        public static void SetLayerInteraction(InteractionLayer actor, InteractionLayer receiver,
+            InteractionType interactionType) {
+            BetterPhysicsSettings.Instance.SetLayerInteraction(actor.KeyWith(receiver), interactionType);
+        }
+        
+        internal static void SetLayerInteraction(int actor, int receiver,
+            InteractionType interactionType) {
+            BetterPhysicsSettings.Instance.SetLayerInteraction(new InteractionLayer(actor), new InteractionLayer(receiver), interactionType);
         }
 
         public static string LayerIndexToName(int layerIndex) {
             return BetterPhysicsSettings.Instance.LayerIndexToName(layerIndex);
         }
 
-        public static int LayerNameToIndex(string layerName) {
-            return BetterPhysicsSettings.Instance.LayerNameToIndex(layerName);
+        public static InteractionLayer LayerFromName(string name) {
+            return BetterPhysicsSettings.Instance.LayerFromName(name);
+        }
+
+        public static bool TryGetLayerFromName(string name, out InteractionLayer layer) {
+            return BetterPhysicsSettings.Instance.TryGetLayerFromName(name, out layer);
+        }
+
+        public static InteractionLayer LayerFromIndex(int index) {
+            if (!BetterPhysicsSettings.Instance.LayerIsDefined(index)) {
+                throw new Exception($"Undefined interaction layer {index}");
+            }
+            InteractionLayer layer = new InteractionLayer(index);
+            return layer;
         }
     }
 }

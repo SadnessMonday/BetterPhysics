@@ -16,6 +16,8 @@ MonoBehaviour:
   - Default
   - Unstoppable
   - Feather
+  - Feather
+  - Feather
   interactionsStorage:
   - interactionType: 2
   - interactionType: 2

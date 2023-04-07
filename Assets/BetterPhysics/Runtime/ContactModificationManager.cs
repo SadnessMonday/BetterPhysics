@@ -68,18 +68,18 @@ namespace SadnessMonday.BetterPhysics {
                 
                 if (_perRigidbodyData.TryGetValue(bodyAId, out var bodyAInteractions)
                     && bodyAInteractions.TryGetValue(layerB, out OneWayLayerInteraction owInteractionA)) {
-                    if (owInteractionA.interactionType == LayerInteraction.InteractionType.Feather) {
+                    if (owInteractionA.interactionType == InteractionType.Feather) {
                         aToBMultiplier = 0;
                     }
-                    else if (owInteractionA.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                    else if (owInteractionA.interactionType == InteractionType.Kinematic) {
                         bToAMultiplier = 0;
                     }
                 }                
-                else if (_settings.TryGetLayerInteraction(layerA, layerB, out LayerInteraction aToBInteraction)) {
-                    if (aToBInteraction.interactionType == LayerInteraction.InteractionType.Feather) {
+                else if (_settings.TryGetLayerInteraction(layerA, layerB, out InteractionConfiguration aToBInteraction)) {
+                    if (aToBInteraction.interactionType == InteractionType.Feather) {
                         aToBMultiplier = 0;
                     }
-                    else if (aToBInteraction.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                    else if (aToBInteraction.interactionType == InteractionType.Kinematic) {
                         bToAMultiplier = 0;
                     }
                 }
@@ -89,18 +89,18 @@ namespace SadnessMonday.BetterPhysics {
 
                 if (_perRigidbodyData.TryGetValue(bodyBId, out var bodyBInteractions)
                     && bodyBInteractions.TryGetValue(layerB, out OneWayLayerInteraction owInteractionB)) {
-                    if (owInteractionB.interactionType == LayerInteraction.InteractionType.Feather) {
+                    if (owInteractionB.interactionType == InteractionType.Feather) {
                         bToAMultiplier = 0;
                     }
-                    else if (owInteractionB.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                    else if (owInteractionB.interactionType == InteractionType.Kinematic) {
                         aToBMultiplier = 0;
                     }
                 }                
-                else if (_settings.TryGetLayerInteraction(layerB, layerA, out LayerInteraction bToAInteraction)) {
-                    if (bToAInteraction.interactionType == LayerInteraction.InteractionType.Feather) {
+                else if (_settings.TryGetLayerInteraction(layerB, layerA, out InteractionConfiguration bToAInteraction)) {
+                    if (bToAInteraction.interactionType == InteractionType.Feather) {
                         bToAMultiplier = 0;
                     }
-                    else if (bToAInteraction.interactionType == LayerInteraction.InteractionType.Kinematic) {
+                    else if (bToAInteraction.interactionType == InteractionType.Kinematic) {
                         aToBMultiplier = 0;
                     }
                 }
