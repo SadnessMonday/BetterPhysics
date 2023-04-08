@@ -76,9 +76,11 @@ namespace SadnessMonday.BetterPhysics.Editor {
             // _interactionsScrollPos = EditorGUILayout.BeginScrollView(_interactionsScrollPos, GUILayout.Height(120));
             // EditorGUILayout.PropertyField(_settings.FindProperty("interactionsStorage"), Styles.InteractionsStorage);
             // EditorGUILayout.EndScrollView();
-                 
-            LayerInteractionMatrixGUI.Draw(new GUIContent("Layer Interactions"), BetterPhysics.GetLayerInteraction, BetterPhysics.SetLayerInteraction);
-            if (GUILayout.Button("Reset Better Physics Settings")) {
+
+            LayerInteractionMatrixGUI.Draw(new GUIContent("Layer Interactions"), BetterPhysics.GetLayerInteraction,
+                (a, b, t) => BetterPhysics.SetLayerInteraction(
+                    InteractionLayer.FromIndex(a), InteractionLayer.FromIndex(b), t));
+            if (GUILayout.Button("Reset All Better Physics Settings")) {
                 ((BetterPhysicsSettings)_settings.targetObject).Reset();
                 _settings.Update();
             }

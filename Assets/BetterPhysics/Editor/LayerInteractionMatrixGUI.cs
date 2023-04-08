@@ -247,8 +247,9 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
                 // Made the buttons span the entire matrix of layers
                 if (GUILayout.Button("Reset All", GUILayout.MinWidth(checkboxSize * BetterPhysics.DefinedLayerCount),
-                        GUILayout.ExpandWidth(false)))
-                    SetAllLayerCollisions(InteractionType.Default, setValue);
+                        GUILayout.ExpandWidth(false))) {
+                    BetterPhysicsSettings.Instance.ResetAllLayerInteractions();
+                }
 
                 // if (GUILayout.Button("Disable All", GUILayout.MinWidth((checkboxSize * activeLayerCount) / 2),
                 //         GUILayout.ExpandWidth(false)))
@@ -259,6 +260,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 //     SetAllLayerCollisions(true, setValue);
 
                 GUILayout.EndHorizontal();
+                
+                
             }
         }
 

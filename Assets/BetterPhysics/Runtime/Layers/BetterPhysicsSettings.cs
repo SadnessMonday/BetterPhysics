@@ -74,6 +74,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
         [RuntimeInitializeOnLoadMethod]
         private static void WhenGameStarts() {
+            Debug.Log(nameof(WhenGameStarts));
             var instance = Instance;
             instance.Init();
         }
@@ -92,21 +93,26 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         public void Reset() {
+            Debug.Log(nameof(Reset));
             layerNamesStorage.Clear();
             interactionsStorage.Clear();
             
             // Create 
             layerNamesStorage.AddRange(InteractionLayer.GetBuiltinLayerNames());
-            
-            // TODO actually we should be able to do something like "ANY LAYER" as the other side.
+            PopulateDefaultInteractions();
+        }
+
+        void PopulateDefaultInteractions() {
+            Debug.Log(nameof(PopulateDefaultInteractions));
             interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.DefaultLayer, InteractionLayer.FeatherLayer));
             interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.UnstoppableLayer, InteractionLayer.FeatherLayer));
             interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.FeatherLayer, InteractionLayer.FeatherLayer));
             interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.UnstoppableLayer, InteractionLayer.DefaultLayer));
         }
+        
 
         public void Init() {
-            Debug.Log("Initializing settings");
+            Debug.Log(nameof(Init));
             InitLayerNames();
             InitLayerInteractions();
         }
@@ -204,7 +210,9 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         public void ResetAllLayerInteractions() {
+            Debug.Log(nameof(ResetAllLayerInteractions));
             _interactionsLookup.Clear();
+            PopulateDefaultInteractions();
         }
 
         public InteractionLayer AddLayer(string name) {
