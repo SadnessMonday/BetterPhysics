@@ -13,10 +13,14 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public const string DefaultLayerName = "Default";
         public const string UnstoppableLayerName = "Unstoppable";
         public const string FeatherLayerName = "Feather";
+
+        public const int DefaultLayerIndex = 0;
+        public const int UnstoppableLayerIndex = 1;
+        public const int FeatherLayerIndex = 2;
         
-        public static readonly InteractionLayer DefaultLayer = new(0/*, DefaultLayerName*/);
-        public static readonly InteractionLayer UnstoppableLayer = new(1/*, UnstoppableLayerName*/);
-        public static readonly InteractionLayer FeatherLayer = new(2/*, FeatherLayerName*/);
+        public static readonly InteractionLayer DefaultLayer = new(DefaultLayerIndex);
+        public static readonly InteractionLayer UnstoppableLayer = new(UnstoppableLayerIndex);
+        public static readonly InteractionLayer FeatherLayer = new(FeatherLayerIndex);
         public static readonly InteractionLayer InvalidLayer = new(-1);
 
         public InteractionLayer(int index) {

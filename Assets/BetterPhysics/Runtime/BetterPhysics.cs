@@ -43,4 +43,10 @@ namespace SadnessMonday.BetterPhysics {
             return layer;
         }
     }
+
+    public class BetterPhysicsException : Exception {
+        internal BetterPhysicsException() : base() { }
+        internal BetterPhysicsException(string message) : base(message) { }
+        internal BetterPhysicsException(string message, Exception innerException) : base(message, innerException) { }
+    }
 }

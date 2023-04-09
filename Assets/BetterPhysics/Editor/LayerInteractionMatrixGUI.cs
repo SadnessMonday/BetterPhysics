@@ -153,7 +153,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 }
 
                 var translate =
-                    new Vector3(
+                    new Vector3(                        
                         labelSize + indent + checkboxSize * (BetterPhysics.DefinedLayerCount - i) + topLeft.y +
                         topLeft.x + 10,
                         topLeft.y, 0);
@@ -165,7 +165,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                     GUI.Label(labelRect, GUIContent.none, Styles.rightLabel);
                 }
                 else {
-                    GUI.Label(labelRect, BetterPhysics.LayerIndexToName(i), Styles.rightLabel);
+                    GUI.Label(labelRect, BetterPhysics.LayerIndexToName(BetterPhysics.DefinedLayerCount - i - 1), Styles.rightLabel);
 
                     // Empty Transparent label used to indicate highlighted row
                     var checkRect = new Rect(2 - topLeft.x, 1 /*This centers the highlight*/,

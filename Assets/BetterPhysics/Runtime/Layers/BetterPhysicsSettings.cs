@@ -100,14 +100,16 @@ namespace SadnessMonday.BetterPhysics.Layers {
             // Create 
             layerNamesStorage.AddRange(InteractionLayer.GetBuiltinLayerNames());
             PopulateDefaultInteractions();
+            Init();
         }
 
         void PopulateDefaultInteractions() {
             Debug.Log(nameof(PopulateDefaultInteractions));
-            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.DefaultLayer, InteractionLayer.FeatherLayer));
-            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.UnstoppableLayer, InteractionLayer.FeatherLayer));
-            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.FeatherLayer, InteractionLayer.FeatherLayer));
-            interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(InteractionLayer.UnstoppableLayer, InteractionLayer.DefaultLayer));
+
+            for (int i = 0; i < InteractionLayer.MaxLayerCount; i++) {
+                interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(new InteractionLayer(i), InteractionLayer.FeatherLayer));
+                interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction( InteractionLayer.UnstoppableLayer, new InteractionLayer(i)));
+            }
         }
         
 
@@ -187,6 +189,17 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         public void SetLayerInteraction(Vector2Int key, InteractionType interactionType) {
+            Debug.Log($"Attempting to set interaction {key.x}/{key.y} to {interactionType}");
+            int unstoppableIndex = InteractionLayer.UnstoppableLayerIndex;
+            if (unstoppableIndex == key.x || unstoppableIndex == key.y) {
+                throw new BetterPhysicsException($"Cannot modify interaction with the built in layer '{InteractionLayer.UnstoppableLayerName}'");
+            }
+
+            int featherIndex = InteractionLayer.FeatherLayerIndex;
+            if (featherIndex == key.x || featherIndex == key.y) {
+                throw new BetterPhysicsException($"Cannot modify interaction with the built in layer '{InteractionLayer.FeatherLayerName}'");
+            }
+            
             if (interactionType == InteractionType.Default) {
                 _interactionsLookup.Remove(key);
                 return;
