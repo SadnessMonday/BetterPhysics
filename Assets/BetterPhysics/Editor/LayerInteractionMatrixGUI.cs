@@ -165,7 +165,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                     GUI.Label(labelRect, GUIContent.none, Styles.rightLabel);
                 }
                 else {
-                    GUI.Label(labelRect, BetterPhysics.LayerIndexToName(BetterPhysics.DefinedLayerCount - i - 1), Styles.rightLabel);
+                    GUI.Label(labelRect, BetterPhysics.LayerIndexToName(i), Styles.rightLabel);
 
                     // Empty Transparent label used to indicate highlighted row
                     var checkRect = new Rect(2 - topLeft.x, 1 /*This centers the highlight*/,
@@ -214,9 +214,12 @@ namespace SadnessMonday.BetterPhysics.Editor {
                     // Iterate all the layers.
                     for (var j = BetterPhysics.DefinedLayerCount - 1; j >= 0; j--) {
                         if (j < BetterPhysics.DefinedLayerCount - i) {
+                            // TODO disable "reserved" layers (Unstoppable and Feather)
+                            int actor = i;
+                            int receiver = BetterPhysics.DefinedLayerCount - j - 1;
                             var tooltip = new GUIContent("",
-                                BetterPhysics.LayerIndexToName(i) + "/" + BetterPhysics.LayerIndexToName(j));
-                            var val = getValue(i, j);
+                                BetterPhysics.LayerIndexToName(actor) + "/" + BetterPhysics.LayerIndexToName(receiver));
+                            var val = getValue(actor, receiver);
                             var thisRect = new Rect(labelSize + indent + r.x + j * checkboxSize, r.y,
                                 checkboxSize,
                                 checkboxSize);
@@ -228,7 +231,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                             if (GUI.Button(thisRect, tooltip)) {
                                 InteractionType newType =
                                     (InteractionType)(((int)val + 1) % InteractionTypeCount);
-                                setValue(i, j, newType);
+                                setValue(actor, receiver, newType);
                             }
                             // var newVal = (LayerInteraction.InteractionType)EditorGUI.EnumPopup(thisRect, tooltip, val);
                             // if (newVal != val) {
