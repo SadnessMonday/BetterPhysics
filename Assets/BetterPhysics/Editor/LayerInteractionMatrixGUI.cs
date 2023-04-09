@@ -73,7 +73,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
         }
 
         // Draw the whole collision matrix view.
-        public static void Draw(GUIContent label, GetValueFunc getValue, SetValueFunc setValue) {
+        public static void Draw(SerializedObject serializedObject) {
+            BetterPhysicsSettings settings = (BetterPhysicsSettings)serializedObject.targetObject;
             const int checkboxSize = 32;
             var labelSize = 110;
             const int indent = 30;
@@ -219,19 +220,19 @@ namespace SadnessMonday.BetterPhysics.Editor {
                             int receiver = BetterPhysics.DefinedLayerCount - j - 1;
                             var tooltip = new GUIContent("",
                                 BetterPhysics.LayerIndexToName(actor) + "/" + BetterPhysics.LayerIndexToName(receiver));
-                            var val = getValue(actor, receiver);
+                            var interactionType = settings.GetInteractionOrDefault(actor, receiver).InteractionType;
                             var thisRect = new Rect(labelSize + indent + r.x + j * checkboxSize, r.y,
                                 checkboxSize,
                                 checkboxSize);
                             
-                            GUI.backgroundColor = GetColor(val);
+                            GUI.backgroundColor = GetColor(interactionType);
                             var wasEnabled = GUI.enabled;
                             GUI.enabled = !(InteractionLayer.IsReservedLayer(actor) ||
                                             InteractionLayer.IsReservedLayer(receiver));
                             if (GUI.Button(thisRect, tooltip)) {
                                 InteractionType newType =
-                                    (InteractionType)(((int)val + 1) % InteractionTypeCount);
-                                setValue(actor, receiver, newType);
+                                    (InteractionType)(((int)interactionType + 1) % InteractionTypeCount);
+                                settings.SetLayerInteraction(actor, receiver, newType);
                             }
 
                             GUI.enabled = wasEnabled;
@@ -240,6 +241,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
                     GUI.backgroundColor = oldColor;
                 }
+                
+                serializedObject.Update();
             }
 
             // Buttons.

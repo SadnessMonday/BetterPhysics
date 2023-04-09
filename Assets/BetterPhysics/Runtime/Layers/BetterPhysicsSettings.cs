@@ -175,6 +175,19 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public bool LayerIsDefined(int layer) {
             return layer >= 0 && layer < layerNamesStorage.Count;
         }
+
+        public InteractionConfiguration GetInteractionOrDefault(int actor, int receiver) {
+            return GetInteractionOrDefault(new(actor, receiver));
+        }
+
+        public InteractionConfiguration GetInteractionOrDefault(Vector2Int key) {
+            key.Normalize();
+            if (TryGetLayerInteraction(key, out InteractionConfiguration configuration)) {
+                return configuration;
+            }
+
+            return new InteractionConfiguration(new(key.x), new(key.y), InteractionType.Default);
+        }
         
         public bool TryGetLayerInteraction(InteractionLayer actor, InteractionLayer receiver, out InteractionConfiguration interactionConfiguration) {
             return TryGetLayerInteraction(actor.KeyWith(receiver), out interactionConfiguration);
@@ -207,6 +220,10 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public void SetLayerInteraction(InteractionLayer actor, InteractionLayer receiver, InteractionType interactionType) {
             Vector2Int key = actor.KeyWith(receiver);
             SetLayerInteraction(key, interactionType);
+        }
+
+        public void SetLayerInteraction(int actor, int receiver, InteractionType interactionType) {
+            SetLayerInteraction(new InteractionLayer(actor), new InteractionLayer(receiver), interactionType);
         }
 
         /**
