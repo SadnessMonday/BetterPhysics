@@ -27,6 +27,15 @@ namespace SadnessMonday.BetterPhysics.Layers {
             Index = index;
         }
 
+        public static bool IsReservedLayer(int layerIndex) {
+            return layerIndex == UnstoppableLayerIndex || layerIndex == FeatherLayerIndex;
+        }
+        
+        public static bool IncludesReservedLayers(Vector2Int key) {
+            return IsReservedLayer(key.x)
+                   || IsReservedLayer(key.y);
+        }
+
         public static InteractionLayer GetOrCreateLayer(string name) {
             if (BetterPhysics.TryGetLayerFromName(name, out InteractionLayer layer)) {
                 return layer;
@@ -99,6 +108,25 @@ namespace SadnessMonday.BetterPhysics.Layers {
             }
 
             return new PhysicsLayerMask(mask);
+        }
+    }
+
+    public static class InteractionLayerExtensions {
+        public static bool IsReserved(this InteractionLayer layer) {
+            return InteractionLayer.IsReservedLayer(layer.Index);
+        }
+
+        /**
+         * Return true if swapped.
+         */
+        internal static bool Normalize(ref this Vector2Int key) {
+            if (key.x.CompareTo(key.y) > 0) {
+                // Swap
+                (key.x, key.y) = (key.y, key.x);
+                return true;
+            }
+
+            return false;
         }
     }
 }

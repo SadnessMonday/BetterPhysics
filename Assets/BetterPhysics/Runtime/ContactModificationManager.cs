@@ -76,10 +76,10 @@ namespace SadnessMonday.BetterPhysics {
                     }
                 }                
                 else if (_settings.TryGetLayerInteraction(layerA, layerB, out InteractionConfiguration aToBInteraction)) {
-                    if (aToBInteraction.interactionType == InteractionType.Feather) {
+                    if (aToBInteraction.InteractionType == InteractionType.Feather) {
                         aToBMultiplier = 0;
                     }
-                    else if (aToBInteraction.interactionType == InteractionType.Kinematic) {
+                    else if (aToBInteraction.InteractionType == InteractionType.Kinematic) {
                         bToAMultiplier = 0;
                     }
                 }
@@ -97,10 +97,10 @@ namespace SadnessMonday.BetterPhysics {
                     }
                 }                
                 else if (_settings.TryGetLayerInteraction(layerB, layerA, out InteractionConfiguration bToAInteraction)) {
-                    if (bToAInteraction.interactionType == InteractionType.Feather) {
+                    if (bToAInteraction.InteractionType == InteractionType.Feather) {
                         bToAMultiplier = 0;
                     }
-                    else if (bToAInteraction.interactionType == InteractionType.Kinematic) {
+                    else if (bToAInteraction.InteractionType == InteractionType.Kinematic) {
                         aToBMultiplier = 0;
                     }
                 }

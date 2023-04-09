@@ -1,18 +1,19 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace SadnessMonday.BetterPhysics.Layers {
     [Serializable]
     public struct InteractionConfiguration {
-        public readonly InteractionLayer actor;
-        public readonly InteractionLayer receiver;
-        public InteractionType interactionType;
+        [field:SerializeField] public InteractionLayer Actor { get; private set; }
+        [field:SerializeField] public InteractionLayer Receiver  { get; private set; }
+        [field:SerializeField] public InteractionType InteractionType { get; private set; }
 
         public InteractionConfiguration(InteractionLayer actor, InteractionLayer receiver, InteractionType interactionType = InteractionType.Default) {
-            this.actor = actor;
-            this.receiver = receiver;
-            this.interactionType = interactionType;
+            Actor = actor;
+            Receiver = receiver;
+            InteractionType = interactionType;
+            
+            Normalize();
         }
 
         public static InteractionConfiguration CreateKinematicInteraction(InteractionLayer kinematicLayer, InteractionLayer dynamicLayer) {
@@ -20,13 +21,19 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
         
         public void ResetToDefault() {
-            interactionType = InteractionType.Default;
+            InteractionType = InteractionType.Default;
         }
 
         internal Vector2Int Key() {
-            return actor.KeyWith(receiver);
+            return Actor.KeyWith(Receiver);
         }
-        
+
+        void Normalize() {
+            var key = Key();
+            if (key.Normalize()) {
+                InteractionType = InteractionType.Inverse();
+            }
+        }
     }
 
     [Serializable]

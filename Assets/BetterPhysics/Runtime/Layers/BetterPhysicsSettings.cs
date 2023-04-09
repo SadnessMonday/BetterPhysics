@@ -135,7 +135,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
                     Debug.LogWarning($"Found interaction involving an undefined layer: {interaction}");
                     continue;
                 }
-
+                
                 if (_interactionsLookup.ContainsKey(coord)) {
                     Debug.LogWarning($"Two or more BetterPhysics interactions defined between layers {coord.x} and {coord.y}");
                 }
@@ -187,26 +187,20 @@ namespace SadnessMonday.BetterPhysics.Layers {
         internal bool TryGetLayerInteraction(Vector2Int key, out InteractionConfiguration interactionConfiguration) {
             return _interactionsLookup.TryGetValue(key, out interactionConfiguration);
         }
-
+        
         public void SetLayerInteraction(Vector2Int key, InteractionType interactionType) {
             Debug.Log($"Attempting to set interaction {key.x}/{key.y} to {interactionType}");
-            int unstoppableIndex = InteractionLayer.UnstoppableLayerIndex;
-            if (unstoppableIndex == key.x || unstoppableIndex == key.y) {
-                throw new BetterPhysicsException($"Cannot modify interaction with the built in layer '{InteractionLayer.UnstoppableLayerName}'");
-            }
-
-            int featherIndex = InteractionLayer.FeatherLayerIndex;
-            if (featherIndex == key.x || featherIndex == key.y) {
-                throw new BetterPhysicsException($"Cannot modify interaction with the built in layer '{InteractionLayer.FeatherLayerName}'");
+            if (InteractionLayer.IncludesReservedLayers(key)) {
+                throw new BetterPhysicsException($"Cannot modify interaction with reserved layers");
             }
             
+            key.Normalize();
             if (interactionType == InteractionType.Default) {
                 _interactionsLookup.Remove(key);
                 return;
             }
             
             InteractionConfiguration interactionConfiguration = new InteractionConfiguration(InteractionLayer.FromIndex(key.x), InteractionLayer.FromIndex(key.y));
-            interactionConfiguration.interactionType = interactionType;
             _interactionsLookup[key] = interactionConfiguration;
         }
         

@@ -223,19 +223,18 @@ namespace SadnessMonday.BetterPhysics.Editor {
                             var thisRect = new Rect(labelSize + indent + r.x + j * checkboxSize, r.y,
                                 checkboxSize,
                                 checkboxSize);
-                            // var toggle = GUI.Toggle(thisRect, val, tooltip);
-                            //
-                            // if (toggle != val)
-                            //     setValue(i, j, toggle);
+                            
                             GUI.backgroundColor = GetColor(val);
+                            var wasEnabled = GUI.enabled;
+                            GUI.enabled = !(InteractionLayer.IsReservedLayer(actor) ||
+                                            InteractionLayer.IsReservedLayer(receiver));
                             if (GUI.Button(thisRect, tooltip)) {
                                 InteractionType newType =
                                     (InteractionType)(((int)val + 1) % InteractionTypeCount);
                                 setValue(actor, receiver, newType);
                             }
-                            // var newVal = (LayerInteraction.InteractionType)EditorGUI.EnumPopup(thisRect, tooltip, val);
-                            // if (newVal != val) {
-                            // }
+
+                            GUI.enabled = wasEnabled;
                         }
                     }
 
@@ -253,14 +252,6 @@ namespace SadnessMonday.BetterPhysics.Editor {
                         GUILayout.ExpandWidth(false))) {
                     BetterPhysicsSettings.Instance.ResetAllLayerInteractions();
                 }
-
-                // if (GUILayout.Button("Disable All", GUILayout.MinWidth((checkboxSize * activeLayerCount) / 2),
-                //         GUILayout.ExpandWidth(false)))
-                //     SetAllLayerCollisions(false, setValue);
-                //
-                // if (GUILayout.Button("Enable All", GUILayout.MinWidth((checkboxSize * activeLayerCount) / 2),
-                //         GUILayout.ExpandWidth(false)))
-                //     SetAllLayerCollisions(true, setValue);
 
                 GUILayout.EndHorizontal();
                 

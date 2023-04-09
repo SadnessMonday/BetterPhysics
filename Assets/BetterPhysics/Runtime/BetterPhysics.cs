@@ -10,7 +10,7 @@ namespace SadnessMonday.BetterPhysics {
         
         public static InteractionType GetLayerInteraction(int actor, int receiver) {
             BetterPhysicsSettings.Instance.TryGetLayerInteraction(actor, receiver, out InteractionConfiguration result);
-            return result.interactionType;
+            return result.InteractionType;
         }
 
         public static void SetLayerInteraction(InteractionLayer actor, InteractionLayer receiver,
