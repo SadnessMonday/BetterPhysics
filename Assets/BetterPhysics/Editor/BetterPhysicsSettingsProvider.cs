@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using SadnessMonday.BetterPhysics.Layers;
+using Unity.Jobs;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -62,16 +65,26 @@ namespace SadnessMonday.BetterPhysics.Editor {
             //     element.stringValue = layerName;
             // };
 
+            layerNameList.onAddCallback += list => {
+                // add a new element and give it an appropriate nam
+                var listProp = list.serializedProperty;
+                var elementCount = listProp.arraySize;
+
+                listProp.arraySize += 1;
+                var newElement = listProp.GetArrayElementAtIndex(elementCount);
+                newElement.stringValue = $"User Layer {elementCount - InteractionLayer.BuiltinLayerCount}";
+            };
+
             layerNameList.drawElementCallback += (rect, index, active, focused) => {
                 var element = layerNameList.serializedProperty.GetArrayElementAtIndex(index);
                 bool isBuiltinLayer = index < InteractionLayer.BuiltinLayerCount;
                 EditorGUI.BeginDisabledGroup(isBuiltinLayer);
-                EditorGUI.PropertyField(rect, element, new GUIContent($"{(isBuiltinLayer ? "Builtin Layer" : "User Layer")} {index}"));
+                EditorGUI.PropertyField(rect, element, new GUIContent($"{(isBuiltinLayer ? "Builtin Layer" : "User Layer")} {(isBuiltinLayer ? index : index - InteractionLayer.BuiltinLayerCount)}"));
                 EditorGUI.EndDisabledGroup();
             };
             
             layerNameList.DoLayoutList();
-            EditorGUILayout.PropertyField(_settings.FindProperty("layerNamesStorage"), Styles.LayerNamesStorage);
+            // EditorGUILayout.PropertyField(_settings.FindProperty("layerNamesStorage"), Styles.LayerNamesStorage);
             
             // _interactionsScrollPos = EditorGUILayout.BeginScrollView(_interactionsScrollPos, GUILayout.Height(120));
             // EditorGUILayout.PropertyField(_settings.FindProperty("interactionsStorage"), Styles.InteractionsStorage);

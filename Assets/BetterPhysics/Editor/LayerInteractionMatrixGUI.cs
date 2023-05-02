@@ -254,6 +254,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 if (GUILayout.Button("Reset All", GUILayout.MinWidth(checkboxSize * BetterPhysics.DefinedLayerCount),
                         GUILayout.ExpandWidth(false))) {
                     BetterPhysicsSettings.Instance.ResetAllLayerInteractions();
+                    serializedObject.Update();
                 }
 
                 GUILayout.EndHorizontal();

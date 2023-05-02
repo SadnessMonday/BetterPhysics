@@ -12,6 +12,8 @@ namespace SadnessMonday.BetterPhysics.Layers {
      * Represents the custom settings page for physics layers
      */
     public class BetterPhysicsSettings : ScriptableObject {
+        private const int DefaultUserLayerCount = 3;
+        private const string DefaultUserLayerNameFormat = "User Layer {0}";
         private const string DefaultSettingsAssetName = "BetterPhysicsSettings";
         private static BetterPhysicsSettings _instance;
         public int DefinedLayerCount => layerNamesStorage.Count;
@@ -36,7 +38,6 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
 #if UNITY_EDITOR
-        
         private const string DefaultSettingsAssetPath = "Assets/BetterPhysics/Resources";
         private const string DefaultSettingsAssetFileName = DefaultSettingsAssetName + ".asset";
 
@@ -47,6 +48,8 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
             path = Path.Combine(DefaultSettingsAssetPath, DefaultSettingsAssetFileName);
             var settings = CreateInstance<BetterPhysicsSettings>();
+            settings.Reset();
+            
             AssetDatabase.CreateAsset(settings, path);
             AssetDatabase.SaveAssets();
 
@@ -80,7 +83,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
 
-        [SerializeField] internal List<string> layerNamesStorage = new();
+        [SerializeField] private List<string> layerNamesStorage = new();
         private Dictionary<string, int> _layerNamesLookup = new();
 
         [SerializeField] private List<InteractionConfiguration> interactionsStorage = new();
@@ -89,17 +92,35 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public IReadOnlyList<string> AllLayerNames => layerNamesStorage;
 
         private void Awake() {
-            Reset();
+            Init();
         }
 
         public void Reset() {
             Debug.Log(nameof(Reset));
+            ResetAllLayerNames();
+            ResetAllLayerInteractions();
+        }
+
+        void ResetAllLayerNames() {
             layerNamesStorage.Clear();
-            interactionsStorage.Clear();
-            
+            _layerNamesLookup.Clear();
+            PopulateDefaultLayerNames();
+        }
+        
+        void PopulateDefaultLayerNames() {
             // Create 
             layerNamesStorage.AddRange(InteractionLayer.GetBuiltinLayerNames());
+            for (int i = 0; i < DefaultUserLayerCount; i++) {
+                layerNamesStorage.Add(string.Format(DefaultUserLayerNameFormat, i));
+            }
+        }
+        
+        public void ResetAllLayerInteractions() {
+            Debug.Log(nameof(ResetAllLayerInteractions));
+            interactionsStorage.Clear();
+            _interactionsLookup.Clear();
             PopulateDefaultInteractions();
+            
             Init();
         }
 
@@ -111,13 +132,6 @@ namespace SadnessMonday.BetterPhysics.Layers {
                 interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction( InteractionLayer.UnstoppableLayer, new InteractionLayer(i)));
             }
         }
-        
-
-        public void Init() {
-            Debug.Log(nameof(Init));
-            InitLayerNames();
-            InitLayerInteractions();
-        }
 
         private void InitLayerNames() {
             _layerNamesLookup.Clear();
@@ -128,13 +142,13 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         private void InitLayerInteractions() {
-            ResetAllLayerInteractions();
             foreach (var interaction in interactionsStorage) {
                 Vector2Int coord = interaction.Key();
-                if (!LayerIsDefined(coord.x) || !LayerIsDefined(coord.y)) {
-                    Debug.LogWarning($"Found interaction involving an undefined layer: {interaction}");
-                    continue;
-                }
+                coord.Normalize();
+                // if (!LayerIsDefined(coord.x) || !LayerIsDefined(coord.y)) {
+                //     Debug.LogWarning($"Found interaction involving an undefined layer: {interaction}");
+                //     continue;
+                // }
                 
                 if (_interactionsLookup.ContainsKey(coord)) {
                     Debug.LogWarning($"Two or more BetterPhysics interactions defined between layers {coord.x} and {coord.y}");
@@ -142,6 +156,12 @@ namespace SadnessMonday.BetterPhysics.Layers {
                 
                 _interactionsLookup[coord] = interaction;
             }
+        }
+
+        public void Init() {
+            Debug.Log(nameof(Init));
+            InitLayerNames();
+            InitLayerInteractions();
         }
 
         public bool TryGetLayerFromName(string layerName, out InteractionLayer output) {
@@ -231,12 +251,6 @@ namespace SadnessMonday.BetterPhysics.Layers {
          */
         public bool ResetLayerInteraction(InteractionLayer actor, InteractionLayer receiver) {
             return _interactionsLookup.Remove(actor.KeyWith(receiver));
-        }
-
-        public void ResetAllLayerInteractions() {
-            Debug.Log(nameof(ResetAllLayerInteractions));
-            _interactionsLookup.Clear();
-            PopulateDefaultInteractions();
         }
 
         public InteractionLayer AddLayer(string name) {
