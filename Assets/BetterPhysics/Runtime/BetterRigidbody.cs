@@ -4,12 +4,43 @@ using System.Linq;
 using SadnessMonday.BetterPhysics.Layers;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.LowLevel;
 
 namespace SadnessMonday.BetterPhysics {
     [RequireComponent(typeof(Rigidbody))]
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(10000)] // We need to run _late_ so we get a chance to modify velocity.
     public class BetterRigidbody : MonoBehaviour {
+        private static HashSet<BetterRigidbody> allBodies = new();
+
+        [RuntimeInitializeOnLoadMethod]
+        static void ModifyPlayerLoop() {
+            PlayerLoopSystem.UpdateFunction myFunction = new PlayerLoopSystem.UpdateFunction(UpdateAllBetterBodies);
+        }
+
+        static void UpdateAllBetterBodies() {
+            foreach (BetterRigidbody body in allBodies) {
+                body.ApplyLimits();
+            }
+        }
+
+        public void ApplyLimits() {
+            ApplySoftLimits();
+            ApplyHardLimits();
+        }
+
+        private void ApplySoftLimits() {
+            for (int i = 0; i < 3; i++) {
+                if (!softLimits.AxisLimited[i]) {
+                    rb.GetAccumulatedForce()
+                }
+            }
+        }
+
+        private void ApplyHardLimits() {
+            throw new NotImplementedException();
+        }
+
         public delegate void PhysicsLayerChangeHandler(BetterRigidbody source, int oldLayer, int newLayer);
 
         public event PhysicsLayerChangeHandler OnPhysicsLayerChanged;
@@ -356,10 +387,12 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         void OnEnable() {
+            allBodies.Add(this);
             ContactModificationManager.Instance.Register(this);
         }
 
         void OnDisable() {
+            allBodies.Remove(this);
             ContactModificationManager.Instance.UnRegister(this);
         }
 
