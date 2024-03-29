@@ -8,6 +8,7 @@ using UnityEngine;
 namespace SadnessMonday.BetterPhysics {
     [RequireComponent(typeof(Rigidbody))]
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(10000)] // We need to run _late_ so we get a chance to modify velocity.
     public class BetterRigidbody : MonoBehaviour {
         public delegate void PhysicsLayerChangeHandler(BetterRigidbody source, int oldLayer, int newLayer);
 
@@ -20,9 +21,6 @@ namespace SadnessMonday.BetterPhysics {
 
         internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
         internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();
-
-        // public LimitType softLimitType;
-        // public LimitType hardLimitType;
 
         public Vector3 Velocity {
             get => rb.velocity;
@@ -343,7 +341,7 @@ namespace SadnessMonday.BetterPhysics {
                     "Problem creating BetterRigidbody. There may be incompatible components present, such as 2D physics components");
             }
 
-            rb.hideFlags = HideFlags.HideInInspector;
+            rb.hideFlags = HideFlags.None;
         }
 
         void OnValidate() {
@@ -677,9 +675,5 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         #endregion
-
-        public void AddRelativeForceWithLimits() {
-            throw new NotImplementedException();
-        }
     }
 }
