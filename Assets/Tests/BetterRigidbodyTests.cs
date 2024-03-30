@@ -128,7 +128,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
         static AddForceTestArgs SoftWorldArgs(Vector3 limit) {
             return new AddForceTestArgs()
-                .WithLimit(SpeedLimit.SymmetricalWorldLimits(limit).WithLimitType(LimitType.Soft))
+                .WithLimit(SpeedLimit.SymmetricalWorldLimits(LimitType.Soft, limit))
                 .WithForceVec(Vector3.one * 10);
         }
 

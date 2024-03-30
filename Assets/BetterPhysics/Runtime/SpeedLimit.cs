@@ -154,25 +154,27 @@ namespace SadnessMonday.BetterPhysics {
             Validate();
         }
 
-        public SpeedLimit WithLimitType(LimitType limitType) {
+        public void SetLimitType(LimitType limitType) {
             this.limitType = limitType;
-            return this;
         }
 
-        public static SpeedLimit SymmetricalLocalLimits(Vector3 limits) {
+        public static SpeedLimit SymmetricalLocalLimits(LimitType limitType, Vector3 limits) {
             SpeedLimit toReturn = Default;
+            toReturn.SetLimitType(limitType);
             toReturn.SetLocalLimits(limits);
             return toReturn;
         }
 
-        public static SpeedLimit SymmetricalWorldLimits(Vector3 limits) {
+        public static SpeedLimit SymmetricalWorldLimits(LimitType limitType, Vector3 limits) {
             SpeedLimit toReturn = Default;
+            toReturn.SetLimitType(limitType);
             toReturn.SetWorldLimits(limits);
             return toReturn;
         }
 
-        public static SpeedLimit OmnidirectionalLimit(float desiredSpeed) {
+        public static SpeedLimit OmnidirectionalLimit(LimitType limitType, float desiredSpeed) {
             SpeedLimit toReturn = Default;
+            toReturn.SetLimitType(limitType);
             toReturn.SetOmniDirectionalLimit(desiredSpeed);
             return toReturn;
         }
