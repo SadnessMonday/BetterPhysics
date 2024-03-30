@@ -1,15 +1,14 @@
-using SadnessMonday.BetterPhysics;
 using UnityEngine;
 
 public class DemoShip : MonoBehaviour {
-    private BetterRigidbody brb;
+    private Rigidbody rb;
     [SerializeField] private float speed = 4f;
 
     private void Awake() {
-        brb = GetComponent<BetterRigidbody>();
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Start() {
-        brb.AddRelativeForceWithoutLimit(Vector3.forward * speed, ForceMode.VelocityChange);
+        rb.AddForce(Vector3.forward * speed, ForceMode.VelocityChange);
     }
 }

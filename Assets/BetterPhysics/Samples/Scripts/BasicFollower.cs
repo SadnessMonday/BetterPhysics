@@ -22,8 +22,9 @@ namespace SadnessMonday.BetterPhysics.Samples {
         }
 
         private void Start() {
-            rb.softLimits = Limits.Default;
-            rb.softLimits.SetOmniDirectionalLimit(maxSpeed);
+            var limit = SpeedLimit.Soft;
+            limit.SetOmniDirectionalLimit(maxSpeed);
+            rb.limits.Add(limit);
         }
 
         private void FixedUpdate() {

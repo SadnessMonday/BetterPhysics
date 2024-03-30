@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using static SadnessMonday.BetterPhysics.Utilities.ForceUtilities;
+
 namespace SadnessMonday.BetterPhysics {
     public static class RigidbodyExtensions {
         public static Vector3 Forward(this Rigidbody rb) => rb.rotation * Vector3.forward;
@@ -17,21 +19,6 @@ namespace SadnessMonday.BetterPhysics {
             rb.velocity += velocityChange;
 
             return velocityChange;
-        }
-        
-        public static Vector3 CalculateVelocityChange(Vector3 force, float mass, ForceMode mode) {
-            switch (mode) {
-                case ForceMode.Force:
-                    return (force * Time.fixedDeltaTime) / mass;
-                case ForceMode.Acceleration:
-                    return force * Time.fixedDeltaTime;
-                case ForceMode.Impulse:
-                    return force / mass;
-                case ForceMode.VelocityChange:
-                    return force;
-                default:
-                    throw new System.Exception($"Unknown force mode " + mode);
-            }
         }
 
         /**

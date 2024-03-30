@@ -3,37 +3,28 @@ using UnityEngine;
 
 namespace SadnessMonday.BetterPhysics {
     [Serializable]
-    public struct Limits {
-        [SerializeField] LimitType limitType;
+    public struct SpeedLimit {
+        [SerializeField] private LimitType limitType;
+        [SerializeField] Directionality directionality;
         [SerializeField] private float scalarLimit;
         [SerializeField] bool asymmetrical;
         [SerializeField] Vector3 min;
         [SerializeField] Vector3 max;
         [SerializeField] private Bool3 axisLimited;
 
-        public Bool3 AxisLimited {
-            get => axisLimited;
-        }
+        public Bool3 AxisLimited => axisLimited;
+
+        public LimitType LimitType => limitType;
         
-        public LimitType LimitType {
-            get => limitType;
-        }
+        public Directionality Directionality => directionality;
 
-        public float ScalarLimit {
-            get => scalarLimit;
-        }
+        public float ScalarLimit => scalarLimit;
 
-        public bool Asymmetrical {
-            get => asymmetrical;
-        }
+        public bool Asymmetrical => asymmetrical;
 
-        public Vector3 Min {
-            get => min;
-        }
+        public Vector3 Min => min;
 
-        public Vector3 Max {
-            get => max;
-        }
+        public Vector3 Max => max;
 
         public bool XLimited {
             get => axisLimited.x;
@@ -58,17 +49,39 @@ namespace SadnessMonday.BetterPhysics {
             axisLimited[axis] = limited;
         }
 
-        public static readonly Limits Default = new() {
+        public static readonly SpeedLimit Default = new() {
             limitType = LimitType.None,
+            directionality = Directionality.Omnidirectional,
             asymmetrical = false,
             scalarLimit = 10,
             min = -5 * Vector3.one,
             max = 5 * Vector3.one,
             axisLimited = Bool3.True,
         };
+        
+        public static readonly SpeedLimit Soft = new() {
+            limitType = LimitType.Soft,
+            directionality = Directionality.Omnidirectional,
+            asymmetrical = false,
+            scalarLimit = 10,
+            min = -5 * Vector3.one,
+            max = 5 * Vector3.one,
+            axisLimited = Bool3.True,
+        };
+        
+        public static readonly SpeedLimit Hard = new() {
+            limitType = LimitType.Hard,
+            directionality = Directionality.Omnidirectional,
+            asymmetrical = false,
+            scalarLimit = 10,
+            min = -5 * Vector3.one,
+            max = 5 * Vector3.one,
+            axisLimited = Bool3.True,
+        };
+        
 
         public void SetOmniDirectionalLimit(float maxSpeed) {
-            limitType = LimitType.Omnidirectional;
+            directionality = Directionality.Omnidirectional;
             scalarLimit = maxSpeed;
             
             Validate();
@@ -76,7 +89,7 @@ namespace SadnessMonday.BetterPhysics {
 
         public void SetWorldLimits(in Bool3 axisLimited, in Vector3 min, in Vector3 max) {
             this.axisLimited = axisLimited;
-            limitType = LimitType.WorldAxes;
+            directionality = Directionality.WorldAxes;
             asymmetrical = true;
             this.min = min;
             this.max = max;
@@ -84,14 +97,14 @@ namespace SadnessMonday.BetterPhysics {
         
         public void SetWorldLimits(in Bool3 axisLimited, in Vector3 limits) {
             this.axisLimited = axisLimited;
-            limitType = LimitType.WorldAxes;
+            directionality = Directionality.WorldAxes;
             asymmetrical = false;
             max = limits;
             Validate();
         }
 
         public void SetWorldLimits(in Vector3 limits) {
-            limitType = LimitType.WorldAxes;
+            directionality = Directionality.WorldAxes;
             axisLimited = Bool3.True;
             asymmetrical = false;
             max = limits;
@@ -99,7 +112,7 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public void SetWorldLimits(in Vector3 min, in Vector3 max) {
-            limitType = LimitType.WorldAxes;
+            directionality = Directionality.WorldAxes;
             axisLimited = Bool3.True;
             asymmetrical = true;
             this.min = min;
@@ -109,7 +122,7 @@ namespace SadnessMonday.BetterPhysics {
         
         public void SetLocalLimits(in Bool3 axisLimited, in Vector3 min, in Vector3 max) {
             this.axisLimited = axisLimited;
-            limitType = LimitType.LocalAxes;
+            directionality = Directionality.LocalAxes;
             asymmetrical = true;
             this.min = min;
             this.max = max;
@@ -118,14 +131,14 @@ namespace SadnessMonday.BetterPhysics {
 
         public void SetLocalLimits(in Bool3 axisLimited, in Vector3 limits) {
             this.axisLimited = axisLimited;
-            limitType = LimitType.LocalAxes;
+            directionality = Directionality.LocalAxes;
             asymmetrical = false;
             max = limits;
             Validate();
         }
 
         public void SetLocalLimits(in Vector3 min, in Vector3 max) {
-            limitType = LimitType.LocalAxes;
+            directionality = Directionality.LocalAxes;
             axisLimited = Bool3.True;
             asymmetrical = true;
             this.min = min;
@@ -134,42 +147,45 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public void SetLocalLimits(in Vector3 limits) {
-            limitType = LimitType.LocalAxes;
+            directionality = Directionality.LocalAxes;
             axisLimited = Bool3.True;
             asymmetrical = false;
             max = limits;
             Validate();
         }
 
-        public static Limits SymmetricalLocalLimits(Vector3 limits) {
-            Limits toReturn = Default;
+        public SpeedLimit WithLimitType(LimitType limitType) {
+            this.limitType = limitType;
+            return this;
+        }
+
+        public static SpeedLimit SymmetricalLocalLimits(Vector3 limits) {
+            SpeedLimit toReturn = Default;
             toReturn.SetLocalLimits(limits);
             return toReturn;
         }
 
-        public static Limits SymmetricalWorldLimits(Vector3 limits) {
-            Limits toReturn = Default;
+        public static SpeedLimit SymmetricalWorldLimits(Vector3 limits) {
+            SpeedLimit toReturn = Default;
             toReturn.SetWorldLimits(limits);
             return toReturn;
         }
 
-        public static Limits OmnidirectionalLimit(float desiredSpeed) {
-            Limits toReturn = Default;
+        public static SpeedLimit OmnidirectionalLimit(float desiredSpeed) {
+            SpeedLimit toReturn = Default;
             toReturn.SetOmniDirectionalLimit(desiredSpeed);
             return toReturn;
         }
 
         void Validate() {
-            switch (limitType) {
-                case LimitType.None:
-                    break;
-                case LimitType.Omnidirectional:
+            switch (directionality) {
+                case Directionality.Omnidirectional:
                     if (scalarLimit < 0) {
                         throw new ArgumentException($"Omnidirectional limit must not be negative. Got {scalarLimit}");
                     }
                     break;
-                case LimitType.WorldAxes:
-                case LimitType.LocalAxes:
+                case Directionality.WorldAxes:
+                case Directionality.LocalAxes:
                     if (!asymmetrical) {
                         if (max.x < 0 || max.y < 0 || max.z < 0) {
                             throw new ArgumentException($"Symmetrical limits must not be negative. Got {max}");

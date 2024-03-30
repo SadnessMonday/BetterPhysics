@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -13,8 +14,9 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
         public class AddForceTestArgs {
             private readonly int _testNumber;
-            public Limits SoftLimits = Limits.Default;
-            public Limits HardLimits = Limits.Default;
+            // public SpeedLimit SoftLimits = SpeedLimit.Default;
+            // public SpeedLimit HardLimits = SpeedLimit.Default;
+            public List<SpeedLimit> limits = new();
             public ForceMode ForceMode = ForceMode.VelocityChange;
             public Vector3 StartVel = Vector3.zero;
             public Vector3 StartLocalVel = Vector3.zero;
@@ -36,13 +38,8 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
             public override string ToString() => $"Test no. {_testNumber}";
 
-            public AddForceTestArgs WithSoftLimits(Limits limits) {
-                SoftLimits = limits;
-                return this;
-            }
-
-            public AddForceTestArgs WithHardLimits(Limits limits) {
-                HardLimits = limits;
+            public AddForceTestArgs WithLimit(SpeedLimit limit) {
+                limits.Add(limit);
                 return this;
             }
 
@@ -103,8 +100,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             }
 
             public void Prepare(BetterRigidbody brb) {
-                brb.softLimits = SoftLimits;
-                brb.hardLimits = HardLimits;
+                brb.limits = new List<SpeedLimit>(this.limits);
 
                 brb.rotation = Quaternion.Euler(Orientation);
                 if (_hasStartLocalVelocity) {
@@ -124,22 +120,22 @@ namespace SadnessMonday.BetterPhysics.Tests {
             }
         }
 
-        static AddForceTestArgs SoftScalarArgs(float limit) {
-            Limits limits = Limits.Default;
-            limits.SetOmniDirectionalLimit(limit);
-            return new AddForceTestArgs().WithSoftLimits(limits).WithForceVec(Vector3.right * 10);
+        static AddForceTestArgs SoftScalarArgs(float omniLimit) {
+            SpeedLimit limit = SpeedLimit.Soft;
+            limit.SetOmniDirectionalLimit(omniLimit);
+            return new AddForceTestArgs().WithLimit(limit).WithForceVec(Vector3.right * 10);
         }
 
         static AddForceTestArgs SoftWorldArgs(Vector3 limit) {
             return new AddForceTestArgs()
-                .WithSoftLimits(Limits.SymmetricalWorldLimits(limit))
+                .WithLimit(SpeedLimit.SymmetricalWorldLimits(limit).WithLimitType(LimitType.Soft))
                 .WithForceVec(Vector3.one * 10);
         }
 
         static AddForceTestArgs SoftLocalArgs(Vector3 limit) {
             return new AddForceTestArgs()
                 .WithOrientation(Vector3.one)
-                .WithSoftLimits(Limits.SymmetricalLocalLimits(limit))
+                .WithLimit(SpeedLimit.SymmetricalLocalLimits(limit))
                 .WithLocalForceVec(Vector3.one * 10);
         }
 

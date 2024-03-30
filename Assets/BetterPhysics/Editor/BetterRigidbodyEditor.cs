@@ -89,10 +89,10 @@ namespace SadnessMonday.BetterPhysics.Editor {
             string limitsFoldoutText = SpeedLimitsLabelPrefix;
             if (!showSpeedLimits) {
                 // potentially show extra info
-                Limits softLimits = (Limits)softLimitsProperty.boxedValue;
-                Limits hardLimits = (Limits)hardLimitsProperty.boxedValue;
-                bool hasSoftLimit = softLimits.LimitType != LimitType.None;
-                bool hasHardLimit = hardLimits.LimitType != LimitType.None;
+                SpeedLimit softLimits = (SpeedLimit)softLimitsProperty.boxedValue;
+                SpeedLimit hardLimits = (SpeedLimit)hardLimitsProperty.boxedValue;
+                bool hasSoftLimit = softLimits.Directionality != Directionality.None;
+                bool hasHardLimit = hardLimits.Directionality != Directionality.None;
                 if (hasSoftLimit && hasHardLimit) {
                     limitsFoldoutText = BothLimits;
                 }

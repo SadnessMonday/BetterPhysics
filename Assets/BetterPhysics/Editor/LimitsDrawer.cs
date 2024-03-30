@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SadnessMonday.BetterPhysics.Editor {
-    [CustomPropertyDrawer(typeof(Limits))]
+    [CustomPropertyDrawer(typeof(SpeedLimit))]
     public class LimitsDrawer : PropertyDrawer {
         private const float LabelWidth = 40;
         const float Between = 5;
@@ -21,31 +21,32 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
             // Draw Limit type field
             SerializedProperty limitTypeProp = property.FindPropertyRelative("limitType");
+            SerializedProperty directionalityProp = property.FindPropertyRelative("directionality");
             Rect limitTypeRect = new(position.x, posY, position.width, rowHeight);
             EditorGUI.PropertyField(limitTypeRect, limitTypeProp, new GUIContent("Limit Type"));
-            
             LimitType limitType = (LimitType)limitTypeProp.enumValueIndex;
-            switch (limitType) {
-                case LimitType.None:
-                    DrawNothing(property, position, posY);
-                    break;
-                case LimitType.Omnidirectional:
-                    DrawScalarLimit(property, position, posY);
-                    break;
-                case LimitType.WorldAxes:
-                case LimitType.LocalAxes:
-                    DrawVectorLimit(property, position, posY);
-                    break;
+            
+            if (limitType != LimitType.None) {
+                posY += rowHeight;
+                position.y += rowHeight;
+                Rect directionalityRect = new(position.x, posY, position.width, rowHeight);
+                EditorGUI.PropertyField(directionalityRect, directionalityProp, new GUIContent("Directionality"));
+            
+                Directionality directionality = (Directionality)directionalityProp.enumValueIndex;
+                switch (directionality) {
+                    case Directionality.Omnidirectional:
+                        DrawScalarLimit(property, position, posY);
+                        break;
+                    case Directionality.WorldAxes:
+                    case Directionality.LocalAxes:
+                        DrawVectorLimit(property, position, posY);
+                        break;
+                }
             }
 
 
             EditorGUI.EndProperty();
         }
-
-        private void DrawNothing(SerializedProperty property, Rect position, float posY) {
-            float rowHeight = EditorGUIUtility.singleLineHeight;
-        }
-
         private void DrawScalarLimit(SerializedProperty property, Rect position, float posY) {
             float rowHeight = EditorGUIUtility.singleLineHeight;
             SerializedProperty scalarLimitProperty = property.FindPropertyRelative("scalarLimit");
@@ -158,19 +159,24 @@ namespace SadnessMonday.BetterPhysics.Editor {
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            // Draw Limit type field
-            SerializedProperty limitTypeProp = property.FindPropertyRelative("limitType");
+            SerializedProperty limitTypeProp = property.FindPropertyRelative("directionality");
             LimitType limitType = (LimitType)limitTypeProp.enumValueIndex;
-            switch (limitType) {
-                case LimitType.None:
-                    return EditorGUIUtility.singleLineHeight * 1;
-                case LimitType.Omnidirectional:
-                    return EditorGUIUtility.singleLineHeight * 2;
-                case LimitType.WorldAxes:
-                case LimitType.LocalAxes:
-                    return EditorGUIUtility.singleLineHeight * 6;
+
+            if (limitType == LimitType.None) {
+                return EditorGUIUtility.singleLineHeight * 1;
+            }
+            
+            // Draw Limit type field
+            SerializedProperty directionalityProp = property.FindPropertyRelative("directionality");
+            Directionality directionality = (Directionality)directionalityProp.enumValueIndex;
+            switch (directionality) {
+                case Directionality.Omnidirectional:
+                    return EditorGUIUtility.singleLineHeight * 3;
+                case Directionality.WorldAxes:
+                case Directionality.LocalAxes:
+                    return EditorGUIUtility.singleLineHeight * 7;
                 default:
-                    return EditorGUIUtility.singleLineHeight * 1;
+                    return EditorGUIUtility.singleLineHeight * 2;
             }
         }
     }

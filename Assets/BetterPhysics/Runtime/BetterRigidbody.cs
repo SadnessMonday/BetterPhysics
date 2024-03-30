@@ -6,6 +6,8 @@ using Unity.Collections;
 using UnityEngine;
 using UnityEngine.LowLevel;
 
+using static SadnessMonday.BetterPhysics.Utilities.ForceUtilities;
+
 namespace SadnessMonday.BetterPhysics {
     [RequireComponent(typeof(Rigidbody))]
     [DisallowMultipleComponent]
@@ -18,6 +20,16 @@ namespace SadnessMonday.BetterPhysics {
             PlayerLoopSystem.UpdateFunction myFunction = new PlayerLoopSystem.UpdateFunction(UpdateAllBetterBodies);
         }
 
+        private void FixedUpdate() {
+            Vector3 velocityBefore = rb.velocity;
+            Vector3 accForceBefore = rb.GetAccumulatedForce();
+            ApplyLimits();
+            Vector3 velocityAfter = rb.velocity;
+            Vector3 accForceAter = rb.GetAccumulatedForce();
+            
+            Debug.Log($"VelB: {velocityBefore}, AFB: {accForceBefore}\nVelA: {velocityAfter}, AFA: {accForceAter}");
+        }
+
         static void UpdateAllBetterBodies() {
             foreach (BetterRigidbody body in allBodies) {
                 body.ApplyLimits();
@@ -25,28 +37,149 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public void ApplyLimits() {
-            ApplySoftLimits();
-            ApplyHardLimits();
-        }
-
-        private void ApplySoftLimits() {
-            for (int i = 0; i < 3; i++) {
-                if (!softLimits.AxisLimited[i]) {
-                    rb.GetAccumulatedForce()
-                }
+            foreach (SpeedLimit limit in limits) {
+                ApplyLimit(limit);
             }
         }
 
-        private void ApplyHardLimits() {
-            throw new NotImplementedException();
+        void ApplyLimit(SpeedLimit limit) {
+            switch (limit.LimitType) {
+                case LimitType.Hard:
+                    ApplyHardLimit(limit);
+                    break;
+                case LimitType.Soft:
+                    ApplySoftLimit(limit);
+                    break;
+            }
+        }
+
+        private void ApplySoftLimit(SpeedLimit limit) {
+            // Accumulated force is always expressed in terms of newtons. As if applied with ForceMode.Force.
+            var accumulatedNewtons = rb.GetAccumulatedForce();
+            var currentVelocity = rb.velocity;
+            var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, rb.mass,
+                ForceMode.Force);
+
+            switch (limit.Directionality) {
+                case Directionality.Omnidirectional: {
+                    Vector3 limitedChange = CalculateVelocityChangeWithSoftLimit(currentVelocity, accumulatedNewtons,
+                        limit.ScalarLimit);
+                    Vector3 diff = limitedChange - expectedVelocityChange;
+                    rb.AddForce(diff, ForceMode.VelocityChange);
+                    break;
+                }
+                // return AddForceWithOmnidirectionalLimit(force, limits.ScalarLimit, mode);
+                case Directionality.WorldAxes: {
+                    Vector3 min;
+                    Vector3 max = limit.Max;
+                    if (limit.Asymmetrical) {
+                        min = limit.Min;
+                    }
+                    else {
+                        min = -limit.Max;
+                    }
+
+                    // This is what we want the new velocity to be.
+                    Vector3 newVelocity = SoftClamp(currentVelocity, expectedVelocityChange, limit.AxisLimited,
+                        min, max);
+                    // This is what we want the velocity diff to be
+                    Vector3 clampedVelocityDiff = newVelocity - currentVelocity;
+                    Vector3 correction = clampedVelocityDiff - expectedVelocityChange;
+                    rb.AddForce(correction, ForceMode.VelocityChange);
+                    break;
+                }
+                case Directionality.LocalAxes: {
+                    Vector3 min;
+                    Vector3 max = limit.Max;
+                    if (limit.Asymmetrical) {
+                        min = limit.Min;
+                    }
+                    else {
+                        min = -limit.Max;
+                    }
+
+                    // Convert everything to local
+                    Quaternion inverseRot = Quaternion.Inverse(rb.rotation);
+                    Vector3 localForce = inverseRot * accumulatedNewtons;
+                    Vector3 localVelocity = inverseRot * currentVelocity;
+
+                    // Do the math in local space
+                    Vector3 expectedLocalChange = CalculateVelocityChange(localForce, rb.mass, ForceMode.Force);
+                    Vector3 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limit.AxisLimited, min, max);
+                    // print($"Clamped new local velocity is {newLocalVelocity}");
+
+                    // Convert back to worldspace
+                    Vector3 newWorldVelocity = rb.rotation * newLocalVelocity;
+                    Vector3 worldChange = newWorldVelocity - currentVelocity;
+                    Vector3 correction = worldChange - expectedVelocityChange;
+                    rb.AddForce(correction, ForceMode.VelocityChange);
+                    break;
+                }
+                default:
+                    throw new NotImplementedException($"Unknown limit type: {limit.Directionality.ToString()}");
+            }
+        }
+
+        private void ApplyHardLimit(SpeedLimit limit) {
+            var accumulatedNewtons = rb.GetAccumulatedForce();
+            var currentVelocity = rb.velocity;
+            var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, rb.mass,
+                ForceMode.Force);
+            var expectedNewVelocity = currentVelocity + expectedVelocityChange;
+            
+            switch (limit.Directionality) {
+                case Directionality.Omnidirectional:
+                    Vector3 clampedVelocity = Vector3.ClampMagnitude(expectedNewVelocity, limit.ScalarLimit);
+                    Vector3 requiredVelocityDiff = clampedVelocity - expectedNewVelocity;
+                    rb.AddForce(requiredVelocityDiff, ForceMode.VelocityChange);
+                    break;
+                case Directionality.WorldAxes: {
+                    Vector3 clampedNewVelocity = expectedNewVelocity;
+                    var max = limit.Max;
+                    var min = limit.Min;
+                    for (int i = 0; i < 3; i++) {
+                        if (limit.Asymmetrical) {
+                            clampedNewVelocity[i] = Mathf.Clamp(clampedNewVelocity[i], min[i], max[i]);
+                        }
+                        else {
+                            clampedNewVelocity[i] = Mathf.Clamp(clampedNewVelocity[i], -max[i], max[i]);
+                        }
+                    }
+
+                    Vector3 correction = clampedNewVelocity - expectedNewVelocity;
+                    rb.AddForce(correction, ForceMode.VelocityChange);
+                    break;
+                }
+                case Directionality.LocalAxes: {
+                    Vector3 clampedLocalVelocity = Quaternion.Inverse(rb.rotation) * expectedNewVelocity;
+                    var max = limit.Max;
+                    var min = limit.Min;
+                    for (int i = 0; i < 3; i++) {
+                        if (limit.Asymmetrical) {
+                            clampedLocalVelocity[i] = Mathf.Clamp(clampedLocalVelocity[i], min[i], max[i]);
+                        }
+                        else {
+                            clampedLocalVelocity[i] = Mathf.Clamp(clampedLocalVelocity[i], -max[i], max[i]);
+                        }
+                    }
+
+                    Vector3 clampedWorldVelocity = rb.rotation * clampedLocalVelocity;
+                    Vector3 correction = clampedWorldVelocity - expectedNewVelocity;
+                    rb.AddForce(correction, ForceMode.VelocityChange);
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public delegate void PhysicsLayerChangeHandler(BetterRigidbody source, int oldLayer, int newLayer);
 
         public event PhysicsLayerChangeHandler OnPhysicsLayerChanged;
 
-        public Limits softLimits;
-        public Limits hardLimits;
+        // public SpeedLimit softLimits;
+        // public SpeedLimit hardLimits;
+        public List<SpeedLimit> limits = new();
         
         Rigidbody rb;
 
@@ -62,7 +195,7 @@ namespace SadnessMonday.BetterPhysics {
             get => Quaternion.Inverse(rb.rotation) * rb.velocity;
             set => rb.velocity = rb.rotation * value;
         }
-
+        
         public float Speed => rb.velocity.magnitude;
 
         [SerializeField] private List<OneWayLayerInteraction> layerInteractions = new();
@@ -268,30 +401,6 @@ namespace SadnessMonday.BetterPhysics {
             return velocityChange;
         }
 
-        /**
-         * Adds the desired force in the body's local coordinate system and returns the absolute effective change in
-         * velocity that occurred in world space.
-         */
-        public Vector3 AddRelativeForce(float x, float y, float z, ForceMode mode = ForceMode.Force) {
-            return AddRelativeForce(new Vector3(x, y, z), mode);
-        }
-
-        public void AddRelativeTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
-            rb.AddRelativeTorque(x, y, z, mode);
-        }
-        
-        public void AddRelativeTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
-            rb.AddRelativeTorque(torque, mode);
-        }
-
-        public void AddTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
-            rb.AddTorque(x, y, z, mode);
-        }
-
-        public void AddTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
-            rb.AddTorque(torque, mode);
-        }
-
         public Func<Vector3, Vector3> ClosestPointOnBounds => rb.ClosestPointOnBounds;
         public Func<Vector3, Vector3> GetPointVelocity => rb.GetPointVelocity;
         public Func<Vector3, Vector3> GetRelativePointVelocity => rb.GetRelativePointVelocity;
@@ -407,49 +516,61 @@ namespace SadnessMonday.BetterPhysics {
 
         #region custom stuff
 
-        public Vector3 AddForceWithSoftLimit(Vector3 force, Limits limits, ForceMode mode) {
-            switch (limits.LimitType) {
-                case LimitType.None:
-                    return AddForceWithoutLimit(force, mode);
-                case LimitType.Omnidirectional:
+        public Vector3 AddForceWithLimit(Vector3 force, ForceMode mode, SpeedLimit limit) {
+            rb.AddForce(force, mode);
+            ApplyLimit(limit);
+            
+            // TODO calculate the correct velocity diff here
+            return Vector3.zero;
+        }
+
+        public Vector3 AddForceWithLimits(Vector3 force, ForceMode mode, params SpeedLimit[] limits) {
+            rb.AddForce(force, mode);
+            foreach (var limit in limits) ApplyLimit(limit);
+            
+            // TODO calculate the correct velocity diff here
+            return Vector3.zero;
+        }
+
+        public Vector3 AddForceWithSoftLimit(Vector3 force, SpeedLimit limits, ForceMode mode) {
+            switch (limits.Directionality) {
+                case Directionality.Omnidirectional:
                     return AddForceWithOmnidirectionalLimit(force, limits.ScalarLimit, mode);
-                case LimitType.WorldAxes:
+                case Directionality.WorldAxes:
                     if (limits.Asymmetrical) {
                         return AddForceWithWorldAxisLimit(force, limits.AxisLimited, limits.Min, limits.Max, mode);
                     }
 
                     return AddForceWithWorldAxisLimit(force, limits.AxisLimited, -limits.Max, limits.Max, mode);
-                case LimitType.LocalAxes:
+                case Directionality.LocalAxes:
                     if (limits.Asymmetrical) {
                         return AddForceWithLocalAxisLimit(force, limits.AxisLimited, limits.Min, limits.Max, mode);
                     }
                     
                     return AddForceWithLocalAxisLimit(force, limits.AxisLimited, -limits.Max, limits.Max, mode);
                 default:
-                    throw new NotImplementedException($"Unknown limit type: {limits.LimitType.ToString()}");
+                    throw new NotImplementedException($"Unknown limit type: {limits.Directionality.ToString()}");
             }
         }
         
-        private Vector3 AddRelativeForceWithSoftLimit(Vector3 force, Limits limits, ForceMode mode) {
-            switch (limits.LimitType) {
-                case LimitType.None:
-                    return AddRelativeForceWithoutLimit(force, mode);
-                case LimitType.Omnidirectional:
+        private Vector3 AddRelativeForceWithSoftLimit(Vector3 force, SpeedLimit limits, ForceMode mode) {
+            switch (limits.Directionality) {
+                case Directionality.Omnidirectional:
                     return AddRelativeForceWithOmnidirectionalLimit(force, limits.ScalarLimit, mode);
-                case LimitType.WorldAxes:
+                case Directionality.WorldAxes:
                     if (limits.Asymmetrical) {
                         return AddRelativeForceWithWorldAxisLimit(force, limits.AxisLimited, -limits.Max, limits.Max, mode);
                     }
 
                     return AddRelativeForceWithWorldAxisLimit(force, limits.AxisLimited, limits.Min, limits.Max, mode);
-                case LimitType.LocalAxes:
+                case Directionality.LocalAxes:
                     if (limits.Asymmetrical) {
                         return AddRelativeForceWithLocalAxisLimit(force, limits.AxisLimited, -limits.Max, limits.Max, mode);
                     }
 
                     return AddRelativeForceWithLocalAxisLimit(force, limits.AxisLimited, limits.Min, limits.Max, mode);
                 default:
-                    throw new NotImplementedException($"Unknown limit type: {limits.LimitType.ToString()}");
+                    throw new NotImplementedException($"Unknown limit type: {limits.Directionality.ToString()}");
             }
         }
 
@@ -460,7 +581,7 @@ namespace SadnessMonday.BetterPhysics {
             Vector3 worldVelocity = rb.velocity;
 
             // Do the math in local space
-            Vector3 expectedLocalChange = RigidbodyExtensions.CalculateVelocityChange(localForce, rb.mass, mode);
+            Vector3 expectedLocalChange = CalculateVelocityChange(localForce, rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limited, min, max);
             // Debug.Log($"Current local vel is {localVelocity:F8}, Expected local change is {expectedLocalChange:F8}, Clamped new local velocity is {newLocalVelocity:F8}");
 
@@ -486,7 +607,7 @@ namespace SadnessMonday.BetterPhysics {
             Vector3 localVelocity = inverseRot * worldVelocity;
 
             // Do the math in local space
-            Vector3 expectedLocalChange = RigidbodyExtensions.CalculateVelocityChange(localForce, rb.mass, mode);
+            Vector3 expectedLocalChange = CalculateVelocityChange(localForce, rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limited, min, max);
             // print($"Clamped new local velocity is {newLocalVelocity}");
 
@@ -510,7 +631,7 @@ namespace SadnessMonday.BetterPhysics {
             CheckForFixedTimestep();
 #endif
 
-            Vector3 expectedChange = RigidbodyExtensions.CalculateVelocityChange(localForce, rb.mass, mode);
+            Vector3 expectedChange = CalculateVelocityChange(localForce, rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(LocalVelocity, expectedChange, limited, min, max);
 
             Vector3 newWorldVelocity = rotation * newLocalVelocity;
@@ -530,7 +651,7 @@ namespace SadnessMonday.BetterPhysics {
             CheckForFixedTimestep();
 #endif
 
-            Vector3 expectedChange = RigidbodyExtensions.CalculateVelocityChange(force, rb.mass, mode);
+            Vector3 expectedChange = CalculateVelocityChange(force, rb.mass, mode);
             Vector3 currentVelocity = rb.velocity;
             Vector3 newVelocity = SoftClamp(currentVelocity, expectedChange, limited, min, max);
             rb.velocity = newVelocity;
@@ -631,54 +752,52 @@ namespace SadnessMonday.BetterPhysics {
             return rb.VisibleAddRelativeForce(force, mode);
         }
 
-        private void ApplyHardLimit(Limits limits) {
-            switch (limits.LimitType) {
-                case LimitType.None:
-                    break;
-                case LimitType.Omnidirectional:
-                    rb.velocity = Vector3.ClampMagnitude(rb.velocity, limits.ScalarLimit);
-                    break;
-                case LimitType.WorldAxes: {
-                    Vector3 vel = rb.velocity;
-                    var max = limits.Max;
-                    var min = limits.Min;
-                    for (int i = 0; i < 3; i++) {
-                        if (limits.Asymmetrical) {
-                            vel[i] = Mathf.Clamp(vel[i], min[i], max[i]);
-                        }
-                        else {
-                            vel[i] = Mathf.Clamp(vel[i], -max[i], max[i]);
-                        }
-                    }
-
-                    rb.velocity = vel;
-                    break;
-                }
-                case LimitType.LocalAxes: {
-                    Vector3 localVelocity = LocalVelocity;
-                    var max = limits.Max;
-                    var min = limits.Min;
-                    for (int i = 0; i < 3; i++) {
-                        if (limits.Asymmetrical) {
-                            localVelocity[i] = Mathf.Clamp(localVelocity[i], min[i], max[i]);
-                        }
-                        else {
-                            localVelocity[i] = Mathf.Clamp(localVelocity[i], -max[i], max[i]);
-                        }
-                    }
-
-                    rb.velocity = rb.rotation * localVelocity;
-                    break;
-                }
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
+        // private void ApplyHardLimit(SpeedLimit limit) {
+        //     switch (limit.Directionality) {
+        //         case Directionality.Omnidirectional:
+        //             rb.velocity = Vector3.ClampMagnitude(rb.velocity, limit.ScalarLimit);
+        //             break;
+        //         case Directionality.WorldAxes: {
+        //             Vector3 vel = rb.velocity;
+        //             var max = limit.Max;
+        //             var min = limit.Min;
+        //             for (int i = 0; i < 3; i++) {
+        //                 if (limit.Asymmetrical) {
+        //                     vel[i] = Mathf.Clamp(vel[i], min[i], max[i]);
+        //                 }
+        //                 else {
+        //                     vel[i] = Mathf.Clamp(vel[i], -max[i], max[i]);
+        //                 }
+        //             }
+        //
+        //             rb.velocity = vel;
+        //             break;
+        //         }
+        //         case Directionality.LocalAxes: {
+        //             Vector3 localVelocity = LocalVelocity;
+        //             var max = limit.Max;
+        //             var min = limit.Min;
+        //             for (int i = 0; i < 3; i++) {
+        //                 if (limit.Asymmetrical) {
+        //                     localVelocity[i] = Mathf.Clamp(localVelocity[i], min[i], max[i]);
+        //                 }
+        //                 else {
+        //                     localVelocity[i] = Mathf.Clamp(localVelocity[i], -max[i], max[i]);
+        //                 }
+        //             }
+        //
+        //             rb.velocity = rb.rotation * localVelocity;
+        //             break;
+        //         }
+        //         default:
+        //             throw new ArgumentOutOfRangeException();
+        //     }
+        // }
 
         private Vector3 CalculateVelocityChangeWithSoftLimit(in Vector3 currentVelocity, in Vector3 force,
             float speedLimit, ForceMode mode = ForceMode.Force) {
             // velocityChange is how much we would be adding to the velocity if we were to just add it normally.
-            Vector3 velocityChange = RigidbodyExtensions.CalculateVelocityChange(force, rb.mass, mode);
+            Vector3 velocityChange = CalculateVelocityChange(force, rb.mass, mode);
             if (speedLimit < 0 || float.IsPositiveInfinity(speedLimit)) {
                 // Speed limit < 0 counts as no limit.
                 return velocityChange;
@@ -699,6 +818,8 @@ namespace SadnessMonday.BetterPhysics {
             Vector3 effectiveVelocityChange = velocityChange - component + adjustedComponent;
             return effectiveVelocityChange;
         }
+
+        // Calculate the required newtons to effect the desired velocity change
 
         private static void CheckForFixedTimestep() {
             if (!Time.inFixedTimeStep) {
