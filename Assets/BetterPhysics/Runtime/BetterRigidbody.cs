@@ -14,6 +14,16 @@ namespace SadnessMonday.BetterPhysics {
     [DefaultExecutionOrder(10000)] // We need to run _late_ so we get a chance to modify velocity.
     public class BetterRigidbody : MonoBehaviour {
         private static HashSet<BetterRigidbody> allBodies = new();
+        
+        public delegate void PhysicsLayerChangeHandler(BetterRigidbody source, int oldLayer, int newLayer);
+
+        public event PhysicsLayerChangeHandler OnPhysicsLayerChanged;
+
+        // public SpeedLimit softLimits;
+        // public SpeedLimit hardLimits;
+        public List<SpeedLimit> limits = new();
+        
+        Rigidbody rb;
 
         [RuntimeInitializeOnLoadMethod]
         static void ModifyPlayerLoop() {
@@ -21,13 +31,13 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void FixedUpdate() {
-            Vector3 velocityBefore = rb.velocity;
-            Vector3 accForceBefore = rb.GetAccumulatedForce();
+            // Vector3 velocityBefore = rb.velocity;
+            // Vector3 accForceBefore = rb.GetAccumulatedForce();
             ApplyLimits();
-            Vector3 velocityAfter = rb.velocity;
-            Vector3 accForceAter = rb.GetAccumulatedForce();
+            // Vector3 velocityAfter = rb.velocity;
+            // Vector3 accForceAter = rb.GetAccumulatedForce();
             
-            Debug.Log($"VelB: {velocityBefore}, AFB: {accForceBefore}\nVelA: {velocityAfter}, AFA: {accForceAter}");
+            // Debug.Log($"VelB: {velocityBefore}, AFB: {accForceBefore}\nVelA: {velocityAfter}, AFA: {accForceAter}");
         }
 
         static void UpdateAllBetterBodies() {
@@ -172,16 +182,6 @@ namespace SadnessMonday.BetterPhysics {
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-        public delegate void PhysicsLayerChangeHandler(BetterRigidbody source, int oldLayer, int newLayer);
-
-        public event PhysicsLayerChangeHandler OnPhysicsLayerChanged;
-
-        // public SpeedLimit softLimits;
-        // public SpeedLimit hardLimits;
-        public List<SpeedLimit> limits = new();
-        
-        Rigidbody rb;
 
         internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
         internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();
@@ -375,30 +375,78 @@ namespace SadnessMonday.BetterPhysics {
 
             return AddForceWithoutLimit(direction * forceAmount, mode);
         }
+        
+        /// <summary>
+        /// Pass-through of Rigidbody.AddForce
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddForce(Vector3 force, ForceMode mode = ForceMode.Force) {
+            rb.AddForce(force, mode);
+        }
 
-        public Vector3 AddForce(float x, float y, float z, ForceMode mode = ForceMode.Force) {
+        /// <summary>
+        /// Pass-through of Rigidbody.AddForce
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddForce(float x, float y, float z, ForceMode mode = ForceMode.Force) {
             // print("Adding force");
-            return AddForce(new Vector3(x, y, z), mode);
+            rb.AddForce(x, y, z, mode);
         }
 
-        // TODO AddForceAtPosition
-
-        public Vector3 AddForce(Vector3 force, ForceMode mode = ForceMode.Force) {
-            Vector3 velocityChange = AddForceWithSoftLimit(force, softLimits, mode);
-
-            ApplyHardLimit(hardLimits);
-
-            return velocityChange;
+        /// <summary>
+        /// Pass-through of Rigidbody.AddRelativeForce
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddRelativeForce(Vector3 force, ForceMode mode = ForceMode.Force) {
+            rb.AddRelativeForce(force, mode);
+        }
+        
+        /// <summary>
+        /// Pass-through of Rigidbody.AddRelativeForce
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddRelativeForce(float x, float y, float z, ForceMode mode = ForceMode.Force) {
+            rb.AddRelativeForce(x, y, z, mode);
+        }
+        
+        /// <summary>
+        /// Pass-through of Rigidbody.AddTorque
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
+            rb.AddTorque(torque, mode);
+        }
+        
+        /// <summary>
+        /// Pass-through of Rigidbody.AddTorque
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
+            rb.AddTorque(x, y, z, mode);
         }
 
-        /**
-         * Adds the desired force in the body's local coordinate system and returns the absolute effective change in
-         * velocity that occurred in world space.
-         */
-        public Vector3 AddRelativeForce(Vector3 force, ForceMode mode = ForceMode.Force) {
-            Vector3 velocityChange = AddRelativeForceWithSoftLimit(force, softLimits, mode);
-            ApplyHardLimit(hardLimits);
-            return velocityChange;
+        /// <summary>
+        /// Pass-through of Rigidbody.AddRelativeTorque
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddRelativeTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
+            rb.AddRelativeTorque(torque, mode);
+        }
+
+        /// <summary>
+        /// Pass-through of Rigidbody.AddRelativeTorque
+        /// </summary>
+        /// <param name="force"></param>
+        /// <param name="mode"></param>
+        public void AddRelativeTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
+            rb.AddRelativeTorque(x, y, z, mode);
         }
 
         public Func<Vector3, Vector3> ClosestPointOnBounds => rb.ClosestPointOnBounds;
@@ -525,6 +573,10 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public Vector3 AddForceWithLimits(Vector3 force, ForceMode mode, params SpeedLimit[] limits) {
+            return AddForceWithLimits(force, mode, (IEnumerable<SpeedLimit>)limits);
+        }
+
+        public Vector3 AddForceWithLimits(Vector3 force, ForceMode mode, IEnumerable<SpeedLimit> limits) {
             rb.AddForce(force, mode);
             foreach (var limit in limits) ApplyLimit(limit);
             

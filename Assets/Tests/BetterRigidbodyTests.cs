@@ -14,8 +14,6 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
         public class AddForceTestArgs {
             private readonly int _testNumber;
-            // public SpeedLimit SoftLimits = SpeedLimit.Default;
-            // public SpeedLimit HardLimits = SpeedLimit.Default;
             public List<SpeedLimit> limits = new();
             public ForceMode ForceMode = ForceMode.VelocityChange;
             public Vector3 StartVel = Vector3.zero;
@@ -100,7 +98,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             }
 
             public void Prepare(BetterRigidbody brb) {
-                brb.limits = new List<SpeedLimit>(this.limits);
+                brb.limits = new List<SpeedLimit>(limits);
 
                 brb.rotation = Quaternion.Euler(Orientation);
                 if (_hasStartLocalVelocity) {
@@ -112,11 +110,9 @@ namespace SadnessMonday.BetterPhysics.Tests {
                 }
             }
 
-            public Vector3 ApplyForce(BetterRigidbody brb) {
-                Vector3 sum = Vector3.zero;
-                if (_hasWorldForce) sum += brb.AddForce(ForceVec, ForceMode);
-                if (_hasLocalForce) sum += brb.AddRelativeForce(LocalForceVec, ForceMode);
-                return sum;
+            public void ApplyForce(BetterRigidbody brb) {
+                if (_hasWorldForce) brb.AddForce(ForceVec, ForceMode);
+                if (_hasLocalForce) brb.AddRelativeForce(LocalForceVec, ForceMode);
             }
         }
 
@@ -135,7 +131,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
         static AddForceTestArgs SoftLocalArgs(Vector3 limit) {
             return new AddForceTestArgs()
                 .WithOrientation(Vector3.one)
-                .WithLimit(SpeedLimit.SymmetricalLocalLimits(limit))
+                .WithLimit(SpeedLimit.SymmetricalLocalLimits(LimitType.Soft, limit))
                 .WithLocalForceVec(Vector3.one * 10);
         }
 
@@ -212,19 +208,17 @@ namespace SadnessMonday.BetterPhysics.Tests {
         }
 
         // A Test behaves as an ordinary method
-        [Test]
+        [UnityTest]
         [TestCaseSource(nameof(AddForceCases))]
-        public void AddForceTest(AddForceTestArgs args) {
+        public IEnumerator AddForceTest(AddForceTestArgs args) {
             BetterRigidbody brb = PrepareBody();
             // set up limits etc
             args.Prepare(brb);
             Vector3 oldWorldVelocity = brb.Velocity;
-            Vector3 reportedWorldVelocityChange = args.ApplyForce(brb);
-            Vector3 newWorldVelocity = brb.Velocity;
-            Vector3 actualWorldVelocityChange = newWorldVelocity - oldWorldVelocity;
             
-            Assert.AreEqual(actualWorldVelocityChange, reportedWorldVelocityChange);
-            
+            args.ApplyForce(brb);
+            yield return new WaitForFixedUpdate();
+
             if (args.ExpectsLocalVelocity) {
                 Assert.AreEqual(args.ExpectedVelocity, brb.LocalVelocity);
             }

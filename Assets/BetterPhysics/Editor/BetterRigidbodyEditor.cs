@@ -83,16 +83,22 @@ namespace SadnessMonday.BetterPhysics.Editor {
         }
 
         private void DrawLimitsSection() {
-            var softLimitsProperty = serializedObject.FindProperty("softLimits");
-            var hardLimitsProperty = serializedObject.FindProperty("hardLimits");
+            var limitsProperty = serializedObject.FindProperty("limits");
 
             string limitsFoldoutText = SpeedLimitsLabelPrefix;
             if (!showSpeedLimits) {
                 // potentially show extra info
-                SpeedLimit softLimits = (SpeedLimit)softLimitsProperty.boxedValue;
-                SpeedLimit hardLimits = (SpeedLimit)hardLimitsProperty.boxedValue;
-                bool hasSoftLimit = softLimits.Directionality != Directionality.None;
-                bool hasHardLimit = hardLimits.Directionality != Directionality.None;
+                bool hasSoftLimit = false;
+                bool hasHardLimit = false;
+                for (int i = 0; i < limitsProperty.arraySize; i++) {
+                    SerializedProperty limitProp = limitsProperty.GetArrayElementAtIndex(i);
+                    var limit = (SpeedLimit)limitProp.boxedValue;
+                    hasSoftLimit |= limit.LimitType == LimitType.Soft;
+                    hasHardLimit |= limit.LimitType == LimitType.Hard;
+                    
+                    if (hasSoftLimit && hasHardLimit) break;
+                }
+                
                 if (hasSoftLimit && hasHardLimit) {
                     limitsFoldoutText = BothLimits;
                 }
@@ -106,8 +112,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
             
             showSpeedLimits = EditorGUILayout.Foldout(showSpeedLimits, limitsFoldoutText, rtStyle);
             if (showSpeedLimits) {
-                EditorGUILayout.PropertyField(softLimitsProperty);
-                EditorGUILayout.PropertyField(hardLimitsProperty);
+                EditorGUILayout.PropertyField(limitsProperty);
             }
         }
     }
