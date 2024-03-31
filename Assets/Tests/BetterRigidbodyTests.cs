@@ -209,8 +209,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
         // A Test behaves as an ordinary method
         [UnityTest]
-        [TestCaseSource(nameof(AddForceCases))]
-        public IEnumerator AddForceTest(AddForceTestArgs args) {
+        public IEnumerator AddForceTest([ValueSource(nameof(AddForceCases))] AddForceTestArgs args) {
             BetterRigidbody brb = PrepareBody();
             // set up limits etc
             args.Prepare(brb);
