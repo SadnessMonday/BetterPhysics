@@ -49,6 +49,10 @@ namespace SadnessMonday.BetterPhysics {
             axisLimited[axis] = limited;
         }
 
+        public void SetAxisLimited(Bool3 newLimits) {
+            axisLimited = newLimits;
+        }
+
         public static readonly SpeedLimit Default = new() {
             limitType = LimitType.None,
             directionality = Directionality.Omnidirectional,

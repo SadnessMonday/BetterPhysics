@@ -135,7 +135,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
                 .WithLocalForceVec(Vector3.one * 10);
         }
 
-        static AddForceTestArgs[] AddForceCases() {
+        static AddForceTestArgs[] SoftLimitsCases() {
             _testNo = 1;
             return new[] {
                 // Omnidirectional tests
@@ -206,14 +206,13 @@ namespace SadnessMonday.BetterPhysics.Tests {
             brb.useGravity = false;
             brb.drag = 0;
             brb.angularDrag = 0;
-            brb.detectCollisions = false;
 
             return brb;
         }
 
         // A Test behaves as an ordinary method
         [UnityTest]
-        public IEnumerator AddForceTest([ValueSource(nameof(AddForceCases))] AddForceTestArgs args) {
+        public IEnumerator SoftLimitsTest([ValueSource(nameof(SoftLimitsCases))] AddForceTestArgs args) {
             BetterRigidbody brb = PrepareBody();
             // set up limits etc
             args.Prepare(brb);
@@ -231,6 +230,16 @@ namespace SadnessMonday.BetterPhysics.Tests {
             }
 
             Assert.AreEqual(brb.velocity, brb.Velocity);
+        }
+
+        [UnityTest]
+        public IEnumerator HardLimitsTest() {
+            BetterRigidbody brb = PrepareBody();
+
+            SpeedLimit limit = SpeedLimit.Hard;
+            limit.SetOmniDirectionalLimit(10);
+            brb.velocity = Vector3.right * 5; // starting velocity;
+            yield return new WaitForFixedUpdate();
         }
 
         [Test]
