@@ -22,8 +22,9 @@ namespace SadnessMonday.BetterPhysics {
         // public SpeedLimit softLimits;
         // public SpeedLimit hardLimits;
         public List<SpeedLimit> limits = new();
-        
         Rigidbody rb;
+        // Exempt from local limits
+        private Vector3 exemptedVelocityChange;
 
         [RuntimeInitializeOnLoadMethod]
         static void ModifyPlayerLoop() {
@@ -31,6 +32,10 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void FixedUpdate() {
+            // Apply exempted newtons directly to the velocity
+            rb.velocity += exemptedVelocityChange;
+            exemptedVelocityChange = Vector3.zero;
+
             // Vector3 velocityBefore = rb.velocity;
             // Vector3 accForceBefore = rb.GetAccumulatedForce();
             ApplyLimits();
@@ -132,9 +137,6 @@ namespace SadnessMonday.BetterPhysics {
 
         private void ApplyHardLimit(SpeedLimit limit) {
             var currentVelocity = rb.velocity;
-            // We're going to do this clamping no matter what.
-            rb.velocity = Vector3.ClampMagnitude(currentVelocity, limit.ScalarLimit);
-            
             var accumulatedNewtons = rb.GetAccumulatedForce();
             var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, rb.mass,
                 ForceMode.Force);
@@ -145,6 +147,8 @@ namespace SadnessMonday.BetterPhysics {
                     Vector3 clampedVelocity = Vector3.ClampMagnitude(expectedNewVelocity, limit.ScalarLimit);
                     Vector3 requiredVelocityDiff = clampedVelocity - expectedNewVelocity;
                     rb.AddForce(requiredVelocityDiff, ForceMode.VelocityChange);
+                    // We're going to do this clamping no matter what.
+                    rb.velocity = clampedVelocity;
                     break;
                 case Directionality.WorldAxes: {
                     Vector3 clampedNewVelocity = expectedNewVelocity;
@@ -161,6 +165,8 @@ namespace SadnessMonday.BetterPhysics {
 
                     Vector3 correction = clampedNewVelocity - expectedNewVelocity;
                     rb.AddForce(correction, ForceMode.VelocityChange);
+                    // We're going to do this clamping no matter what.
+                    rb.velocity = clampedNewVelocity;
                     
                     break;
                 }
@@ -180,6 +186,7 @@ namespace SadnessMonday.BetterPhysics {
                     Vector3 clampedWorldVelocity = rb.rotation * clampedLocalVelocity;
                     Vector3 correction = clampedWorldVelocity - expectedNewVelocity;
                     rb.AddForce(correction, ForceMode.VelocityChange);
+                    rb.velocity = clampedWorldVelocity;
                     break;
                 }
                 default:
@@ -786,7 +793,9 @@ namespace SadnessMonday.BetterPhysics {
             CheckForFixedTimestep();
 #endif
 
-            rb.AddForce(force, mode);
+            // rb.AddForce(force, mode);
+            Vector3 velocityChange = CalculateVelocityChange(force, mass, mode);
+            exemptedVelocityChange += velocityChange;
         }
 
         public void AddRelativeForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {

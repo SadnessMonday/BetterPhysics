@@ -20,7 +20,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             public Vector3 StartLocalVel = Vector3.zero;
             public Vector3 ForceVec = Vector3.zero;
             public Vector3 LocalForceVec = Vector3.zero;
-            public Vector3 WithoutLimitForceVec = Vector3.zero;
+            public Vector3 ForceVecWithoutLimit = Vector3.zero;
             
             public Vector3 Orientation = Vector3.forward;
             public Vector3 ExpectedVelocity = Vector3.zero;
@@ -78,7 +78,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
                 _hasLocalForce = false;
                 _hasWorldForce = false;
 
-                WithoutLimitForceVec = forceVec;
+                ForceVecWithoutLimit = forceVec;
                 _hasWorldForceWithoutLimit = true;
                 return this;
             }
@@ -125,7 +125,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             public void ApplyForce(BetterRigidbody brb) {
                 if (_hasWorldForce) brb.AddForce(ForceVec, ForceMode);
                 if (_hasLocalForce) brb.AddRelativeForce(LocalForceVec, ForceMode);
-                if (_hasWorldForceWithoutLimit) brb.AddForceWithoutLimit(WithoutLimitForceVec, ForceMode);
+                if (_hasWorldForceWithoutLimit) brb.AddForceWithoutLimit(ForceVecWithoutLimit, ForceMode);
             }
         }
 
@@ -210,6 +210,14 @@ namespace SadnessMonday.BetterPhysics.Tests {
                     .WithExpectedLocalVelocity(Vector3.one * 10),
                 SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero)
                     .WithExpectedLocalVelocity(Vector3.one * 10),
+                
+                // No limits tests
+                SoftScalarArgs(1).WithForceVecWithoutLimit(Vector3.one * 10)
+                    .WithExpectedVelocity(Vector3.one * 10),
+                SoftLocalArgs(Vector3.one).WithForceVecWithoutLimit(Vector3.one * 10)
+                    .WithExpectedVelocity(Vector3.one * 10),
+                SoftWorldArgs(Vector3.one).WithForceVecWithoutLimit(Vector3.one * 10)
+                    .WithExpectedVelocity(Vector3.one * 10),
             };
         }
 

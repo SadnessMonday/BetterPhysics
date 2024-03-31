@@ -25,5 +25,20 @@ namespace SadnessMonday.BetterPhysics.Utilities {
                     throw new System.Exception($"Unknown force mode " + mode);
             }
         }
+
+        public static Vector3 CalculateNewtons(Vector3 force, float mass, ForceMode mode) {
+            switch (mode) {
+                case ForceMode.Force:
+                    return force;
+                case ForceMode.Acceleration:
+                    return force / Time.fixedDeltaTime;
+                case ForceMode.Impulse:
+                    return force * mass;
+                case ForceMode.VelocityChange:
+                    return force / Time.fixedDeltaTime * mass;
+                default:
+                    throw new System.Exception($"Unknown force mode " + mode);
+            }
+        }
     }
 }
