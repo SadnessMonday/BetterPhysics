@@ -131,8 +131,11 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void ApplyHardLimit(SpeedLimit limit) {
-            var accumulatedNewtons = rb.GetAccumulatedForce();
             var currentVelocity = rb.velocity;
+            // We're going to do this clamping no matter what.
+            rb.velocity = Vector3.ClampMagnitude(currentVelocity, limit.ScalarLimit);
+            
+            var accumulatedNewtons = rb.GetAccumulatedForce();
             var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, rb.mass,
                 ForceMode.Force);
             var expectedNewVelocity = currentVelocity + expectedVelocityChange;
@@ -158,6 +161,7 @@ namespace SadnessMonday.BetterPhysics {
 
                     Vector3 correction = clampedNewVelocity - expectedNewVelocity;
                     rb.AddForce(correction, ForceMode.VelocityChange);
+                    
                     break;
                 }
                 case Directionality.LocalAxes: {
@@ -352,28 +356,17 @@ namespace SadnessMonday.BetterPhysics {
 
         #region Method pass-through
 
-        // TODO we probably want to do a better passthrough here.
-        public Vector3 AddExplosionForce(float explosionForce, Vector3 explosionPosition, float explosionRadius,
-            float upwardsModifier,
-            ForceMode mode = ForceMode.Force) {
-            Vector3 myPos = this.position;
-
-            // Remap
-            float distance = Vector3.Distance(myPos, explosionPosition);
-            float interpolant = Mathf.InverseLerp(0, explosionRadius, distance);
-            float forceAmount = Mathf.Lerp(explosionForce, 0, interpolant);
-
-            Vector3 direction = myPos - explosionPosition;
-            if (upwardsModifier == 0) {
-                // normalize
-                direction /= distance;
-            }
-            else {
-                direction.y += upwardsModifier;
-                direction.Normalize();
-            }
-
-            return AddForceWithoutLimit(direction * forceAmount, mode);
+        /// <summary>
+        /// Pass-Through of AddExplosionForce
+        /// </summary>
+        /// <param name="explosionForce"></param>
+        /// <param name="explosionPosition"></param>
+        /// <param name="explosionRadius"></param>
+        /// <param name="upwardsModifier"></param>
+        /// <param name="mode"></param>
+        public void AddExplosionForce(float explosionForce, Vector3 explosionPosition, float explosionRadius,
+            float upwardsModifier, ForceMode mode = ForceMode.Force) {
+            rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier, mode);
         }
         
         /// <summary>
@@ -584,7 +577,7 @@ namespace SadnessMonday.BetterPhysics {
             return Vector3.zero;
         }
 
-        public Vector3 AddForceWithSoftLimit(Vector3 force, SpeedLimit limits, ForceMode mode) {
+        Vector3 AddForceWithSoftLimit(Vector3 force, SpeedLimit limits, ForceMode mode) {
             switch (limits.Directionality) {
                 case Directionality.Omnidirectional:
                     return AddForceWithOmnidirectionalLimit(force, limits.ScalarLimit, mode);
@@ -627,7 +620,7 @@ namespace SadnessMonday.BetterPhysics {
         }
 
 
-        public Vector3 AddRelativeForceWithLocalAxisLimit(Vector3 localForce, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
+        Vector3 AddRelativeForceWithLocalAxisLimit(Vector3 localForce, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
             // Convert everything to local
             Vector3 localVelocity = LocalVelocity;
             Vector3 worldVelocity = rb.velocity;
@@ -646,7 +639,7 @@ namespace SadnessMonday.BetterPhysics {
         }
 
 
-        public Vector3 AddForceWithLocalAxisLimit(Vector3 worldForce, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
+        Vector3 AddForceWithLocalAxisLimit(Vector3 worldForce, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
 #if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
             CheckForFixedTimestep();
 #endif
@@ -677,7 +670,7 @@ namespace SadnessMonday.BetterPhysics {
          *
          * Return the actual world space velocity change that occurred
          */
-        public Vector3 AddRelativeForceWithWorldAxisLimit(Vector3 localForce, in Bool3 limited, in Vector3 min, in Vector3 max,
+        Vector3 AddRelativeForceWithWorldAxisLimit(Vector3 localForce, in Bool3 limited, in Vector3 min, in Vector3 max,
             ForceMode mode = ForceMode.Force) {
 #if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
             CheckForFixedTimestep();
@@ -698,7 +691,7 @@ namespace SadnessMonday.BetterPhysics {
          *
          * Return the actual world space velocity change that occurred
          */
-        public Vector3 AddForceWithWorldAxisLimit(Vector3 force, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
+        Vector3 AddForceWithWorldAxisLimit(Vector3 force, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
 #if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
             CheckForFixedTimestep();
 #endif
@@ -788,20 +781,21 @@ namespace SadnessMonday.BetterPhysics {
             return worldChange;
         }
 
-        public Vector3 AddForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
+        public void AddForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
 #if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
             CheckForFixedTimestep();
 #endif
 
-            return rb.VisibleAddForce(force, mode);
+            rb.AddForce(force, mode);
         }
 
-        public Vector3 AddRelativeForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
+        public void AddRelativeForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
 #if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
             CheckForFixedTimestep();
 #endif
 
-            return rb.VisibleAddRelativeForce(force, mode);
+            force = rb.rotation * force;
+            AddForceWithoutLimit(force, mode);
         }
 
         // private void ApplyHardLimit(SpeedLimit limit) {

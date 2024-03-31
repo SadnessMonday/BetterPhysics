@@ -20,6 +20,8 @@ namespace SadnessMonday.BetterPhysics.Tests {
             public Vector3 StartLocalVel = Vector3.zero;
             public Vector3 ForceVec = Vector3.zero;
             public Vector3 LocalForceVec = Vector3.zero;
+            public Vector3 WithoutLimitForceVec = Vector3.zero;
+            
             public Vector3 Orientation = Vector3.forward;
             public Vector3 ExpectedVelocity = Vector3.zero;
             public bool ExpectsLocalVelocity { get; private set; } = false;
@@ -29,6 +31,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             private bool _hasStartWorldVelocity = false;
             private bool _hasLocalForce = false;
             private bool _hasWorldForce = false;
+            private bool _hasWorldForceWithoutLimit = false;
             
             public AddForceTestArgs() {
                 this._testNumber = _testNo++;
@@ -63,17 +66,27 @@ namespace SadnessMonday.BetterPhysics.Tests {
             public AddForceTestArgs WithForceVec(Vector3 forceVec) {
                 // clear out local force
                 _hasLocalForce = false;
-                LocalForceVec = Vector3.zero;
+                _hasWorldForceWithoutLimit = false;
 
                 ForceVec = forceVec;
                 _hasWorldForce = true;
                 return this;
             }
 
+            public AddForceTestArgs WithForceVecWithoutLimit(Vector3 forceVec) {
+                // clear out local force
+                _hasLocalForce = false;
+                _hasWorldForce = false;
+
+                WithoutLimitForceVec = forceVec;
+                _hasWorldForceWithoutLimit = true;
+                return this;
+            }
+
             public AddForceTestArgs WithLocalForceVec(Vector3 forceVec) {
                 // clear out world force
                 _hasWorldForce = false;
-                ForceVec = Vector3.zero;
+                _hasWorldForceWithoutLimit = false;
 
                 LocalForceVec = forceVec;
                 _hasLocalForce = true;
@@ -99,7 +112,6 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
             public void Prepare(BetterRigidbody brb) {
                 brb.limits = new List<SpeedLimit>(limits);
-
                 brb.rotation = Quaternion.Euler(Orientation);
                 if (_hasStartLocalVelocity) {
                     brb.LocalVelocity = StartLocalVel;
@@ -113,6 +125,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             public void ApplyForce(BetterRigidbody brb) {
                 if (_hasWorldForce) brb.AddForce(ForceVec, ForceMode);
                 if (_hasLocalForce) brb.AddRelativeForce(LocalForceVec, ForceMode);
+                if (_hasWorldForceWithoutLimit) brb.AddForceWithoutLimit(WithoutLimitForceVec, ForceMode);
             }
         }
 
@@ -200,12 +213,13 @@ namespace SadnessMonday.BetterPhysics.Tests {
             };
         }
 
-        BetterRigidbody PrepareBody() {
+        BetterRigidbody PrepareBody(params SpeedLimit[] limits) {
             GameObject obj = new GameObject("Test Body", typeof(Rigidbody), typeof(BetterRigidbody));
             BetterRigidbody brb = obj.GetComponent<BetterRigidbody>();
             brb.useGravity = false;
             brb.drag = 0;
             brb.angularDrag = 0;
+            brb.limits.AddRange(limits);
 
             return brb;
         }
@@ -216,8 +230,6 @@ namespace SadnessMonday.BetterPhysics.Tests {
             BetterRigidbody brb = PrepareBody();
             // set up limits etc
             args.Prepare(brb);
-            Vector3 oldWorldVelocity = brb.Velocity;
-            
             args.ApplyForce(brb);
             yield return new WaitForFixedUpdate();
 
@@ -234,12 +246,29 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
         [UnityTest]
         public IEnumerator HardLimitsTest() {
-            BetterRigidbody brb = PrepareBody();
-
             SpeedLimit limit = SpeedLimit.Hard;
-            limit.SetOmniDirectionalLimit(10);
-            brb.velocity = Vector3.right * 5; // starting velocity;
+            float maxSpeed = 10;
+            var expectedVelocity = Vector3.right * maxSpeed;
+            limit.SetOmniDirectionalLimit(maxSpeed);
+            
+            BetterRigidbody brb = PrepareBody(limit);
+            brb.velocity = expectedVelocity; // starting velocity;
             yield return new WaitForFixedUpdate();
+
+            brb.AddForce(Vector3.right * 100, ForceMode.VelocityChange);
+            yield return new WaitForFixedUpdate();
+            Assert.AreEqual(expectedVelocity, brb.velocity);
+
+            expectedVelocity = Vector3.left * maxSpeed;
+            brb.AddForce(Vector3.left * 100, ForceMode.VelocityChange);
+            yield return new WaitForFixedUpdate();
+            Assert.AreEqual(expectedVelocity, brb.velocity);
+
+            expectedVelocity = Vector3.right * maxSpeed;
+            brb.AddForceWithoutLimit(Vector3.right * 100,
+                ForceMode.VelocityChange); // ForceWithoutLimit is still limited by hard limits
+            yield return new WaitForFixedUpdate();
+            Assert.AreEqual(expectedVelocity, brb.velocity);
         }
 
         [Test]
@@ -257,15 +286,6 @@ namespace SadnessMonday.BetterPhysics.Tests {
             Assert.AreEqual(expected.x, actual.x, tolerance);
             Assert.AreEqual(expected.y, actual.y, tolerance);
             Assert.AreEqual(expected.z, actual.z, tolerance);
-        }
-
-        // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-        // `yield return null;` to skip a frame.
-        [UnityTest]
-        public IEnumerator BetterRigidbodyTestWithEnumeratorPasses() {
-            // Use the Assert class to test conditions.
-            // Use yield to skip a frame.
-            yield return null;
         }
     }
 }
