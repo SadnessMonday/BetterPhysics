@@ -77,7 +77,6 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
         [RuntimeInitializeOnLoadMethod]
         private static void WhenGameStarts() {
-            Debug.Log(nameof(WhenGameStarts));
             var instance = Instance;
             instance.Init();
         }
@@ -159,7 +158,6 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         public void Init() {
-            Debug.Log(nameof(Init));
             InitLayerNames();
             InitLayerInteractions();
         }

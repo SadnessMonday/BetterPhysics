@@ -7,7 +7,7 @@ using UnityEngine.TestTools;
 
 namespace SadnessMonday.BetterPhysics.Tests {
     public class BetterRigidbodyTests {
-        private const float MarginOfError = 0.005f;
+        private const float MarginOfError = 0.0005f;
         private const float RootTwo = 1.41421356237f;
         private const float SineFortyFive = 0.707106781186548f;
         private static int _testNo = 0;
@@ -203,6 +203,10 @@ namespace SadnessMonday.BetterPhysics.Tests {
         BetterRigidbody PrepareBody() {
             GameObject obj = new GameObject("Test Body", typeof(Rigidbody), typeof(BetterRigidbody));
             BetterRigidbody brb = obj.GetComponent<BetterRigidbody>();
+            brb.useGravity = false;
+            brb.drag = 0;
+            brb.angularDrag = 0;
+            brb.detectCollisions = false;
 
             return brb;
         }
@@ -219,7 +223,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             yield return new WaitForFixedUpdate();
 
             if (args.ExpectsLocalVelocity) {
-                Assert.AreEqual(args.ExpectedVelocity, brb.LocalVelocity);
+                AreEqual(args.ExpectedVelocity, brb.LocalVelocity);
             }
 
             if (args.ExpectsWorldVelocity) {
