@@ -4,13 +4,23 @@ using UnityEngine;
 namespace SadnessMonday.BetterPhysics.Layers {
     [Serializable]
     public struct InteractionConfiguration {
-        [field:SerializeField] public InteractionLayer Actor { get; private set; }
-        [field:SerializeField] public InteractionLayer Receiver  { get; private set; }
+        [SerializeField] private int _actorLayer;
+        [SerializeField] private int _receiverLayer;
+
+        public InteractionLayer Actor {
+            get => InteractionLayer.FromIndex(_actorLayer);
+            set => _actorLayer = value.Index;
+        }
+
+        public InteractionLayer Receiver {
+            get => InteractionLayer.FromIndex(_receiverLayer);
+            set => _receiverLayer = value.Index;
+        }
         [field:SerializeField] public InteractionType InteractionType { get; private set; }
 
         public InteractionConfiguration(InteractionLayer actor, InteractionLayer receiver, InteractionType interactionType = InteractionType.Default) {
-            Actor = actor;
-            Receiver = receiver;
+            _actorLayer = actor.Index;
+            _receiverLayer = receiver.Index;
             InteractionType = interactionType;
             
             Normalize();

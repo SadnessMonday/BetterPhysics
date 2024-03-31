@@ -254,12 +254,12 @@ namespace SadnessMonday.BetterPhysics.Tests {
 
         [UnityTest]
         public IEnumerator HardLimitsTest() {
-            SpeedLimit limit = SpeedLimit.Hard;
             float maxSpeed = 10;
-            var expectedVelocity = Vector3.right * maxSpeed;
+            SpeedLimit limit = SpeedLimit.Hard;
             limit.SetOmniDirectionalLimit(maxSpeed);
-            
             BetterRigidbody brb = PrepareBody(limit);
+            
+            var expectedVelocity = Vector3.right * maxSpeed;
             brb.velocity = expectedVelocity; // starting velocity;
             yield return new WaitForFixedUpdate();
 
