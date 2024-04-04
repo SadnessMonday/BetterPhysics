@@ -7,7 +7,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8a8820f2c8d54340b6df64bad009e725, type: 3}
   m_Name: BetterPhysicsSettings
@@ -20,131 +20,39 @@ MonoBehaviour:
   - User Layer 1
   - User Layer 2
   interactionsStorage:
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
-  - <InteractionType>k__BackingField: 1
-  - <InteractionType>k__BackingField: 2
+  - _actorLayer: 0
+    _receiverLayer: 2
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 1
+    _receiverLayer: 0
+    <InteractionType>k__BackingField: 1
+  - _actorLayer: 1
+    _receiverLayer: 2
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 1
+    _receiverLayer: 1
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 2
+    _receiverLayer: 2
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 1
+    _receiverLayer: 2
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 3
+    _receiverLayer: 2
+    <InteractionType>k__BackingField: 1
+  - _actorLayer: 1
+    _receiverLayer: 3
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 4
+    _receiverLayer: 2
+    <InteractionType>k__BackingField: 1
+  - _actorLayer: 1
+    _receiverLayer: 4
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 5
+    _receiverLayer: 2
+    <InteractionType>k__BackingField: 1
+  - _actorLayer: 1
+    _receiverLayer: 5
+    <InteractionType>k__BackingField: 2

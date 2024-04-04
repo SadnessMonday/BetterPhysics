@@ -16,20 +16,24 @@ namespace SadnessMonday.BetterPhysics.Layers {
             get => InteractionLayer.FromIndex(_receiverLayer);
             set => _receiverLayer = value.Index;
         }
-        [field:SerializeField] public InteractionType InteractionType { get; private set; }
 
-        public InteractionConfiguration(InteractionLayer actor, InteractionLayer receiver, InteractionType interactionType = InteractionType.Default) {
+        [field: SerializeField] public InteractionType InteractionType { get; private set; }
+
+        public InteractionConfiguration(InteractionLayer actor, InteractionLayer receiver,
+            InteractionType interactionType = InteractionType.Default) {
             _actorLayer = actor.Index;
             _receiverLayer = receiver.Index;
+
             InteractionType = interactionType;
-            
+
             Normalize();
         }
 
-        public static InteractionConfiguration CreateKinematicInteraction(InteractionLayer kinematicLayer, InteractionLayer dynamicLayer) {
+        public static InteractionConfiguration CreateKinematicInteraction(InteractionLayer kinematicLayer,
+            InteractionLayer dynamicLayer) {
             return new InteractionConfiguration(kinematicLayer, dynamicLayer, InteractionType.Kinematic);
         }
-        
+
         public void ResetToDefault() {
             InteractionType = InteractionType.Default;
         }
@@ -56,7 +60,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
             interactionType = InteractionType.Default;
         }
-        
+
         public void ResetToDefault() {
             interactionType = InteractionType.Default;
         }
