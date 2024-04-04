@@ -128,5 +128,11 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
             return false;
         }
+
+        internal static void Normalize(ref this Vector2Int key, ref InteractionType interactionType) {
+            if (key.Normalize()) {
+                interactionType = interactionType.Inverse();
+            }
+        }
     }
 }

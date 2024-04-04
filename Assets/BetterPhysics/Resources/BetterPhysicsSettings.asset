@@ -35,9 +35,6 @@ MonoBehaviour:
   - _actorLayer: 2
     _receiverLayer: 2
     <InteractionType>k__BackingField: 2
-  - _actorLayer: 1
-    _receiverLayer: 2
-    <InteractionType>k__BackingField: 2
   - _actorLayer: 3
     _receiverLayer: 2
     <InteractionType>k__BackingField: 1

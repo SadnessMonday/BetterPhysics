@@ -29,6 +29,14 @@ namespace SadnessMonday.BetterPhysics.Layers {
             Normalize();
         }
 
+        public InteractionConfiguration(Vector2Int key, InteractionType interactionType = InteractionType.Default) {
+            _actorLayer = key.x;
+            _receiverLayer = key.y;
+            InteractionType = interactionType;
+            
+            Normalize();
+        }
+
         public static InteractionConfiguration CreateKinematicInteraction(InteractionLayer kinematicLayer,
             InteractionLayer dynamicLayer) {
             return new InteractionConfiguration(kinematicLayer, dynamicLayer, InteractionType.Kinematic);

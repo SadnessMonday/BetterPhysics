@@ -232,7 +232,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                             if (GUI.Button(thisRect, tooltip)) {
                                 InteractionType newType =
                                     (InteractionType)(((int)interactionType + 1) % InteractionTypeCount);
-                                settings.SetLayerInteraction(actor, receiver, newType);
+                                settings.UpdateLayerInteractionMatrix(new(actor, receiver), newType);
                             }
 
                             GUI.enabled = wasEnabled;

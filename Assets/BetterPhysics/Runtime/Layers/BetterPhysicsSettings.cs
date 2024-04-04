@@ -222,6 +222,38 @@ namespace SadnessMonday.BetterPhysics.Layers {
             return _interactionsLookup.TryGetValue(key, out interactionConfiguration);
         }
         
+        #if UNITY_EDITOR
+        public void UpdateLayerInteractionMatrix(Vector2Int key, InteractionType interactionType) {
+            key.Normalize(ref interactionType);
+            if (DefinedLayerCount <= key.x || DefinedLayerCount <= key.y) {
+                throw new BetterPhysicsException("Cannot set an interaction with an undefined layer");
+            }
+
+            if (InteractionLayer.IncludesReservedLayers(key)) {
+                throw new BetterPhysicsException($"Cannot modify interaction with reserved layers");
+            }
+            
+            // find existing interaction if any
+            for (int i = 0; i < interactionsStorage.Count; i++) {
+                var interaction = interactionsStorage[i];
+                if (interaction.Key().Equals(key)) {
+                    // found it
+                    if (interactionType == InteractionType.Default) {
+                        // remove it
+                        interactionsStorage.RemoveAt(i);
+                    }
+                    else {
+                        var interactionConfiguration = new InteractionConfiguration(key, interactionType);
+                        interactionsStorage[i] = interactionConfiguration;
+                    }
+
+                    SetLayerInteraction(key, interactionType);
+                    break;
+                }
+            }
+        }
+        #endif
+        
         public void SetLayerInteraction(Vector2Int key, InteractionType interactionType) {
             Debug.Log($"Attempting to set interaction {key.x}/{key.y} to {interactionType}");
             if (InteractionLayer.IncludesReservedLayers(key)) {
@@ -259,7 +291,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
                 return layer;
             }
 
-            var index = layerNamesStorage.Count;
+            var index = DefinedLayerCount;
             _layerNamesLookup[name] = index;
             layerNamesStorage.Add(name);
 
