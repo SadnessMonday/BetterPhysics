@@ -84,11 +84,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
             };
             
             layerNameList.DoLayoutList();
-            // EditorGUILayout.PropertyField(_settings.FindProperty("layerNamesStorage"), Styles.LayerNamesStorage);
             
-            // _interactionsScrollPos = EditorGUILayout.BeginScrollView(_interactionsScrollPos, GUILayout.Height(120));
-            // EditorGUILayout.PropertyField(_settings.FindProperty("interactionsStorage"), Styles.InteractionsStorage);
-            // EditorGUILayout.EndScrollView();
             _settings.ApplyModifiedPropertiesWithoutUndo();
             LayerInteractionMatrixGUI.Draw(_settings);
             _settings.Update();

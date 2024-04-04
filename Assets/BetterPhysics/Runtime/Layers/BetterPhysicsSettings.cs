@@ -91,11 +91,13 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public IReadOnlyList<string> AllLayerNames => layerNamesStorage;
 
         private void Awake() {
+            if (_instance == null) _instance = this;
             Init();
         }
 
         public void Reset() {
             Debug.Log(nameof(Reset));
+            if (_instance == null) _instance = this;
             ResetAllLayerNames();
             ResetAllLayerInteractions();
         }
@@ -112,6 +114,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
             for (int i = 0; i < DefaultUserLayerCount; i++) {
                 layerNamesStorage.Add(string.Format(DefaultUserLayerNameFormat, i));
             }
+            Debug.Log($"Populated {layerNamesStorage.Count} layers");
         }
         
         public void ResetAllLayerInteractions() {
@@ -126,7 +129,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         void PopulateDefaultInteractions() {
             Debug.Log(nameof(PopulateDefaultInteractions));
 
-            for (int i = 0; i < InteractionLayer.MaxLayerCount; i++) {
+            for (int i = 0; i < layerNamesStorage.Count; i++) {
                 interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(new InteractionLayer(i), InteractionLayer.FeatherLayer));
                 interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction( InteractionLayer.UnstoppableLayer, new InteractionLayer(i)));
             }
