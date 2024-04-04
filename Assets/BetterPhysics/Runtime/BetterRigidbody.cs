@@ -35,14 +35,8 @@ namespace SadnessMonday.BetterPhysics {
             // Apply exempted newtons directly to the velocity
             rb.velocity += exemptedVelocityChange;
             exemptedVelocityChange = Vector3.zero;
-
-            // Vector3 velocityBefore = rb.velocity;
-            // Vector3 accForceBefore = rb.GetAccumulatedForce();
-            ApplyLimits();
-            // Vector3 velocityAfter = rb.velocity;
-            // Vector3 accForceAter = rb.GetAccumulatedForce();
             
-            // Debug.Log($"VelB: {velocityBefore}, AFB: {accForceBefore}\nVelA: {velocityAfter}, AFA: {accForceAter}");
+            ApplyLimits();
         }
 
         static void UpdateAllBetterBodies() {
@@ -145,9 +139,9 @@ namespace SadnessMonday.BetterPhysics {
             switch (limit.Directionality) {
                 case Directionality.Omnidirectional:
                     Vector3 clampedVelocity = Vector3.ClampMagnitude(expectedNewVelocity, limit.ScalarLimit);
-                    Vector3 requiredVelocityDiff = clampedVelocity - expectedNewVelocity;
-                    rb.AddForce(requiredVelocityDiff, ForceMode.VelocityChange);
-                    // We're going to do this clamping no matter what.
+                    
+                    // We're hard clamping so remove all accumulated force
+                    rb.AddForce(-accumulatedNewtons);
                     rb.velocity = clampedVelocity;
                     break;
                 case Directionality.WorldAxes: {
@@ -162,9 +156,9 @@ namespace SadnessMonday.BetterPhysics {
                             clampedNewVelocity[i] = Mathf.Clamp(clampedNewVelocity[i], -max[i], max[i]);
                         }
                     }
-
-                    Vector3 correction = clampedNewVelocity - expectedNewVelocity;
-                    rb.AddForce(correction, ForceMode.VelocityChange);
+                    
+                    // We're hard clamping so remove all accumulated force
+                    rb.AddForce(-accumulatedNewtons);
                     // We're going to do this clamping no matter what.
                     rb.velocity = clampedNewVelocity;
                     
@@ -184,8 +178,9 @@ namespace SadnessMonday.BetterPhysics {
                     }
 
                     Vector3 clampedWorldVelocity = rb.rotation * clampedLocalVelocity;
-                    Vector3 correction = clampedWorldVelocity - expectedNewVelocity;
-                    rb.AddForce(correction, ForceMode.VelocityChange);
+
+                    // We're hard clamping so remove all accumulated force
+                    rb.AddForce(-accumulatedNewtons);
                     rb.velocity = clampedWorldVelocity;
                     break;
                 }
@@ -471,7 +466,6 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public Action WakeUp => rb.WakeUp;
-        public CustomCollisionData CustomCollisionData { get; set; }
 
         #endregion
 
@@ -806,48 +800,6 @@ namespace SadnessMonday.BetterPhysics {
             force = rb.rotation * force;
             AddForceWithoutLimit(force, mode);
         }
-
-        // private void ApplyHardLimit(SpeedLimit limit) {
-        //     switch (limit.Directionality) {
-        //         case Directionality.Omnidirectional:
-        //             rb.velocity = Vector3.ClampMagnitude(rb.velocity, limit.ScalarLimit);
-        //             break;
-        //         case Directionality.WorldAxes: {
-        //             Vector3 vel = rb.velocity;
-        //             var max = limit.Max;
-        //             var min = limit.Min;
-        //             for (int i = 0; i < 3; i++) {
-        //                 if (limit.Asymmetrical) {
-        //                     vel[i] = Mathf.Clamp(vel[i], min[i], max[i]);
-        //                 }
-        //                 else {
-        //                     vel[i] = Mathf.Clamp(vel[i], -max[i], max[i]);
-        //                 }
-        //             }
-        //
-        //             rb.velocity = vel;
-        //             break;
-        //         }
-        //         case Directionality.LocalAxes: {
-        //             Vector3 localVelocity = LocalVelocity;
-        //             var max = limit.Max;
-        //             var min = limit.Min;
-        //             for (int i = 0; i < 3; i++) {
-        //                 if (limit.Asymmetrical) {
-        //                     localVelocity[i] = Mathf.Clamp(localVelocity[i], min[i], max[i]);
-        //                 }
-        //                 else {
-        //                     localVelocity[i] = Mathf.Clamp(localVelocity[i], -max[i], max[i]);
-        //                 }
-        //             }
-        //
-        //             rb.velocity = rb.rotation * localVelocity;
-        //             break;
-        //         }
-        //         default:
-        //             throw new ArgumentOutOfRangeException();
-        //     }
-        // }
 
         private Vector3 CalculateVelocityChangeWithSoftLimit(in Vector3 currentVelocity, in Vector3 force,
             float speedLimit, ForceMode mode = ForceMode.Force) {
