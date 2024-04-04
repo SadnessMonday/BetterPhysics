@@ -114,11 +114,10 @@ namespace SadnessMonday.BetterPhysics.Layers {
             for (int i = 0; i < DefaultUserLayerCount; i++) {
                 layerNamesStorage.Add(string.Format(DefaultUserLayerNameFormat, i));
             }
-            Debug.Log($"Populated {layerNamesStorage.Count} layers");
         }
         
         public void ResetAllLayerInteractions() {
-            Debug.Log(nameof(ResetAllLayerInteractions));
+            // Debug.Log(nameof(ResetAllLayerInteractions));
             interactionsStorage.Clear();
             _interactionsLookup.Clear();
             PopulateDefaultInteractions();
@@ -127,11 +126,12 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         void PopulateDefaultInteractions() {
-            Debug.Log(nameof(PopulateDefaultInteractions));
+            // Debug.Log(nameof(PopulateDefaultInteractions));
 
             for (int i = 0; i < layerNamesStorage.Count; i++) {
                 interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(new InteractionLayer(i), InteractionLayer.FeatherLayer));
-                interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction( InteractionLayer.UnstoppableLayer, new InteractionLayer(i)));
+                if (i != InteractionLayer.FeatherLayerIndex)
+                    interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction( InteractionLayer.UnstoppableLayer, new InteractionLayer(i)));
             }
         }
 
