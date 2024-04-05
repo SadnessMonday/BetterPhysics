@@ -73,11 +73,13 @@ namespace SadnessMonday.BetterPhysics.Editor {
         }
 
         // Draw the whole collision matrix view.
-        public static void Draw(SerializedObject serializedObject) {
+        public static bool Draw(SerializedObject serializedObject) {
             BetterPhysicsSettings settings = (BetterPhysicsSettings)serializedObject.targetObject;
             const int checkboxSize = 32;
             var labelSize = 110;
             const int indent = 30;
+
+            bool changesMade = false;
 
             // Find the longest label
             for (var i = 0; i < BetterPhysics.DefinedLayerCount; ++i) {
@@ -233,6 +235,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                                 InteractionType newType =
                                     (InteractionType)(((int)interactionType + 1) % InteractionTypeCount);
                                 settings.UpdateLayerInteractionMatrix(new(actor, receiver), newType);
+                                changesMade = true;
                             }
 
                             GUI.enabled = wasEnabled;
@@ -255,12 +258,15 @@ namespace SadnessMonday.BetterPhysics.Editor {
                         GUILayout.ExpandWidth(false))) {
                     BetterPhysicsSettings.Instance.ResetAllLayerInteractions();
                     serializedObject.Update();
+                    changesMade = true;
                 }
 
                 GUILayout.EndHorizontal();
                 
                 
             }
+
+            return changesMade;
         }
 
         private static Color GetColor(InteractionType interactionType) {

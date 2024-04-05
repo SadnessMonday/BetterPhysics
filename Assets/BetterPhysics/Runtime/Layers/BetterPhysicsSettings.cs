@@ -11,7 +11,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
     /**
      * Represents the custom settings page for physics layers
      */
-    public class BetterPhysicsSettings : ScriptableObject {
+    public class BetterPhysicsSettings : ScriptableObject, ISerializationCallbackReceiver {
         private const int DefaultUserLayerCount = 3;
         private const string DefaultUserLayerNameFormat = "User Layer {0}";
         private const string DefaultSettingsAssetName = "BetterPhysicsSettings";
@@ -232,7 +232,9 @@ namespace SadnessMonday.BetterPhysics.Layers {
             if (InteractionLayer.IncludesReservedLayers(key)) {
                 throw new BetterPhysicsException($"Cannot modify interaction with reserved layers");
             }
-            
+
+            bool foundIt = false;
+            var newInteractionConfig = new InteractionConfiguration(key, interactionType);
             // find existing interaction if any
             for (int i = 0; i < interactionsStorage.Count; i++) {
                 var interaction = interactionsStorage[i];
@@ -243,14 +245,20 @@ namespace SadnessMonday.BetterPhysics.Layers {
                         interactionsStorage.RemoveAt(i);
                     }
                     else {
-                        var interactionConfiguration = new InteractionConfiguration(key, interactionType);
-                        interactionsStorage[i] = interactionConfiguration;
+                        interactionsStorage[i] = newInteractionConfig;
                     }
 
-                    SetLayerInteraction(key, interactionType);
+                    foundIt = true;
                     break;
                 }
             }
+
+            if (!foundIt && interactionType != InteractionType.Default) {
+                // Create a new one
+                interactionsStorage.Add(newInteractionConfig);
+            }
+            
+            SetLayerInteraction(key, interactionType);
         }
         #endif
         
@@ -296,6 +304,33 @@ namespace SadnessMonday.BetterPhysics.Layers {
             layerNamesStorage.Add(name);
 
             return new InteractionLayer(index);
+        }
+
+        public void OnBeforeSerialize() {
+            interactionsStorage.Clear();
+            layerNamesStorage.Clear();
+            foreach (var pair in _interactionsLookup) {
+                interactionsStorage.Add(pair.Value);
+            }
+
+            for (int i = 0; i < _layerNamesLookup.Count; i++) {
+                layerNamesStorage.Add(null);
+            }
+            foreach (var pair in _layerNamesLookup) {
+                layerNamesStorage[pair.Value] = pair.Key;
+            }
+        }
+
+        public void OnAfterDeserialize() {
+            _interactionsLookup.Clear();
+            foreach (var interaction in interactionsStorage) {
+                _interactionsLookup[interaction.Key()] = interaction;
+            }
+            
+            _layerNamesLookup.Clear();
+            for (int i = 0; i < layerNamesStorage.Count; i++) {
+                _layerNamesLookup[layerNamesStorage[i]] = i;
+            }
         }
     }
 }
