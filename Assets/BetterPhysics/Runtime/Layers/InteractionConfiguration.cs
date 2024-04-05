@@ -50,6 +50,10 @@ namespace SadnessMonday.BetterPhysics.Layers {
             return Actor.KeyWith(Receiver);
         }
 
+        internal Vector2Int UnsafeKey() {
+            return new(_actorLayer, _receiverLayer);
+        }
+
         void Normalize() {
             var key = Key();
             if (key.Normalize()) {

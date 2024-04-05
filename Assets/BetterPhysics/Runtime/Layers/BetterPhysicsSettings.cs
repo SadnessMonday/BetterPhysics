@@ -324,7 +324,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public void OnAfterDeserialize() {
             _interactionsLookup.Clear();
             foreach (var interaction in interactionsStorage) {
-                _interactionsLookup[interaction.Key()] = interaction;
+                _interactionsLookup[interaction.UnsafeKey()] = interaction;
             }
             
             _layerNamesLookup.Clear();
