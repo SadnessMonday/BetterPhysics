@@ -129,6 +129,17 @@ namespace SadnessMonday.BetterPhysics.Layers {
             return false;
         }
 
+        internal static bool NormalizedCopy(this in Vector2Int key, out Vector2Int normalized) {
+            if (key.x.CompareTo(key.y) > 0) {
+                // Swap
+                normalized = new (key.y, key.x);
+                return true;
+            }
+
+            normalized = key;
+            return false;
+        }
+
         internal static void Normalize(ref this Vector2Int key, ref InteractionType interactionType) {
             if (key.Normalize()) {
                 interactionType = interactionType.Inverse();

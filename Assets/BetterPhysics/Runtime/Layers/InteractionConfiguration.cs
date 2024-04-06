@@ -25,16 +25,12 @@ namespace SadnessMonday.BetterPhysics.Layers {
             _receiverLayer = receiver.Index;
 
             InteractionType = interactionType;
-
-            Normalize();
         }
 
         public InteractionConfiguration(Vector2Int key, InteractionType interactionType = InteractionType.Default) {
             _actorLayer = key.x;
             _receiverLayer = key.y;
             InteractionType = interactionType;
-            
-            Normalize();
         }
 
         public static InteractionConfiguration CreateKinematicInteraction(InteractionLayer kinematicLayer,
@@ -59,6 +55,14 @@ namespace SadnessMonday.BetterPhysics.Layers {
             if (key.Normalize()) {
                 InteractionType = InteractionType.Inverse();
             }
+        }
+
+        public InteractionConfiguration Inverse() {
+            return new InteractionConfiguration() {
+                _actorLayer = this._receiverLayer,
+                _receiverLayer = this._actorLayer,
+                InteractionType = this.InteractionType.Inverse()
+            };
         }
     }
 

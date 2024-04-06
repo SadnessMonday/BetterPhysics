@@ -87,6 +87,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
             
             _settings.ApplyModifiedPropertiesWithoutUndo();
             if (LayerInteractionMatrixGUI.Draw(_settings)) {
+                EditorUtility.SetDirty(_settings.targetObject);
                 Repaint();
             }
             _settings.Update();

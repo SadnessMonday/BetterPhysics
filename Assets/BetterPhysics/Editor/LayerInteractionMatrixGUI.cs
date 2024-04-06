@@ -234,7 +234,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
                             if (GUI.Button(thisRect, tooltip)) {
                                 InteractionType newType =
                                     (InteractionType)(((int)interactionType + 1) % InteractionTypeCount);
-                                settings.UpdateLayerInteractionMatrix(new(actor, receiver), newType);
+                                settings.SetLayerInteraction(actor, receiver, newType);
+                                // settings.UpdateLayerInteractionMatrix(new(actor, receiver), newType);
                                 changesMade = true;
                             }
 
@@ -254,7 +255,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 GUILayout.BeginHorizontal();
 
                 // Made the buttons span the entire matrix of layers
-                if (GUILayout.Button("Reset All", GUILayout.MinWidth(checkboxSize * BetterPhysics.DefinedLayerCount),
+                if (GUILayout.Button("Reset Interactions Matrix", GUILayout.MinWidth(checkboxSize * BetterPhysics.DefinedLayerCount),
                         GUILayout.ExpandWidth(false))) {
                     BetterPhysicsSettings.Instance.ResetAllLayerInteractions();
                     serializedObject.Update();

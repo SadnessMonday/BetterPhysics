@@ -16,7 +16,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         private const string DefaultUserLayerNameFormat = "User Layer {0}";
         private const string DefaultSettingsAssetName = "BetterPhysicsSettings";
         private static BetterPhysicsSettings _instance;
-        public int DefinedLayerCount => layerNamesStorage.Count;
+        public int DefinedLayerCount => _layerNamesLookup.Count;
 
         public static BetterPhysicsSettings Instance {
             get {
@@ -46,6 +46,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
             BetterPhysicsSettings instance = AssetDatabase.LoadAssetAtPath<BetterPhysicsSettings>(path);
             if (instance != null) return instance;
 
+            Debug.Log($"Creating new BetterPhysicsSettings instance");
             path = Path.Combine(DefaultSettingsAssetPath, DefaultSettingsAssetFileName);
             var settings = CreateInstance<BetterPhysicsSettings>();
             settings.Reset();
@@ -96,7 +97,6 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         public void Reset() {
-            Debug.Log(nameof(Reset));
             if (_instance == null) _instance = this;
             ResetAllLayerNames();
             ResetAllLayerInteractions();
@@ -114,55 +114,25 @@ namespace SadnessMonday.BetterPhysics.Layers {
             for (int i = 0; i < DefaultUserLayerCount; i++) {
                 layerNamesStorage.Add(string.Format(DefaultUserLayerNameFormat, i));
             }
+
+            for (int i = 0; i < layerNamesStorage.Count; i++) {
+                var name = layerNamesStorage[i];
+                _layerNamesLookup[name] = i;
+            }
         }
         
         public void ResetAllLayerInteractions() {
             // Debug.Log(nameof(ResetAllLayerInteractions));
             interactionsStorage.Clear();
             _interactionsLookup.Clear();
-            PopulateDefaultInteractions();
             
             Init();
         }
 
-        void PopulateDefaultInteractions() {
-            // Debug.Log(nameof(PopulateDefaultInteractions));
-
-            for (int i = 0; i < layerNamesStorage.Count; i++) {
-                interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction(new InteractionLayer(i), InteractionLayer.FeatherLayer));
-                if (i != InteractionLayer.FeatherLayerIndex)
-                    interactionsStorage.Add(InteractionConfiguration.CreateKinematicInteraction( InteractionLayer.UnstoppableLayer, new InteractionLayer(i)));
-            }
-        }
-
-        private void InitLayerNames() {
-            _layerNamesLookup.Clear();
-            for (int i = 0; i < layerNamesStorage.Count; i++) {
-                string layerName = layerNamesStorage[i];
-                _layerNamesLookup[layerName] = i;
-            }
-        }
-
-        private void InitLayerInteractions() {
-            foreach (var interaction in interactionsStorage) {
-                Vector2Int coord = interaction.Key();
-                coord.Normalize();
-                // if (!LayerIsDefined(coord.x) || !LayerIsDefined(coord.y)) {
-                //     Debug.LogWarning($"Found interaction involving an undefined layer: {interaction}");
-                //     continue;
-                // }
-                
-                if (_interactionsLookup.ContainsKey(coord)) {
-                    Debug.LogWarning($"Two or more BetterPhysics interactions defined between layers {coord.x} and {coord.y}");
-                }
-                
-                _interactionsLookup[coord] = interaction;
-            }
-        }
-
         public void Init() {
-            InitLayerNames();
-            InitLayerInteractions();
+            // These shouldn't be necessary anymore with the serialization stuff.
+            // InitLayerNames();
+            // InitLayerInteractions();
         }
 
         public bool TryGetLayerFromName(string layerName, out InteractionLayer output) {
@@ -202,12 +172,11 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         public InteractionConfiguration GetInteractionOrDefault(Vector2Int key) {
-            key.Normalize();
             if (TryGetLayerInteraction(key, out InteractionConfiguration configuration)) {
                 return configuration;
             }
 
-            return new InteractionConfiguration(new(key.x), new(key.y), InteractionType.Default);
+            return new InteractionConfiguration(key, InteractionType.Default);
         }
         
         public bool TryGetLayerInteraction(InteractionLayer actor, InteractionLayer receiver, out InteractionConfiguration interactionConfiguration) {
@@ -219,11 +188,39 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
         internal bool TryGetLayerInteraction(Vector2Int key, out InteractionConfiguration interactionConfiguration) {
-            return _interactionsLookup.TryGetValue(key, out interactionConfiguration);
+            // Check default layers
+            if (key.x == InteractionLayer.UnstoppableLayerIndex && LayerIsDefined(key.y)) {
+                interactionConfiguration = new InteractionConfiguration(key, InteractionType.Kinematic);
+                return true;
+            }
+            if (key.x == InteractionLayer.FeatherLayerIndex && LayerIsDefined(key.y)) {
+                interactionConfiguration = new InteractionConfiguration(key, InteractionType.Feather);
+                return true;
+            }
+            if (key.y == InteractionLayer.UnstoppableLayerIndex && LayerIsDefined(key.x)) {
+                interactionConfiguration = new InteractionConfiguration(key, InteractionType.Feather);
+                return true;
+            }
+            if (key.y == InteractionLayer.FeatherLayerIndex && LayerIsDefined(key.x)) {
+                interactionConfiguration = new InteractionConfiguration(key, InteractionType.Kinematic);
+                return true;
+            }
+            
+            bool flipped = key.NormalizedCopy(out Vector2Int normalizedKey);
+            if (_interactionsLookup.TryGetValue(normalizedKey, out interactionConfiguration)) {
+                if (flipped) {
+                    interactionConfiguration = interactionConfiguration.Inverse();
+                }
+                
+                return true;
+            }
+
+            return false;
         }
         
         #if UNITY_EDITOR
         public void UpdateLayerInteractionMatrix(Vector2Int key, InteractionType interactionType) {
+            Debug.Log($"Updating interaction matrix on {this.GetInstanceID()}");
             key.Normalize(ref interactionType);
             if (DefinedLayerCount <= key.x || DefinedLayerCount <= key.y) {
                 throw new BetterPhysicsException("Cannot set an interaction with an undefined layer");
@@ -261,20 +258,29 @@ namespace SadnessMonday.BetterPhysics.Layers {
             SetLayerInteraction(key, interactionType);
         }
         #endif
-        
+
+        private void SetLayerInteractionUnsafe(Vector2Int key, InteractionType interactionType) {
+            
+        }
+
         public void SetLayerInteraction(Vector2Int key, InteractionType interactionType) {
-            Debug.Log($"Attempting to set interaction {key.x}/{key.y} to {interactionType}");
+            // Debug.Log($"Attempting to set interaction {key.x}/{key.y} to {interactionType}");
             if (InteractionLayer.IncludesReservedLayers(key)) {
                 throw new BetterPhysicsException($"Cannot modify interaction with reserved layers");
             }
             
-            key.Normalize();
+            // We only store normalized interactions.
+            bool flipped = key.Normalize();
+            if (flipped) {
+                interactionType = interactionType.Inverse();
+            }
+            
             if (interactionType == InteractionType.Default) {
                 _interactionsLookup.Remove(key);
                 return;
             }
             
-            InteractionConfiguration interactionConfiguration = new InteractionConfiguration(InteractionLayer.FromIndex(key.x), InteractionLayer.FromIndex(key.y));
+            InteractionConfiguration interactionConfiguration = new InteractionConfiguration(key, interactionType);
             _interactionsLookup[key] = interactionConfiguration;
         }
         
@@ -285,6 +291,11 @@ namespace SadnessMonday.BetterPhysics.Layers {
 
         public void SetLayerInteraction(int actor, int receiver, InteractionType interactionType) {
             SetLayerInteraction(new InteractionLayer(actor), new InteractionLayer(receiver), interactionType);
+        }
+        
+
+        public void SetLayerInteraction(InteractionConfiguration configuration) {
+            SetLayerInteraction(configuration.UnsafeKey(), configuration.InteractionType);
         }
 
         /**
