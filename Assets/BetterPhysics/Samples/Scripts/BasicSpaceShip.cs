@@ -11,6 +11,16 @@ public class BasicSpaceShip : MonoBehaviour {
         float yaw = 0;
         float pitch = 0;
 
-        thrust += Input.GetKey(KeyCode.Space) ? 1 : 0;
+        if (Input.GetKey(KeyCode.Space)) thrust += 1;
+        if (Input.GetKey(KeyCode.LeftShift)) thrust -= 1;
+        
+        if (Input.GetKey(KeyCode.W)) pitch += 1;
+        if (Input.GetKey(KeyCode.S)) pitch -= 1;
+        
+        if (Input.GetKey(KeyCode.A)) roll -= 1;
+        if (Input.GetKey(KeyCode.D)) roll += 1;
+
+        if (Input.GetKey(KeyCode.Q)) yaw -= 1;
+        if (Input.GetKey(KeyCode.E)) yaw += 1;
     }
 }
