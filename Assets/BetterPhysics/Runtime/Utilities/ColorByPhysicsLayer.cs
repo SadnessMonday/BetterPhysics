@@ -8,12 +8,12 @@ namespace SadnessMonday.BetterPhysics.Utilities {
         private Renderer _renderer;
 
         static readonly Color[] Colors = {
-            Color.red,
-            Color.blue, 
-            Color.green,
             Color.magenta,
             Color.yellow,
             Color.cyan,
+            Color.red, 
+            Color.green,
+            Color.blue,
         };
 
         private void Awake() {

@@ -23,29 +23,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
         private bool showSpeedLimits = false;
 
         private SerializedProperty layerField;
-        private SerializedProperty softLimitField;
-        private SerializedProperty hardLimitField;
-        private SerializedProperty softLimitScalarField;
-        private SerializedProperty hardLimitScalarField;
-        private SerializedProperty softLimitVectorField;
-        private SerializedProperty hardLimitVectorField;
 
-        private static readonly MethodInfo SetBitAtIndexForAllTargetsImmediate;
-        private static readonly PropertyInfo hasMultipleDifferentValuesBitwise;
-        private static readonly PropertyInfo kLabelFloatMaxW;
-        private static readonly FieldInfo kSingleLineHeight;
-        
-        static BetterRigidbodyEditor() {
-            SetBitAtIndexForAllTargetsImmediate =
-                typeof(SerializedProperty).GetMethod("SetBitAtIndexForAllTargetsImmediate", BindingFlags.Instance | BindingFlags.NonPublic);
-            hasMultipleDifferentValuesBitwise = typeof(SerializedProperty).GetProperty("hasMultipleDifferentValuesBitwise", BindingFlags.Instance | BindingFlags.NonPublic);
-            kLabelFloatMaxW =
-                typeof(EditorGUILayout).GetProperty("kLabelFloatMaxW", BindingFlags.Static | BindingFlags.NonPublic);
-            kSingleLineHeight =
-                typeof(EditorGUI).GetField("kSingleLineHeight", BindingFlags.Static | BindingFlags.NonPublic);
-            SerializedProperty p;
-        }
-        
         private class Styles
         {
             public static GUIContent includeLayers = EditorGUIUtility.TrTextContent("Include Layers", "Layers to include when producing collisions");
@@ -54,13 +32,6 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
         private void OnEnable() {
             layerField = serializedObject.FindProperty("physicsLayer");
-            softLimitField = serializedObject.FindProperty("softLimitType");
-
-            hardLimitField = serializedObject.FindProperty("hardLimitType");
-            softLimitScalarField = serializedObject.FindProperty("softScalarLimit");
-            hardLimitScalarField = serializedObject.FindProperty("hardScalarLimit");
-            softLimitVectorField = serializedObject.FindProperty("softVectorLimit");
-            hardLimitVectorField = serializedObject.FindProperty("hardVectorLimit");
         }
 
         public override void OnInspectorGUI()

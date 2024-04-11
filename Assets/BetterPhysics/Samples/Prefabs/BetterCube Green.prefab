@@ -54,11 +54,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1776347875811430694, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
       propertyPath: physicsLayer
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1776347875811430699, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
       propertyPath: m_Name
-      value: BetterCube Layer 2
+      value: BetterCube Green
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

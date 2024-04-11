@@ -16,7 +16,16 @@ MonoBehaviour:
   - Default
   - Unstoppable
   - Feather
-  - User Layer 0
-  - User Layer 1
-  - User Layer 2
-  interactionsStorage: []
+  - Red
+  - Green
+  - Blue
+  interactionsStorage:
+  - _actorLayer: 6
+    _receiverLayer: 7
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 7
+    _receiverLayer: 8
+    <InteractionType>k__BackingField: 2
+  - _actorLayer: 6
+    _receiverLayer: 8
+    <InteractionType>k__BackingField: 1
