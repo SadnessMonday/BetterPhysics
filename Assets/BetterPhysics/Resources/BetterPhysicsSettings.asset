@@ -19,7 +19,4 @@ MonoBehaviour:
   - User Layer 0
   - User Layer 1
   - User Layer 2
-  interactionsStorage:
-  - _actorLayer: 3
-    _receiverLayer: 3
-    <InteractionType>k__BackingField: 2
+  interactionsStorage: []

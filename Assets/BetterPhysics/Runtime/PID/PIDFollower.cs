@@ -10,7 +10,7 @@ namespace SadnessMonday.BetterPhysics.PID {
     public class PIDFollower : MonoBehaviour {
         private BetterRigidbody brb;
 
-        private bool targetHasRb = false;
+        private bool targetHasRb;
 
         [SerializeField] private Transform target;
 
@@ -18,15 +18,12 @@ namespace SadnessMonday.BetterPhysics.PID {
 
         [Tooltip("The maximum amount of force the follower is allowed to use to accelerate")] 
         [SerializeField] private float maxAccelerationForce; // the maximum amount of force
-
-        [SerializeField] private float maxSpeed = 10f;
-
+        
         [SerializeField] private Vector3 targetOffset;
-        [SerializeField] private bool offsetInLocalSpace = false;
+        [SerializeField] private bool offsetInLocalSpace;
 
         // A RingBuffer or something would be better
         private List<Vector3> targetPositionHistory; // Used to calculate velocity and potentially acceleration
-        private Vector3 cachedTargetVelocity = Vector3.zero;
         [SerializeField] private int positionHistorySampleCount = 2;
         [SerializeField] private float rotationSpeed = 100;
 

@@ -11,7 +11,7 @@ using static SadnessMonday.BetterPhysics.Utilities.ForceUtilities;
 namespace SadnessMonday.BetterPhysics {
     [RequireComponent(typeof(Rigidbody))]
     [DisallowMultipleComponent]
-    [DefaultExecutionOrder(10000)] // We need to run _late_ so we get a chance to modify velocity.
+    [DefaultExecutionOrder(10001)] // We need to run _late_ so we get a chance to modify velocity.
     public class BetterRigidbody : MonoBehaviour {
         private static HashSet<BetterRigidbody> allBodies = new();
         
@@ -32,8 +32,10 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void FixedUpdate() {
-            // Apply exempted newtons directly to the velocity
-            rb.velocity += exemptedVelocityChange;
+            if (!rb.isKinematic) {
+                // Apply exempted newtons directly to the velocity
+                rb.velocity += exemptedVelocityChange;
+            }
             exemptedVelocityChange = Vector3.zero;
             
             ApplyLimits();
@@ -490,14 +492,16 @@ namespace SadnessMonday.BetterPhysics {
             set {
                 var oldValue = physicsLayer;
                 physicsLayer = value;
-#if UNITY_EDITOR
-                if (UnityEditor.EditorApplication.isPlaying)
-#endif
-                {
-                    ContactModificationManager.Instance.UpdateBodyLayer(this);
-                }
 
-                OnPhysicsLayerChanged?.Invoke(this, oldValue, value);
+                if (value != oldValue) {
+#if UNITY_EDITOR
+                    if (UnityEditor.EditorApplication.isPlaying)
+#endif
+                    {
+                        ContactModificationManager.Instance.UpdateBodyLayer(this);
+                    }
+                    OnPhysicsLayerChanged?.Invoke(this, oldValue, value);
+                }
             }
         }
 
@@ -517,7 +521,7 @@ namespace SadnessMonday.BetterPhysics {
             if (!TryGetComponent(out rb)) {
                 rb = gameObject.AddComponent<Rigidbody>();
             }
-
+            
             if (ReferenceEquals(null, rb)) {
                 throw new Exception(
                     "Problem creating BetterRigidbody. There may be incompatible components present, such as 2D physics components");
@@ -528,7 +532,6 @@ namespace SadnessMonday.BetterPhysics {
 
         void OnValidate() {
             EnsureRigidbody();
-            PhysicsLayer = physicsLayer;
         }
 
         private void OnDestroy() {
@@ -540,6 +543,7 @@ namespace SadnessMonday.BetterPhysics {
         void OnEnable() {
             allBodies.Add(this);
             ContactModificationManager.Instance.Register(this);
+            ContactModificationManager.Instance.UpdateBodyLayer(this);
         }
 
         void OnDisable() {
