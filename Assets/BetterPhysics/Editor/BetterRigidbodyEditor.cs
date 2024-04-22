@@ -20,7 +20,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
         
         private bool showAdvanced;
         private bool showBaseRigidbodySettings;
-        private bool showSpeedLimits = false;
+        private static bool showSpeedLimits = true;
 
         private SerializedProperty layerField;
 
