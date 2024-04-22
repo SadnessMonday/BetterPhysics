@@ -171,12 +171,12 @@ namespace SadnessMonday.BetterPhysics.Editor {
             Directionality directionality = (Directionality)directionalityProp.enumValueIndex;
             switch (directionality) {
                 case Directionality.Omnidirectional:
-                    return EditorGUIUtility.singleLineHeight * 3;
+                    return EditorGUIUtility.singleLineHeight * 4;
                 case Directionality.WorldAxes:
                 case Directionality.LocalAxes:
-                    return EditorGUIUtility.singleLineHeight * 7;
+                    return EditorGUIUtility.singleLineHeight * 8;
                 default:
-                    return EditorGUIUtility.singleLineHeight * 2;
+                    return EditorGUIUtility.singleLineHeight * 3;
             }
         }
     }
