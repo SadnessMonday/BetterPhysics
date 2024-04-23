@@ -20,7 +20,6 @@ namespace SadnessMonday.BetterPhysics.Editor {
         
         private bool showAdvanced;
         private bool showBaseRigidbodySettings;
-        private static bool showSpeedLimits = true;
 
         private SerializedProperty layerField;
 
@@ -55,36 +54,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
         private void DrawLimitsSection() {
             var limitsProperty = serializedObject.FindProperty("limits");
-
-            string limitsFoldoutText = SpeedLimitsLabelPrefix;
-            if (!showSpeedLimits) {
-                // potentially show extra info
-                bool hasSoftLimit = false;
-                bool hasHardLimit = false;
-                for (int i = 0; i < limitsProperty.arraySize; i++) {
-                    SerializedProperty limitProp = limitsProperty.GetArrayElementAtIndex(i);
-                    var limit = (SpeedLimit)limitProp.boxedValue;
-                    hasSoftLimit |= limit.LimitType == LimitType.Soft;
-                    hasHardLimit |= limit.LimitType == LimitType.Hard;
-                    
-                    if (hasSoftLimit && hasHardLimit) break;
-                }
-                
-                if (hasSoftLimit && hasHardLimit) {
-                    limitsFoldoutText = BothLimits;
-                }
-                else if (hasSoftLimit) {
-                    limitsFoldoutText = SoftLimitOnly;
-                }
-                else if (hasHardLimit) {
-                    limitsFoldoutText = HardLimitOnly;
-                }
-            }
-            
-            showSpeedLimits = EditorGUILayout.Foldout(showSpeedLimits, limitsFoldoutText, rtStyle);
-            if (showSpeedLimits) {
-                EditorGUILayout.PropertyField(limitsProperty);
-            }
+            EditorGUILayout.PropertyField(limitsProperty);
         }
     }
 }

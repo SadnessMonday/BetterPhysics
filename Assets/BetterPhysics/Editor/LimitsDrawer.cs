@@ -157,6 +157,14 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 maxProp.vector3Value = maxValue;
             }
         }
+        
+        private const int OmnidirectionalLines = 25;
+        private const int WorldAxesLines = 25;
+        private const int LocalAxesLines = WorldAxesLines;
+
+        private static float OmnidirectionalHeight => EditorGUIUtility.singleLineHeight * OmnidirectionalLines;
+        private static float WorldAxesHeight => EditorGUIUtility.singleLineHeight * OmnidirectionalLines;
+        private static float LocalAxesHeight => EditorGUIUtility.singleLineHeight * OmnidirectionalLines;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
             SerializedProperty limitTypeProp = property.FindPropertyRelative("directionality");
@@ -171,12 +179,13 @@ namespace SadnessMonday.BetterPhysics.Editor {
             Directionality directionality = (Directionality)directionalityProp.enumValueIndex;
             switch (directionality) {
                 case Directionality.Omnidirectional:
-                    return EditorGUIUtility.singleLineHeight * 4;
+                    return OmnidirectionalHeight;
                 case Directionality.WorldAxes:
+                    return WorldAxesHeight;
                 case Directionality.LocalAxes:
-                    return EditorGUIUtility.singleLineHeight * 8;
+                    return LocalAxesHeight;
                 default:
-                    return EditorGUIUtility.singleLineHeight * 3;
+                    throw new Exception($"Unknown directionality {directionality}");
             }
         }
     }
