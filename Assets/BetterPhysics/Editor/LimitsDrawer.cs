@@ -30,9 +30,20 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 posY += rowHeight;
                 position.y += rowHeight;
                 Rect directionalityRect = new(position.x, posY, position.width, rowHeight);
+                Directionality oldDirectionality = (Directionality)directionalityProp.enumValueIndex;
                 EditorGUI.PropertyField(directionalityRect, directionalityProp, new GUIContent("Directionality"));
             
                 Directionality directionality = (Directionality)directionalityProp.enumValueIndex;
+                // if (oldDirectionality != directionality) {
+                //     EditorWindow window = EditorWindow.focusedWindow;
+                //     
+                //     // Check if the window exists and needs repainting
+                //     if (window != null)
+                //     {
+                //         window.Repaint();
+                //     }
+                // }
+                
                 switch (directionality) {
                     case Directionality.Omnidirectional:
                         DrawScalarLimit(property, position, posY);
@@ -158,16 +169,16 @@ namespace SadnessMonday.BetterPhysics.Editor {
             }
         }
         
-        private const int OmnidirectionalLines = 25;
-        private const int WorldAxesLines = 25;
+        private const int OmnidirectionalLines = 3;
+        private const int WorldAxesLines = 7;
         private const int LocalAxesLines = WorldAxesLines;
 
         private static float OmnidirectionalHeight => EditorGUIUtility.singleLineHeight * OmnidirectionalLines;
-        private static float WorldAxesHeight => EditorGUIUtility.singleLineHeight * OmnidirectionalLines;
-        private static float LocalAxesHeight => EditorGUIUtility.singleLineHeight * OmnidirectionalLines;
+        private static float WorldAxesHeight => EditorGUIUtility.singleLineHeight * WorldAxesLines;
+        private static float LocalAxesHeight => EditorGUIUtility.singleLineHeight * LocalAxesLines;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            SerializedProperty limitTypeProp = property.FindPropertyRelative("directionality");
+            SerializedProperty limitTypeProp = property.FindPropertyRelative("limitType");
             LimitType limitType = (LimitType)limitTypeProp.enumValueIndex;
 
             if (limitType == LimitType.None) {
@@ -179,10 +190,13 @@ namespace SadnessMonday.BetterPhysics.Editor {
             Directionality directionality = (Directionality)directionalityProp.enumValueIndex;
             switch (directionality) {
                 case Directionality.Omnidirectional:
+                    Debug.Log(OmnidirectionalHeight);
                     return OmnidirectionalHeight;
                 case Directionality.WorldAxes:
+                    Debug.Log(WorldAxesHeight);
                     return WorldAxesHeight;
                 case Directionality.LocalAxes:
+                    Debug.Log(LocalAxesHeight);
                     return LocalAxesHeight;
                 default:
                     throw new Exception($"Unknown directionality {directionality}");

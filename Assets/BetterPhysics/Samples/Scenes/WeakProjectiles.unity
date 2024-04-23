@@ -391,13 +391,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1032619239}
-  - component: {fileID: 1032619240}
+  - component: {fileID: 1032619234}
+  - component: {fileID: 1032619241}
   - component: {fileID: 1032619238}
   - component: {fileID: 1032619237}
   - component: {fileID: 1032619236}
   - component: {fileID: 1032619235}
-  - component: {fileID: 1032619234}
-  - component: {fileID: 1032619241}
   m_Layer: 0
   m_Name: Ship
   m_TagString: Untagged
@@ -418,8 +417,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limits:
-  - limitType: 1
-    directionality: 0
+  - limitType: 2
+    directionality: 1
     scalarLimit: 0
     asymmetrical: 0
     min: {x: 0, y: 0, z: 0}
@@ -543,19 +542,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 28.274, z: 0}
---- !u!114 &1032619240
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1032619233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8e0b9ba5da024ca4a22670c843859bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 100
 --- !u!114 &1032619241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -568,6 +554,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1e4a718fe9e244aaab7adfb85b01922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  thrustForce: 20
+  pitchTorque: 1
+  rollTorque: 1
+  yawTorque: 1
 --- !u!1 &1039986348 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6131817763582631458, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
