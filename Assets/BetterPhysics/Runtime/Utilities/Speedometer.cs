@@ -13,15 +13,18 @@ namespace SadnessMonday.BetterPhysics.Utilities
         Text localVelocity;
         [SerializeField]
         Text worldVelocity;
+
+        [SerializeField] 
+        private string formatStr = "{0:F2} m/s";
         
         void Awake() {
             if (brb == null) brb = GetComponent<BetterRigidbody>();
         }
 
         void LateUpdate() {
-            if (speed) speed.text = brb.Speed.ToString("F4");
-            if (localVelocity) localVelocity.text = brb.LocalVelocity.ToString("F4");
-            if (worldVelocity) worldVelocity.text = brb.Velocity.ToString("F4");
+            if (speed) speed.text = string.Format(formatStr, brb.velocity.magnitude);
+            if (localVelocity) localVelocity.text = $"{brb.LocalVelocity:F2}";
+            if (worldVelocity) worldVelocity.text = $"{brb.Velocity:F2}";
         }
     }
 }

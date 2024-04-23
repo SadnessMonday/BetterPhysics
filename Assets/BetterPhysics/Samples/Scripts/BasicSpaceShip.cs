@@ -1,4 +1,5 @@
 using System;
+using SadnessMonday.BetterPhysics;
 using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM
@@ -11,6 +12,8 @@ public class BasicSpaceShip : MonoBehaviour {
     [SerializeField] private float pitchTorque = 4;
     [SerializeField] private float rollTorque = 4;
     [SerializeField] private float yawTorque = 4;
+
+    [SerializeField] private float velocityStabilization = 4f;
     private Rigidbody rb;
 
     private void Awake() {
@@ -19,10 +22,30 @@ public class BasicSpaceShip : MonoBehaviour {
 
     private void FixedUpdate() {
         HandleInput(out float thrust, out float pitch, out float roll, out float yaw);
+        AddControlForces(thrust, pitch, roll, yaw);
+        
+        AddStabilizingForces();
+    }
 
+    private void AddStabilizingForces() {
+        Vector3 currentVelocity = rb.velocity;
+        // Project the velocity on the backward-forward axis of the ship
+        Vector3 projectedVelocity = Vector3.Project(currentVelocity, rb.Forward());
+        Vector3 nonAlignedVelocity = currentVelocity - projectedVelocity;
+        
+        // Subtract a proportional stabilizing force:
+        Vector3 resistiveForce = velocityStabilization * -nonAlignedVelocity;
+        rb.AddForce(resistiveForce);
+        
+        // And re-add it along the projected direction:
+        Vector3 correctiveForce = resistiveForce.magnitude * .5f * projectedVelocity.normalized;
+        rb.AddForce(correctiveForce);
+    }
+
+    private void AddControlForces(float thrust, float pitch, float roll, float yaw) {
         Vector3 force = thrustForce * thrust * Vector3.forward;
-        print(force);
         rb.AddRelativeForce(force);
+        
         Vector3 torque = new(
             pitch * pitchTorque,
             yaw * yawTorque,
@@ -39,8 +62,8 @@ public class BasicSpaceShip : MonoBehaviour {
         if (Input.GetKey(KeyCode.S)) pitch -= 1;
         if (Input.GetKey(KeyCode.W)) pitch += 1;
         
-        if (Input.GetKey(KeyCode.A)) roll -= 1;
         if (Input.GetKey(KeyCode.D)) roll += 1;
+        if (Input.GetKey(KeyCode.A)) roll -= 1;
 
         if (Input.GetKey(KeyCode.Q)) yaw -= 1;
         if (Input.GetKey(KeyCode.E)) yaw += 1;
