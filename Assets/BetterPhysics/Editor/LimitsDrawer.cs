@@ -30,20 +30,10 @@ namespace SadnessMonday.BetterPhysics.Editor {
                 posY += rowHeight;
                 position.y += rowHeight;
                 Rect directionalityRect = new(position.x, posY, position.width, rowHeight);
-                Directionality oldDirectionality = (Directionality)directionalityProp.enumValueIndex;
                 EditorGUI.PropertyField(directionalityRect, directionalityProp, new GUIContent("Directionality"));
             
                 Directionality directionality = (Directionality)directionalityProp.enumValueIndex;
-                // if (oldDirectionality != directionality) {
-                //     EditorWindow window = EditorWindow.focusedWindow;
-                //     
-                //     // Check if the window exists and needs repainting
-                //     if (window != null)
-                //     {
-                //         window.Repaint();
-                //     }
-                // }
-                
+
                 switch (directionality) {
                     case Directionality.Omnidirectional:
                         DrawScalarLimit(property, position, posY);
