@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+// This package changed in 2019.1
 using SadnessMonday.BetterPhysics.Layers;
-using Unity.Jobs;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-
-// This package changed in 2019.1
 #if UNITY_2019_1_OR_NEWER
 using UnityEngine.UIElements;
 #elif UNITY_2018_4_OR_NEWER

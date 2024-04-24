@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace SadnessMonday.BetterPhysics.Editor {
     [CustomPropertyDrawer(typeof(SpeedLimit))]

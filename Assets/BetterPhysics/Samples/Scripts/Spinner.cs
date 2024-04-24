@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using SadnessMonday.BetterPhysics;
 using UnityEngine;
 
 namespace SadnessMonday.BetterPhysics.Samples {

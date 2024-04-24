@@ -5,7 +5,6 @@ using SadnessMonday.BetterPhysics.Layers;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.LowLevel;
-
 using static SadnessMonday.BetterPhysics.Utilities.ForceUtilities;
 
 namespace SadnessMonday.BetterPhysics {

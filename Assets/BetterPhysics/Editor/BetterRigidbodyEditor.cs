@@ -1,8 +1,7 @@
 using System.Linq;
-using System.Reflection;
 using SadnessMonday.BetterPhysics.Layers;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace SadnessMonday.BetterPhysics.Editor {
 

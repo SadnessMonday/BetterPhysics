@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using SadnessMonday.BetterPhysics.Layers;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 

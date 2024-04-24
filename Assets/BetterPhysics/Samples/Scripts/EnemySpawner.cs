@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace SadnessMonday.BetterPhysics.Samples {
     public class EnemySpawner : MonoBehaviour {

@@ -1,5 +1,4 @@
 using UnityEngine;
-
 using static SadnessMonday.BetterPhysics.Utilities.ForceUtilities;
 
 namespace SadnessMonday.BetterPhysics {
