@@ -17,7 +17,7 @@ namespace SadnessMonday.BetterPhysics.Samples {
         }
         
         void FixedUpdate() {
-            brb.MoveRotation(brb.rotation * (Quaternion.Euler(speed * Time.fixedDeltaTime * RotationAxis.normalized)));
+            brb.MoveRotation(brb.rotation * Quaternion.Euler(speed * Time.fixedDeltaTime * RotationAxis.normalized));
         }
     } 
 }

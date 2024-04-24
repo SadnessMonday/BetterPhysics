@@ -26,7 +26,7 @@ namespace SadnessMonday.BetterPhysics.Samples {
 
         InterpolationFunction interpolator;
         float t;
-        int waypointIndex = 0;
+        int waypointIndex;
         Transform currentOrigin => waypoints[waypointIndex];
         Transform currentDestination => waypoints[(waypointIndex + 1) % waypoints.Length];
 
@@ -50,11 +50,11 @@ namespace SadnessMonday.BetterPhysics.Samples {
             brb.MovePosition(newPosition);
         }
 
-        static InterpolationFunction SineFunc = (input) => {
+        static readonly InterpolationFunction SineFunc = input => {
             float sineOutput = Mathf.Sin(input * Tau);
             return (sineOutput + 1) / 2f; // change range from -1,1 to 0,1
         };
 
-        static InterpolationFunction LinearFunc = (input) => input;
+        static readonly InterpolationFunction LinearFunc = input => input;
     }
 }

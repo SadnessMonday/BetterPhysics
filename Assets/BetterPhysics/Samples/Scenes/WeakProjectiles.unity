@@ -558,6 +558,8 @@ MonoBehaviour:
   pitchTorque: 1
   rollTorque: 1
   yawTorque: 1
+  thrustParticles: {fileID: 0}
+  velocityStabilization: 4
 --- !u!1 &1039986348 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6131817763582631458, guid: 8af5d43d3455c484798fd95827a5ea49, type: 3}
