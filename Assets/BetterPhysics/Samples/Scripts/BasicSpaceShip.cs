@@ -12,6 +12,9 @@ public class BasicSpaceShip : MonoBehaviour {
     [SerializeField] private float pitchTorque = 4;
     [SerializeField] private float rollTorque = 4;
     [SerializeField] private float yawTorque = 4;
+    [SerializeField] private ParticleSystem thrustParticles;
+    const float particleEmissionMax = 45;
+    private const float particleEmissionAcceleration = 100f;
 
     [SerializeField] private float velocityStabilization = 4f;
     private Rigidbody rb;
@@ -25,6 +28,21 @@ public class BasicSpaceShip : MonoBehaviour {
         AddControlForces(thrust, pitch, roll, yaw);
         
         AddStabilizingForces();
+        UpdateThrustParticles(thrust);
+    }
+
+    private void UpdateThrustParticles(float thrustInput) {
+        if (!thrustParticles) return;
+        
+        var emissionModule = thrustParticles.emission;
+        
+        var emissionModuleRateOverTime = emissionModule.rateOverTime;
+        float currentEmission = emissionModuleRateOverTime.constant;
+        float newEmission = Mathf.MoveTowards(currentEmission, particleEmissionMax * thrustInput,
+            Time.deltaTime * particleEmissionAcceleration);
+        emissionModuleRateOverTime.constant = newEmission;
+        
+        emissionModule.rateOverTime = emissionModuleRateOverTime;
     }
 
     private void AddStabilizingForces() {
@@ -35,11 +53,11 @@ public class BasicSpaceShip : MonoBehaviour {
         
         // Subtract a proportional stabilizing force:
         Vector3 resistiveForce = velocityStabilization * -nonAlignedVelocity;
-        rb.AddForce(resistiveForce);
+        rb.AddForce(resistiveForce, ForceMode.Acceleration);
         
         // And re-add it along the projected direction:
         Vector3 correctiveForce = resistiveForce.magnitude * .5f * projectedVelocity.normalized;
-        rb.AddForce(correctiveForce);
+        rb.AddForce(correctiveForce, ForceMode.Acceleration);
     }
 
     private void AddControlForces(float thrust, float pitch, float roll, float yaw) {
@@ -62,8 +80,8 @@ public class BasicSpaceShip : MonoBehaviour {
         if (Input.GetKey(KeyCode.S)) pitch -= 1;
         if (Input.GetKey(KeyCode.W)) pitch += 1;
         
-        if (Input.GetKey(KeyCode.D)) roll += 1;
-        if (Input.GetKey(KeyCode.A)) roll -= 1;
+        if (Input.GetKey(KeyCode.D)) roll -= 1;
+        if (Input.GetKey(KeyCode.A)) roll += 1;
 
         if (Input.GetKey(KeyCode.Q)) yaw -= 1;
         if (Input.GetKey(KeyCode.E)) yaw += 1;
