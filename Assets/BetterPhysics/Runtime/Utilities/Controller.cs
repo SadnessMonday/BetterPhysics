@@ -1,5 +1,5 @@
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM && NEW_INPUT_SYSTEM_INSTALLED
 using UnityEngine.InputSystem;
 #endif
 
@@ -31,7 +31,7 @@ namespace SadnessMonday.BetterPhysics.Utilities
             moveInput = Vector2.zero;
             rotateInput = 0;
 
-#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM && NEW_INPUT_SYSTEM_INSTALLED
             Keyboard k = Keyboard.current;
             if (k[Key.W]) moveInput += Vector3.forward;
             if (k[Key.A]) moveInput += Vector3.left;

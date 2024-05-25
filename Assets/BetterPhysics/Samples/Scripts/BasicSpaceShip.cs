@@ -1,6 +1,5 @@
-using SadnessMonday.BetterPhysics;
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM && NEW_INPUT_SYSTEM_INSTALLED
 using UnityEngine.InputSystem;
 #endif
 
@@ -85,21 +84,21 @@ namespace SadnessMonday.BetterPhysics.Samples {
 
             if (Input.GetKey(KeyCode.Q)) yaw -= 1;
             if (Input.GetKey(KeyCode.E)) yaw += 1;
-#elif ENABLE_INPUT_SYSTEM
-        Keyboard k = Keyboard.current;
-        if (k.leftShiftKey.isPressed) thrust -= 1;
-        if (k.spaceKey.isPressed) thrust += 1;
-        
-        if (k.sKey.isPressed) pitch -= 1;
-        if (k.wKey.isPressed) pitch += 1;
-        
-        if (k.aKey.isPressed) roll -= 1;
-        if (k.dKey.isPressed) roll += 1;
-        
-        if (k.qKey.isPressed) yaw -= 1;
-        if (k.eKey.isPressed) yaw += 1;
+#elif ENABLE_INPUT_SYSTEM && NEW_INPUT_SYSTEM_INSTALLED
+            Keyboard k = Keyboard.current;
+            if (k.leftShiftKey.isPressed) thrust -= 1;
+            if (k.spaceKey.isPressed) thrust += 1;
+            
+            if (k.sKey.isPressed) pitch -= 1;
+            if (k.wKey.isPressed) pitch += 1;
+            
+            if (k.aKey.isPressed) roll -= 1;
+            if (k.dKey.isPressed) roll += 1;
+            
+            if (k.qKey.isPressed) yaw -= 1;
+            if (k.eKey.isPressed) yaw += 1;
 #else
-        Debug.LogWarning("No known input systems are enabled");
+            Debug.LogWarning("No known input systems are enabled");
 #endif
         }
     }
