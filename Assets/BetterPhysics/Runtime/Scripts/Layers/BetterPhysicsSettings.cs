@@ -38,7 +38,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         }
 
 #if UNITY_EDITOR
-        private const string DefaultSettingsAssetPath = "Assets/BetterPhysics/Resources";
+        private const string DefaultSettingsAssetPath = "Assets/BetterPhysics/Runtime/Resources";
         private const string DefaultSettingsAssetFileName = DefaultSettingsAssetName + ".asset";
 
         private static BetterPhysicsSettings GetLayerSettingsAssetInEditor() {
