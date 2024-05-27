@@ -12,10 +12,9 @@ namespace SadnessMonday.BetterPhysics.Samples {
         [SerializeField] private float rollTorque = 4;
         [SerializeField] private float yawTorque = 4;
         [SerializeField] private ParticleSystem thrustParticles;
-        const float particleEmissionMax = 45;
-        private const float particleEmissionAcceleration = 100f;
-
-        [SerializeField] private float velocityStabilization = 4f;
+        private const float ParticleEmissionMax = 45;
+        private const float ParticleEmissionAcceleration = 100f;
+        
         private Rigidbody rb;
 
         private void Awake() {
@@ -26,39 +25,9 @@ namespace SadnessMonday.BetterPhysics.Samples {
             HandleInput(out float thrust, out float pitch, out float roll, out float yaw);
             AddControlForces(thrust, pitch, roll, yaw);
 
-            AddStabilizingForces();
             UpdateThrustParticles(thrust);
         }
-
-        private void UpdateThrustParticles(float thrustInput) {
-            if (!thrustParticles) return;
-
-            var emissionModule = thrustParticles.emission;
-
-            var emissionModuleRateOverTime = emissionModule.rateOverTime;
-            float currentEmission = emissionModuleRateOverTime.constant;
-            float newEmission = Mathf.MoveTowards(currentEmission, particleEmissionMax * thrustInput,
-                Time.deltaTime * particleEmissionAcceleration);
-            emissionModuleRateOverTime.constant = newEmission;
-
-            emissionModule.rateOverTime = emissionModuleRateOverTime;
-        }
-
-        private void AddStabilizingForces() {
-            Vector3 currentVelocity = rb.velocity;
-            // Project the velocity on the backward-forward axis of the ship
-            Vector3 projectedVelocity = Vector3.Project(currentVelocity, rb.Forward());
-            Vector3 nonAlignedVelocity = currentVelocity - projectedVelocity;
-
-            // Subtract a proportional stabilizing force:
-            Vector3 resistiveForce = velocityStabilization * -nonAlignedVelocity;
-            rb.AddForce(resistiveForce, ForceMode.Acceleration);
-
-            // And re-add it along the projected direction:
-            Vector3 correctiveForce = resistiveForce.magnitude * .5f * projectedVelocity.normalized;
-            rb.AddForce(correctiveForce, ForceMode.Acceleration);
-        }
-
+        
         private void AddControlForces(float thrust, float pitch, float roll, float yaw) {
             Vector3 force = thrustForce * thrust * Vector3.forward;
             rb.AddRelativeForce(force);
@@ -69,7 +38,7 @@ namespace SadnessMonday.BetterPhysics.Samples {
                 roll * rollTorque);
             rb.AddRelativeTorque(torque);
         }
-
+        
         void HandleInput(out float thrust, out float pitch, out float roll, out float yaw) {
             thrust = pitch = roll = yaw = 0;
 #if ENABLE_LEGACY_INPUT_MANAGER
@@ -100,6 +69,20 @@ namespace SadnessMonday.BetterPhysics.Samples {
 #else
             Debug.LogWarning("No known input systems are enabled");
 #endif
+        }
+
+        private void UpdateThrustParticles(float thrustInput) {
+            if (!thrustParticles) return;
+
+            var emissionModule = thrustParticles.emission;
+
+            var emissionModuleRateOverTime = emissionModule.rateOverTime;
+            float currentEmission = emissionModuleRateOverTime.constant;
+            float newEmission = Mathf.MoveTowards(currentEmission, ParticleEmissionMax * thrustInput,
+                Time.deltaTime * ParticleEmissionAcceleration);
+            emissionModuleRateOverTime.constant = newEmission;
+
+            emissionModule.rateOverTime = emissionModuleRateOverTime;
         }
     }
 }

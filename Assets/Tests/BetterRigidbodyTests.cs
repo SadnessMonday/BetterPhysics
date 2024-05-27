@@ -211,6 +211,10 @@ namespace SadnessMonday.BetterPhysics.Tests {
                 SoftLocalArgs(Vector3.one).WithStartLocalVel(Vector3.one * 10).WithLocalForceVec(Vector3.zero)
                     .WithExpectedLocalVelocity(Vector3.one * 10),
                 
+                SoftLocalArgs(new (0, 0, 10)).WithStartLocalVel(new (0, 0, 10))
+                    .WithLocalForceVec(new (0, 0, 10))
+                    .WithExpectedLocalVelocity(new (0, 0, 10)),
+                
                 // No limits tests
                 SoftScalarArgs(1).WithForceVecWithoutLimit(Vector3.one * 10)
                     .WithExpectedVelocity(Vector3.one * 10),
