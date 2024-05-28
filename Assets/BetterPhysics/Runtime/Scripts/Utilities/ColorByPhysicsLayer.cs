@@ -7,7 +7,7 @@ namespace SadnessMonday.BetterPhysics.Utilities {
         private Renderer _renderer;
 
         static readonly Color[] Colors = {
-            new Color(.5f, 0, .7f),
+            Color.gray,
             Color.yellow,
             Color.cyan,
             Color.red, 

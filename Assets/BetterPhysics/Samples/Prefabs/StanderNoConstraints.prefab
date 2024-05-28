@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Constraints
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3774038791552091767, guid: e6cf994f4027815498d85db072e2439a, type: 3}
+      propertyPath: physicsLayer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7254119458018665285, guid: e6cf994f4027815498d85db072e2439a, type: 3}
       propertyPath: m_RootOrder
       value: 0

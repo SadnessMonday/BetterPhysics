@@ -12,6 +12,7 @@ namespace SadnessMonday.BetterPhysics.Utilities
         public float ForceMultiplier = 5f;
         public float RotateSpeed = 50f;
         public bool UseLocalForces = false;
+        public bool Flat = false;
 
         void Awake() {
             brb = GetComponent<BetterRigidbody>();
@@ -41,9 +42,9 @@ namespace SadnessMonday.BetterPhysics.Utilities
             if (k[Key.O]) rotateInput -= 1;
             if (k[Key.P]) rotateInput += 1;
 #else
-            if (Input.GetKey(KeyCode.W)) moveInput += Vector3.forward;
+            if (Input.GetKey(KeyCode.W)) moveInput += Flat ? Vector3.forward : Vector3.up;
             if (Input.GetKey(KeyCode.A)) moveInput += Vector3.left;
-            if (Input.GetKey(KeyCode.S)) moveInput += Vector3.back;
+            if (Input.GetKey(KeyCode.S)) moveInput += Flat ? Vector3.back : Vector3.down;
             if (Input.GetKey(KeyCode.D)) moveInput += Vector3.right;
 
             if (Input.GetKey(KeyCode.O)) rotateInput -= 1;

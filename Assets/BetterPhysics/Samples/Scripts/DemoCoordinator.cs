@@ -21,23 +21,23 @@ namespace SadnessMonday.BetterPhysics.Samples {
             
             label.text = "Red vs Red\nNormal interaction";
             yield return SpawnThenWait(0, 0, 5);
-            label.text = "Red vs Blue\nRed Ignores Blue";
+            label.text = "Red vs Blue\nRed is ignored by Blue";
             yield return SpawnThenWait(0, 1, 5);
-            label.text = "Red vs Green\nRed is ignored by Green";
+            label.text = "Red vs Green\nRed ignores Green";
             yield return SpawnThenWait(0, 2, 5);
             
             label.text = "Blue vs Blue\nNormal interaction";
             yield return SpawnThenWait(1, 1, 5);
-            label.text = "Blue vs Red\nBlue is ignored by Red";
+            label.text = "Blue vs Red\nBlue ignores Red";
             yield return SpawnThenWait(1, 0, 5);
-            label.text = "Blue vs Green\nBlue ignores Green";
+            label.text = "Blue vs Green\nBlue is ignored by Green";
             yield return SpawnThenWait(1, 2, 5);
             
             label.text = "Green vs Green\nNormal interaction";
             yield return SpawnThenWait(2, 2, 5);
-            label.text = "Green vs Red\nGreen ignores Red";
+            label.text = "Green vs Red\nGreen is ignored Red";
             yield return SpawnThenWait(2, 0, 5);
-            label.text = "Green vs Blue\nGreen is ignored by Blue";
+            label.text = "Green vs Blue\nGreen ignores Blue";
             yield return SpawnThenWait(2, 1, 5);
             label.text = "All together now";
             Finale(20);

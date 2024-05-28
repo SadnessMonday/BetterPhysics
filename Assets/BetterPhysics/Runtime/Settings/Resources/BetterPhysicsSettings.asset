@@ -20,12 +20,12 @@ MonoBehaviour:
   - Green
   - Blue
   interactionsStorage:
-  - _actorLayer: 6
-    _receiverLayer: 7
+  - _actorLayer: 3
+    _receiverLayer: 4
     <InteractionType>k__BackingField: 2
-  - _actorLayer: 7
-    _receiverLayer: 8
+  - _actorLayer: 4
+    _receiverLayer: 5
     <InteractionType>k__BackingField: 2
-  - _actorLayer: 6
-    _receiverLayer: 8
+  - _actorLayer: 3
+    _receiverLayer: 5
     <InteractionType>k__BackingField: 1
