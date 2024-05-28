@@ -644,10 +644,6 @@ namespace SadnessMonday.BetterPhysics {
 
 
         Vector3 AddForceWithLocalAxisLimit(Vector3 worldForce, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
-#if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
-            CheckForFixedTimestep();
-#endif
-
             Vector3 worldVelocity = rb.velocity;
 
             // Convert everything to local
@@ -676,10 +672,6 @@ namespace SadnessMonday.BetterPhysics {
          */
         Vector3 AddRelativeForceWithWorldAxisLimit(Vector3 localForce, in Bool3 limited, in Vector3 min, in Vector3 max,
             ForceMode mode = ForceMode.Force) {
-#if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
-            CheckForFixedTimestep();
-#endif
-
             Vector3 expectedChange = CalculateVelocityChange(localForce, rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(LocalVelocity, expectedChange, limited, min, max);
 
@@ -696,10 +688,6 @@ namespace SadnessMonday.BetterPhysics {
          * Return the actual world space velocity change that occurred
          */
         Vector3 AddForceWithWorldAxisLimit(Vector3 force, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
-#if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
-            CheckForFixedTimestep();
-#endif
-
             Vector3 expectedChange = CalculateVelocityChange(force, rb.mass, mode);
             Vector3 currentVelocity = rb.velocity;
             Vector3 newVelocity = SoftClamp(currentVelocity, expectedChange, limited, min, max);
@@ -764,20 +752,12 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         Vector3 AddForceWithOmnidirectionalLimit(Vector3 force, float limit, ForceMode mode = ForceMode.Force) {
-#if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
-            CheckForFixedTimestep();
-#endif
-
             Vector3 velocityChange = CalculateVelocityChangeWithSoftLimit(Velocity, force, limit, mode);
             rb.velocity += velocityChange;
             return velocityChange;
         }
 
         Vector3 AddRelativeForceWithOmnidirectionalLimit(Vector3 force, float limit, ForceMode mode = ForceMode.Force) {
-#if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
-            CheckForFixedTimestep();
-#endif
-
             Vector3 localChange = CalculateVelocityChangeWithSoftLimit(this.LocalVelocity, force, limit, mode);
             Vector3 worldChange = rotation * localChange;
             rb.velocity += worldChange;
@@ -786,20 +766,12 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public void AddForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
-#if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
-            CheckForFixedTimestep();
-#endif
-
             // rb.AddForce(force, mode);
             Vector3 velocityChange = CalculateVelocityChange(force, mass, mode);
             exemptedVelocityChange += velocityChange;
         }
 
         public void AddRelativeForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
-#if UNITY_EDITOR && !BETTER_PHYSICS_IGNORE_FIXED_TIMESTEP
-            CheckForFixedTimestep();
-#endif
-
             force = rb.rotation * force;
             AddForceWithoutLimit(force, mode);
         }
@@ -827,15 +799,6 @@ namespace SadnessMonday.BetterPhysics {
             // take out the component in the direction of the overspeed and add the adjusted one.
             Vector3 effectiveVelocityChange = velocityChange - component + adjustedComponent;
             return effectiveVelocityChange;
-        }
-
-        // Calculate the required newtons to effect the desired velocity change
-
-        private static void CheckForFixedTimestep() {
-            if (!Time.inFixedTimeStep) {
-                throw new Exception(
-                    "Forces should only be added during the fixed timestep. This means FixedUpdate, a collision callback method such as OnCollisionEnter, or a coroutine with yield return new WaitForFixedUpdate");
-            }
         }
 
         #endregion
