@@ -44,8 +44,14 @@ namespace SadnessMonday.BetterPhysics.Editor {
             using (new EditorGUI.DisabledGroupScope(true)) {
                 EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
             }
-            
-            layerField.intValue = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
+
+            int oldLayer = layerField.intValue;
+            int newLayer = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
+            if (oldLayer != newLayer && serializedObject.targetObject is BetterRigidbody brb) {
+                brb.PhysicsLayer = newLayer;
+                layerField.intValue = newLayer;
+            }
+
             DrawLimitsSection();
 
             serializedObject.ApplyModifiedProperties();

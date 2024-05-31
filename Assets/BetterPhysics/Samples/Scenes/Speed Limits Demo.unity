@@ -10774,13 +10774,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39206428aa6bc4e5fa785362d77bb65a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabs: []
+  prefab: {fileID: 0}
   launchSpeed: 0
   lifeSpan: 10
   launchOnStart: 0
   launchPeriodically: 0
   launchInterval: 0
-  launchOnStartIndex: 0
+  material: {fileID: 0}
+  physicsLayer: -1
 --- !u!4 &2066461636
 Transform:
   m_ObjectHideFlags: 0
@@ -11068,22 +11069,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1328068569223356, guid: 3930c834756024cd49ad5ecdb2466e8b, type: 3}
-      propertyPath: limits.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1328068569223356, guid: 3930c834756024cd49ad5ecdb2466e8b, type: 3}
-      propertyPath: limits.Array.data[0].limitType
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1328068569223356, guid: 3930c834756024cd49ad5ecdb2466e8b, type: 3}
-      propertyPath: limits.Array.data[0].scalarLimit
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 1328068569223356, guid: 3930c834756024cd49ad5ecdb2466e8b, type: 3}
-      propertyPath: limits.Array.data[0].directionality
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 854442991009086614, guid: 3930c834756024cd49ad5ecdb2466e8b, type: 3}
       propertyPath: m_LocalScale.x
       value: 50
@@ -11305,7 +11290,7 @@ MonoBehaviour:
       y: 0
       z: 0
   - limitType: 2
-    directionality: 1
+    directionality: 0
     scalarLimit: 100
     asymmetrical: 1
     min: {x: 0, y: -25, z: -25}
@@ -11315,7 +11300,7 @@ MonoBehaviour:
       y: 0
       z: 1
   layerInteractions: []
-  physicsLayer: 1
+  physicsLayer: 0
 --- !u!54 &5929806113257075019
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -18,12 +18,6 @@ namespace SadnessMonday.BetterPhysics.Utilities
             brb = GetComponent<BetterRigidbody>();
         }
 
-        // Start is called before the first frame update
-        void Start()
-        {
-            // Application.targetFrameRate = 30;
-        }
-
         Vector3 moveInput;
         float rotateInput;
 

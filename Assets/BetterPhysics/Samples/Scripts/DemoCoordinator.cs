@@ -9,63 +9,65 @@ namespace SadnessMonday.BetterPhysics.Samples {
         [SerializeField] private BRBLauncher[] rightSpawners;
         [SerializeField] private Text label;
 
-        private IEnumerator Start() {
-            BetterPhysicsSettings.Instance.ResetAllLayerInteractions();
-            var red = InteractionLayer.GetOrCreateLayer("Red");
-            var green = InteractionLayer.GetOrCreateLayer("Green");
-            var blue = InteractionLayer.GetOrCreateLayer("Blue");
+        private InteractionLayer redLayer, greenLayer, blueLayer;
+        [SerializeField] private Material redMaterial, greenMaterial, blueMaterial;
 
-            BetterPhysicsSettings.Instance.SetLayerInteraction(red, green, InteractionType.Kinematic);
-            BetterPhysicsSettings.Instance.SetLayerInteraction(green, blue, InteractionType.Kinematic);
-            BetterPhysicsSettings.Instance.SetLayerInteraction(blue, red, InteractionType.Kinematic);
+        private IEnumerator Start() {
+            redLayer = InteractionLayer.GetOrCreateLayer("Red");
+            blueLayer = InteractionLayer.GetOrCreateLayer("Blue");
+            greenLayer = InteractionLayer.GetOrCreateLayer("Green");
+
+            BetterPhysicsSettings.Instance.SetLayerInteraction(redLayer, greenLayer, InteractionType.Kinematic);
+            BetterPhysicsSettings.Instance.SetLayerInteraction(greenLayer, blueLayer, InteractionType.Kinematic);
+            BetterPhysicsSettings.Instance.SetLayerInteraction(blueLayer, redLayer, InteractionType.Kinematic);
             
             label.text = "Red vs Red\nNormal interaction";
-            yield return SpawnThenWait(0, 0, 5);
+            yield return SpawnThenWait(redLayer, redLayer, redMaterial, redMaterial, 5);
             label.text = "Red vs Blue\nRed is ignored by Blue";
-            yield return SpawnThenWait(0, 1, 5);
+            yield return SpawnThenWait(redLayer, blueLayer, redMaterial, blueMaterial, 5);
             label.text = "Red vs Green\nRed ignores Green";
-            yield return SpawnThenWait(0, 2, 5);
+            yield return SpawnThenWait(redLayer, greenLayer, redMaterial, greenMaterial, 5);
             
             label.text = "Blue vs Blue\nNormal interaction";
-            yield return SpawnThenWait(1, 1, 5);
+            yield return SpawnThenWait(blueLayer, blueLayer, blueMaterial, blueMaterial, 5);
             label.text = "Blue vs Red\nBlue ignores Red";
-            yield return SpawnThenWait(1, 0, 5);
+            yield return SpawnThenWait(blueLayer, redLayer, blueMaterial, redMaterial, 5);
             label.text = "Blue vs Green\nBlue is ignored by Green";
-            yield return SpawnThenWait(1, 2, 5);
+            yield return SpawnThenWait(blueLayer, greenLayer, blueMaterial, greenMaterial, 5);
             
             label.text = "Green vs Green\nNormal interaction";
-            yield return SpawnThenWait(2, 2, 5);
-            label.text = "Green vs Red\nGreen is ignored Red";
-            yield return SpawnThenWait(2, 0, 5);
+            yield return SpawnThenWait(greenLayer, greenLayer, greenMaterial, greenMaterial, 5);
+            label.text = "Green vs Red\nGreen is ignored by Red";
+            yield return SpawnThenWait(greenLayer, redLayer, greenMaterial, redMaterial, 5);
             label.text = "Green vs Blue\nGreen ignores Blue";
-            yield return SpawnThenWait(2, 1, 5);
+            yield return SpawnThenWait(greenLayer, blueLayer,  greenMaterial, blueMaterial, 5);
             label.text = "All together now";
             Finale(20);
         }
 
         private void Finale(float secs) {
-            leftSpawners[2].SpawnPrefab(0, secs);
-            rightSpawners[2].SpawnPrefab(0, secs);
+            leftSpawners[2].SpawnPrefab(redLayer, redMaterial, secs);
+            rightSpawners[2].SpawnPrefab(redLayer, redMaterial, secs);
             
-            leftSpawners[3].SpawnPrefab(1, secs);
-            rightSpawners[3].SpawnPrefab(2, secs);
+            leftSpawners[3].SpawnPrefab(blueLayer, blueMaterial, secs);
+            rightSpawners[3].SpawnPrefab(greenLayer, greenMaterial, secs);
             
-            leftSpawners[4].SpawnPrefab(2, secs);
-            rightSpawners[4].SpawnPrefab(2, secs);
+            leftSpawners[4].SpawnPrefab(greenLayer, greenMaterial, secs);
+            rightSpawners[4].SpawnPrefab(greenLayer, greenMaterial, secs);
             
-            leftSpawners[5].SpawnPrefab(0, secs);
-            rightSpawners[5].SpawnPrefab(1, secs);
+            leftSpawners[5].SpawnPrefab(redLayer, redMaterial, secs);
+            rightSpawners[5].SpawnPrefab(blueLayer, blueMaterial, secs);
             
-            leftSpawners[6].SpawnPrefab(1, secs);
-            rightSpawners[6].SpawnPrefab(1, secs);
+            leftSpawners[6].SpawnPrefab(blueLayer, blueMaterial, secs);
+            rightSpawners[6].SpawnPrefab(blueLayer, blueMaterial, secs);
             
-            leftSpawners[7].SpawnPrefab(2, secs);
-            rightSpawners[7].SpawnPrefab(0, secs);
+            leftSpawners[7].SpawnPrefab(greenLayer, greenMaterial, secs);
+            rightSpawners[7].SpawnPrefab(redLayer, redMaterial, secs);
         }
 
-        IEnumerator SpawnThenWait(int left, int right, float secs) {
-            leftSpawners[5].SpawnPrefab(left, secs);
-            rightSpawners[5].SpawnPrefab(right, secs);
+        IEnumerator SpawnThenWait(int left, int right, Material leftMat, Material rightMat, float secs) {
+            leftSpawners[5].SpawnPrefab(left, leftMat, secs);
+            rightSpawners[5].SpawnPrefab(right, rightMat, secs);
             yield return new WaitForSeconds(secs);
         }
     }

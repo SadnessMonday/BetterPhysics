@@ -89,6 +89,10 @@ namespace SadnessMonday.BetterPhysics.Layers {
         public static bool operator !=(InteractionLayer a, InteractionLayer b) {
             return !(a == b);
         }
+        
+        public static implicit operator int(InteractionLayer layer) {
+            return layer.Index;
+        }
     }
 
     public struct PhysicsLayerMask {

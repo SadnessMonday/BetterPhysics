@@ -2881,6 +2881,9 @@ MonoBehaviour:
   - {fileID: 167963907}
   - {fileID: 1597188470}
   label: {fileID: 1523300755}
+  redMaterial: {fileID: 2100000, guid: fdcdb9d697c25c341b68514f519cc662, type: 2}
+  greenMaterial: {fileID: 2100000, guid: 585257803e58eff4b9a0a65e08a377ad, type: 2}
+  blueMaterial: {fileID: 2100000, guid: 882220c89f6817a4aa178b887095ff29, type: 2}
 --- !u!1 &1760873172
 GameObject:
   m_ObjectHideFlags: 0

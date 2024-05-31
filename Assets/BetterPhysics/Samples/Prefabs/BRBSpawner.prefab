@@ -44,13 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39206428aa6bc4e5fa785362d77bb65a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabs:
-  - {fileID: 3581185825805654207, guid: de0ac6768b1f74cc9acb7f55f46c1842, type: 3}
-  - {fileID: 1024247832553330546, guid: f9e4666a2f49e447f82255cba565c1ca, type: 3}
-  - {fileID: 6485847948424953109, guid: 805ecf94ed40d45f8a5b32589652af5e, type: 3}
+  prefab: {fileID: 1776347875811430694, guid: 68331ce5b5cdd4c1cbbc892678daed1a, type: 3}
   launchSpeed: 5
   lifeSpan: 10
   launchOnStart: 0
   launchPeriodically: 0
   launchInterval: 0
-  launchOnStartIndex: 0
+  material: {fileID: 0}
+  physicsLayer: -1
