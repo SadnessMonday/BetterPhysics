@@ -30,16 +30,28 @@ namespace SadnessMonday.BetterPhysics.Layers {
                     if (ReferenceEquals(_instance, null)) {
                         Debug.LogWarning("Could not find a BetterPhysics settings asset. Falling back to creating one at runtime");
                         _instance = CreateInstance<BetterPhysicsSettings>();
+                        _instance.Reset();
                     }
                 }
+                
+#if UNITY_EDITOR
+                if (UnityEditor.AssetDatabase.GetAssetPath(_instance) == null) {
+                    Directory.CreateDirectory(DefaultSettingsAssetPath);
+                    AssetDatabase.CreateAsset(_instance, DefaultSettingsAssetFullPath);
+                    AssetDatabase.SaveAssets();
+                }
+#endif
 
                 return _instance;
             }
         }
 
 #if UNITY_EDITOR
-        private const string DefaultSettingsAssetPath = "Assets/BetterPhysics/Runtime/Resources";
+        private const string DefaultSettingsAssetPath = "Assets/BetterPhysics/Runtime/Settings/Resources";
         private const string DefaultSettingsAssetFileName = DefaultSettingsAssetName + ".asset";
+
+        private static string DefaultSettingsAssetFullPath =>
+            Path.Combine(DefaultSettingsAssetPath, DefaultSettingsAssetFileName);
 
         private static BetterPhysicsSettings GetLayerSettingsAssetInEditor() {
             string path = GetSettingsFilePathInEditor();
@@ -47,10 +59,11 @@ namespace SadnessMonday.BetterPhysics.Layers {
             if (instance != null) return instance;
 
             Debug.Log($"Creating new BetterPhysicsSettings instance");
-            path = Path.Combine(DefaultSettingsAssetPath, DefaultSettingsAssetFileName);
+            path = DefaultSettingsAssetFullPath;
             var settings = CreateInstance<BetterPhysicsSettings>();
             settings.Reset();
-            
+
+            Directory.CreateDirectory(DefaultSettingsAssetPath);
             AssetDatabase.CreateAsset(settings, path);
             AssetDatabase.SaveAssets();
 
