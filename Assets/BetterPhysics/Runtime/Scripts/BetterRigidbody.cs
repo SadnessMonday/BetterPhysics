@@ -4,7 +4,6 @@ using System.Linq;
 using SadnessMonday.BetterPhysics.Layers;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.LowLevel;
 using static SadnessMonday.BetterPhysics.Utilities.ForceUtilities;
 
 namespace SadnessMonday.BetterPhysics {
@@ -12,42 +11,79 @@ namespace SadnessMonday.BetterPhysics {
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(10001)] // We need to run _late_ so we get a chance to modify velocity.
     public class BetterRigidbody : MonoBehaviour {
-        private static HashSet<BetterRigidbody> allBodies = new();
-        
         public delegate void PhysicsLayerChangeHandler(BetterRigidbody source, int oldLayer, int newLayer);
 
         public event PhysicsLayerChangeHandler OnPhysicsLayerChanged;
-
-        // public SpeedLimit softLimits;
-        // public SpeedLimit hardLimits;
-        public List<SpeedLimit> limits = new();
-        Rigidbody rb;
+        private static readonly List<SpeedLimit> DeferredHardLimits = new();
+        
+        private Rigidbody _rb;
         // Exempt from local limits
-        private Vector3 exemptedVelocityChange;
+        private Vector3 _exemptedVelocityChange;
+        
+        [SerializeField] 
+        List<SpeedLimit> limits = new();
+        
+        public IReadOnlyList<SpeedLimit> Limits => limits;
 
-        [RuntimeInitializeOnLoadMethod]
-        static void ModifyPlayerLoop() {
-            PlayerLoopSystem.UpdateFunction myFunction = new PlayerLoopSystem.UpdateFunction(UpdateAllBetterBodies);
+        public void SetLimits(IEnumerable<SpeedLimit> limits) {
+            this.limits.Clear();
+            AddLimits(limits);
         }
 
+        public void SetLimits(params SpeedLimit[] limits) {
+            SetLimits((IEnumerable<SpeedLimit>)limits);
+        }
+
+        public void AddLimits(IEnumerable<SpeedLimit> limits) {
+            this.limits.AddRange(limits);
+        }
+
+        public void AddLimits(params SpeedLimit[] limits) {
+            AddLimits((IEnumerable<SpeedLimit>)limits);
+        }
+
+        public void ClearLimits() {
+            limits.Clear();
+        }
+
+        public SpeedLimit GetLimit(int index) {
+            return limits[index];
+        }
+
+        public void SetLimit(int index, SpeedLimit limit) {
+            limits[index] = limit;
+        }
+
+        public int LimitCount => limits.Count;
+
         private void FixedUpdate() {
-            if (!rb.isKinematic) {
+            if (!_rb.isKinematic) {
                 // Apply exempted newtons directly to the velocity
-                rb.velocity += exemptedVelocityChange;
+                _rb.velocity += _exemptedVelocityChange;
             }
-            exemptedVelocityChange = Vector3.zero;
+            _exemptedVelocityChange = Vector3.zero;
             
             ApplyLimits();
         }
 
-        static void UpdateAllBetterBodies() {
-            foreach (BetterRigidbody body in allBodies) {
-                body.ApplyLimits();
-            }
-        }
-
         public void ApplyLimits() {
+            DeferredHardLimits.Clear();
+            
             foreach (SpeedLimit limit in limits) {
+                switch (limit.LimitType) {
+                    case LimitType.Hard:
+                        // Defer hard limits
+                        DeferredHardLimits.Add(limit);
+                        break;
+                    case LimitType.Soft:
+                        // Apply soft limits immediately
+                        ApplyLimit(limit);
+                        break;
+                }
+            }
+
+            // Apply the deferred hard limits.
+            foreach (SpeedLimit limit in DeferredHardLimits) {
                 ApplyLimit(limit);
             }
         }
@@ -65,9 +101,9 @@ namespace SadnessMonday.BetterPhysics {
 
         private void ApplySoftLimit(SpeedLimit limit) {
             // Accumulated force is always expressed in terms of newtons. As if applied with ForceMode.Force.
-            var accumulatedNewtons = rb.GetAccumulatedForce();
-            var currentVelocity = rb.velocity;
-            var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, rb.mass,
+            var accumulatedNewtons = _rb.GetAccumulatedForce();
+            var currentVelocity = _rb.velocity;
+            var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, _rb.mass,
                 ForceMode.Force);
 
             switch (limit.Directionality) {
@@ -75,7 +111,7 @@ namespace SadnessMonday.BetterPhysics {
                     Vector3 limitedChange = CalculateVelocityChangeWithSoftLimit(currentVelocity, accumulatedNewtons,
                         limit.ScalarLimit);
                     Vector3 diff = limitedChange - expectedVelocityChange;
-                    rb.AddForce(diff, ForceMode.VelocityChange);
+                    _rb.AddForce(diff, ForceMode.VelocityChange);
                     break;
                 }
                 // return AddForceWithOmnidirectionalLimit(force, limits.ScalarLimit, mode);
@@ -95,7 +131,7 @@ namespace SadnessMonday.BetterPhysics {
                     // This is what we want the velocity diff to be
                     Vector3 clampedVelocityDiff = newVelocity - currentVelocity;
                     Vector3 correction = clampedVelocityDiff - expectedVelocityChange;
-                    rb.AddForce(correction, ForceMode.VelocityChange);
+                    _rb.AddForce(correction, ForceMode.VelocityChange);
                     break;
                 }
                 case Directionality.LocalAxes: {
@@ -109,20 +145,20 @@ namespace SadnessMonday.BetterPhysics {
                     }
 
                     // Convert everything to local
-                    Quaternion inverseRot = Quaternion.Inverse(rb.rotation);
+                    Quaternion inverseRot = Quaternion.Inverse(_rb.rotation);
                     Vector3 localForce = inverseRot * accumulatedNewtons;
                     Vector3 localVelocity = inverseRot * currentVelocity;
 
                     // Do the math in local space
-                    Vector3 expectedLocalChange = CalculateVelocityChange(localForce, rb.mass, ForceMode.Force);
+                    Vector3 expectedLocalChange = CalculateVelocityChange(localForce, _rb.mass, ForceMode.Force);
                     Vector3 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limit.AxisLimited, min, max);
                     // print($"Clamped new local velocity is {newLocalVelocity}");
 
                     // Convert back to worldspace
-                    Vector3 newWorldVelocity = rb.rotation * newLocalVelocity;
+                    Vector3 newWorldVelocity = _rb.rotation * newLocalVelocity;
                     Vector3 worldChange = newWorldVelocity - currentVelocity;
                     Vector3 correction = worldChange - expectedVelocityChange;
-                    rb.AddForce(correction, ForceMode.VelocityChange);
+                    _rb.AddForce(correction, ForceMode.VelocityChange);
                     break;
                 }
                 default:
@@ -131,9 +167,9 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void ApplyHardLimit(SpeedLimit limit) {
-            var currentVelocity = rb.velocity;
-            var accumulatedNewtons = rb.GetAccumulatedForce();
-            var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, rb.mass,
+            var currentVelocity = _rb.velocity;
+            var accumulatedNewtons = _rb.GetAccumulatedForce();
+            var expectedVelocityChange = CalculateVelocityChange(accumulatedNewtons, _rb.mass,
                 ForceMode.Force);
             var expectedNewVelocity = currentVelocity + expectedVelocityChange;
             
@@ -142,8 +178,8 @@ namespace SadnessMonday.BetterPhysics {
                     Vector3 clampedVelocity = Vector3.ClampMagnitude(expectedNewVelocity, limit.ScalarLimit);
                     
                     // We're hard clamping so remove all accumulated force
-                    rb.AddForce(-accumulatedNewtons);
-                    rb.velocity = clampedVelocity;
+                    _rb.AddForce(-accumulatedNewtons);
+                    _rb.velocity = clampedVelocity;
                     break;
                 case Directionality.WorldAxes: {
                     Vector3 clampedNewVelocity = expectedNewVelocity;
@@ -159,14 +195,14 @@ namespace SadnessMonday.BetterPhysics {
                     }
                     
                     // We're hard clamping so remove all accumulated force
-                    rb.AddForce(-accumulatedNewtons);
+                    _rb.AddForce(-accumulatedNewtons);
                     // We're going to do this clamping no matter what.
-                    rb.velocity = clampedNewVelocity;
+                    _rb.velocity = clampedNewVelocity;
                     
                     break;
                 }
                 case Directionality.LocalAxes: {
-                    Vector3 clampedLocalVelocity = Quaternion.Inverse(rb.rotation) * expectedNewVelocity;
+                    Vector3 clampedLocalVelocity = Quaternion.Inverse(_rb.rotation) * expectedNewVelocity;
                     var max = limit.Max;
                     var min = limit.Min;
                     for (int i = 0; i < 3; i++) {
@@ -178,11 +214,11 @@ namespace SadnessMonday.BetterPhysics {
                         }
                     }
 
-                    Vector3 clampedWorldVelocity = rb.rotation * clampedLocalVelocity;
+                    Vector3 clampedWorldVelocity = _rb.rotation * clampedLocalVelocity;
 
                     // We're hard clamping so remove all accumulated force
-                    rb.AddForce(-accumulatedNewtons);
-                    rb.velocity = clampedWorldVelocity;
+                    _rb.AddForce(-accumulatedNewtons);
+                    _rb.velocity = clampedWorldVelocity;
                     break;
                 }
                 default:
@@ -190,20 +226,20 @@ namespace SadnessMonday.BetterPhysics {
             }
         }
 
-        internal int GetRigidbodyInstanceID() => rb.GetInstanceID();
+        internal int GetRigidbodyInstanceID() => _rb.GetInstanceID();
         internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();
 
         public Vector3 Velocity {
-            get => rb.velocity;
-            set => rb.velocity = value;
+            get => _rb.velocity;
+            set => _rb.velocity = value;
         }
 
         public Vector3 LocalVelocity {
-            get => Quaternion.Inverse(rb.rotation) * rb.velocity;
-            set => rb.velocity = rb.rotation * value;
+            get => Quaternion.Inverse(_rb.rotation) * _rb.velocity;
+            set => _rb.velocity = _rb.rotation * value;
         }
         
-        public float Speed => rb.velocity.magnitude;
+        public float Speed => _rb.velocity.magnitude;
 
         [SerializeField] private List<OneWayLayerInteraction> layerInteractions = new();
 
@@ -212,148 +248,148 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public Vector3 Back {
-            get => rb.rotation * Vector3.back;
+            get => _rb.rotation * Vector3.back;
             set => rotation = Quaternion.FromToRotation(Vector3.back, value);
         }
 
         public Vector3 Forward {
-            get => rb.rotation * Vector3.forward;
+            get => _rb.rotation * Vector3.forward;
             set => rotation = Quaternion.LookRotation(value);
         }
 
         public Vector3 Left {
-            get => rb.rotation * Vector3.left;
+            get => _rb.rotation * Vector3.left;
             set => rotation = Quaternion.FromToRotation(Vector3.left, value);
         }
 
         public Vector3 Right {
-            get => rb.rotation * Vector3.right;
+            get => _rb.rotation * Vector3.right;
             set => rotation = Quaternion.FromToRotation(Vector3.right, value);
         }
 
         public Vector3 Down {
-            get => rb.rotation * Vector3.down;
+            get => _rb.rotation * Vector3.down;
             set => rotation = Quaternion.FromToRotation(Vector3.down, value);
         }
 
         public Vector3 Up {
-            get => rb.rotation * Vector3.up;
+            get => _rb.rotation * Vector3.up;
             set => rotation = Quaternion.FromToRotation(Vector3.up, value);
         }
 
         #region Rigidbody property pass-through
 
         public float angularDrag {
-            get => rb.angularDrag;
-            set => rb.angularDrag = value;
+            get => _rb.angularDrag;
+            set => _rb.angularDrag = value;
         }
 
         public Vector3 angularVelocity {
-            get => rb.angularVelocity;
-            set => rb.angularVelocity = value;
+            get => _rb.angularVelocity;
+            set => _rb.angularVelocity = value;
         }
 
         public Vector3 centerOfMass {
-            get => rb.centerOfMass;
-            set => rb.centerOfMass = value;
+            get => _rb.centerOfMass;
+            set => _rb.centerOfMass = value;
         }
 
         public CollisionDetectionMode collisionDetectionMode {
-            get => rb.collisionDetectionMode;
-            set => rb.collisionDetectionMode = value;
+            get => _rb.collisionDetectionMode;
+            set => _rb.collisionDetectionMode = value;
         }
 
         public RigidbodyConstraints constraints {
-            get => rb.constraints;
-            set => rb.constraints = value;
+            get => _rb.constraints;
+            set => _rb.constraints = value;
         }
 
         public bool detectCollisions {
-            get => rb.detectCollisions;
-            set => rb.detectCollisions = value;
+            get => _rb.detectCollisions;
+            set => _rb.detectCollisions = value;
         }
 
         public float drag {
-            get => rb.drag;
-            set => rb.drag = value;
+            get => _rb.drag;
+            set => _rb.drag = value;
         } // TODO we should probably not use normal RB drag as it won't play well with our stuff?
 
         public bool freezeRotation {
-            get => rb.freezeRotation;
-            set => rb.freezeRotation = value;
+            get => _rb.freezeRotation;
+            set => _rb.freezeRotation = value;
         }
 
         public Vector3 inertiaTensor {
-            get => rb.inertiaTensor;
-            set => rb.inertiaTensor = value;
+            get => _rb.inertiaTensor;
+            set => _rb.inertiaTensor = value;
         }
 
         public Quaternion inertiaTensorRotation {
-            get => rb.inertiaTensorRotation;
-            set => rb.inertiaTensorRotation = value;
+            get => _rb.inertiaTensorRotation;
+            set => _rb.inertiaTensorRotation = value;
         }
 
         public RigidbodyInterpolation interpolation {
-            get => rb.interpolation;
-            set => rb.interpolation = value;
+            get => _rb.interpolation;
+            set => _rb.interpolation = value;
         }
 
         public bool isKinematic {
-            get => rb.isKinematic;
-            set => rb.isKinematic = value;
+            get => _rb.isKinematic;
+            set => _rb.isKinematic = value;
         }
 
         public float mass {
-            get => rb.mass;
-            set => rb.mass = value;
+            get => _rb.mass;
+            set => _rb.mass = value;
         }
 
         public float maxAngularVelocity {
-            get => rb.maxAngularVelocity;
-            set => rb.maxAngularVelocity = value;
+            get => _rb.maxAngularVelocity;
+            set => _rb.maxAngularVelocity = value;
         }
 
         public float maxDepenetrationVelocity {
-            get => rb.maxDepenetrationVelocity;
-            set => rb.maxDepenetrationVelocity = value;
+            get => _rb.maxDepenetrationVelocity;
+            set => _rb.maxDepenetrationVelocity = value;
         }
 
         public Vector3 position {
-            get => rb.position;
-            set => rb.position = value;
+            get => _rb.position;
+            set => _rb.position = value;
         }
 
         public Quaternion rotation {
-            get => rb.rotation;
-            set => rb.rotation = value;
+            get => _rb.rotation;
+            set => _rb.rotation = value;
         }
 
         public float sleepThreshold {
-            get => rb.sleepThreshold;
-            set => rb.sleepThreshold = value;
+            get => _rb.sleepThreshold;
+            set => _rb.sleepThreshold = value;
         }
 
         public int solverIterations {
-            get => rb.solverIterations;
-            set => rb.solverIterations = value;
+            get => _rb.solverIterations;
+            set => _rb.solverIterations = value;
         }
 
         public int solverVelocityIterations {
-            get => rb.solverVelocityIterations;
-            set => rb.solverVelocityIterations = value;
+            get => _rb.solverVelocityIterations;
+            set => _rb.solverVelocityIterations = value;
         }
 
         public bool useGravity {
-            get => rb.useGravity;
-            set => rb.useGravity = value;
+            get => _rb.useGravity;
+            set => _rb.useGravity = value;
         } // TODO should we hijack gravity for our own nefarious purposes?
 
         public Vector3 velocity {
-            get => rb.velocity;
-            set => rb.velocity = value;
+            get => _rb.velocity;
+            set => _rb.velocity = value;
         }
 
-        public Vector3 worldCenterOfMass => rb.worldCenterOfMass;
+        public Vector3 worldCenterOfMass => _rb.worldCenterOfMass;
 
         #endregion
 
@@ -369,7 +405,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="mode"></param>
         public void AddExplosionForce(float explosionForce, Vector3 explosionPosition, float explosionRadius,
             float upwardsModifier, ForceMode mode = ForceMode.Force) {
-            rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier, mode);
+            _rb.AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier, mode);
         }
         
         /// <summary>
@@ -378,7 +414,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="force"></param>
         /// <param name="mode"></param>
         public void AddForce(Vector3 force, ForceMode mode = ForceMode.Force) {
-            rb.AddForce(force, mode);
+            _rb.AddForce(force, mode);
         }
 
         /// <summary>
@@ -388,7 +424,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="mode"></param>
         public void AddForce(float x, float y, float z, ForceMode mode = ForceMode.Force) {
             // print("Adding force");
-            rb.AddForce(x, y, z, mode);
+            _rb.AddForce(x, y, z, mode);
         }
 
         /// <summary>
@@ -397,7 +433,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="force"></param>
         /// <param name="mode"></param>
         public void AddRelativeForce(Vector3 force, ForceMode mode = ForceMode.Force) {
-            rb.AddRelativeForce(force, mode);
+            _rb.AddRelativeForce(force, mode);
         }
         
         /// <summary>
@@ -406,7 +442,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="force"></param>
         /// <param name="mode"></param>
         public void AddRelativeForce(float x, float y, float z, ForceMode mode = ForceMode.Force) {
-            rb.AddRelativeForce(x, y, z, mode);
+            _rb.AddRelativeForce(x, y, z, mode);
         }
         
         /// <summary>
@@ -415,7 +451,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="force"></param>
         /// <param name="mode"></param>
         public void AddTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
-            rb.AddTorque(torque, mode);
+            _rb.AddTorque(torque, mode);
         }
         
         /// <summary>
@@ -424,7 +460,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="force"></param>
         /// <param name="mode"></param>
         public void AddTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
-            rb.AddTorque(x, y, z, mode);
+            _rb.AddTorque(x, y, z, mode);
         }
 
         /// <summary>
@@ -433,7 +469,7 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="force"></param>
         /// <param name="mode"></param>
         public void AddRelativeTorque(Vector3 torque, ForceMode mode = ForceMode.Force) {
-            rb.AddRelativeTorque(torque, mode);
+            _rb.AddRelativeTorque(torque, mode);
         }
 
         /// <summary>
@@ -442,31 +478,31 @@ namespace SadnessMonday.BetterPhysics {
         /// <param name="force"></param>
         /// <param name="mode"></param>
         public void AddRelativeTorque(float x, float y, float z, ForceMode mode = ForceMode.Force) {
-            rb.AddRelativeTorque(x, y, z, mode);
+            _rb.AddRelativeTorque(x, y, z, mode);
         }
 
-        public Func<Vector3, Vector3> ClosestPointOnBounds => rb.ClosestPointOnBounds;
-        public Func<Vector3, Vector3> GetPointVelocity => rb.GetPointVelocity;
-        public Func<Vector3, Vector3> GetRelativePointVelocity => rb.GetRelativePointVelocity;
-        public Func<bool> IsSleeping => rb.IsSleeping;
-        public Action<Vector3> MovePosition => rb.MovePosition;
-        public Action<Quaternion> MoveRotation => rb.MoveRotation;
-        public Action ResetCenterOfMass => rb.ResetCenterOfMass;
-        public Action ResetInertiaTensor => rb.ResetInertiaTensor;
-        public Action<float> SetDensity => rb.SetDensity;
-        public Action Sleep => rb.Sleep;
+        public Func<Vector3, Vector3> ClosestPointOnBounds => _rb.ClosestPointOnBounds;
+        public Func<Vector3, Vector3> GetPointVelocity => _rb.GetPointVelocity;
+        public Func<Vector3, Vector3> GetRelativePointVelocity => _rb.GetRelativePointVelocity;
+        public Func<bool> IsSleeping => _rb.IsSleeping;
+        public Action<Vector3> MovePosition => _rb.MovePosition;
+        public Action<Quaternion> MoveRotation => _rb.MoveRotation;
+        public Action ResetCenterOfMass => _rb.ResetCenterOfMass;
+        public Action ResetInertiaTensor => _rb.ResetInertiaTensor;
+        public Action<float> SetDensity => _rb.SetDensity;
+        public Action Sleep => _rb.Sleep;
 
         public bool SweepTest(Vector3 direction, out RaycastHit hitInfo, float maxDistance = Mathf.Infinity,
             QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal) {
-            return rb.SweepTest(direction, out hitInfo, maxDistance, queryTriggerInteraction);
+            return _rb.SweepTest(direction, out hitInfo, maxDistance, queryTriggerInteraction);
         }
 
         public RaycastHit[] SweepTestAll(Vector3 direction, float maxDistance = Mathf.Infinity,
             QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal) {
-            return rb.SweepTestAll(direction, maxDistance, queryTriggerInteraction);
+            return _rb.SweepTestAll(direction, maxDistance, queryTriggerInteraction);
         }
 
-        public Action WakeUp => rb.WakeUp;
+        public Action WakeUp => _rb.WakeUp;
 
         #endregion
 
@@ -517,16 +553,16 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void EnsureRigidbody() {
-            if (!TryGetComponent(out rb)) {
-                rb = gameObject.AddComponent<Rigidbody>();
+            if (!TryGetComponent(out _rb)) {
+                _rb = gameObject.AddComponent<Rigidbody>();
             }
             
-            if (ReferenceEquals(null, rb)) {
+            if (ReferenceEquals(null, _rb)) {
                 throw new Exception(
                     "Problem creating BetterRigidbody. There may be incompatible components present, such as 2D physics components");
             }
 
-            rb.hideFlags = HideFlags.None;
+            _rb.hideFlags = HideFlags.None;
         }
 
         void OnValidate() {
@@ -534,19 +570,17 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void OnDestroy() {
-            if (rb != null) {
-                Destroy(rb);
+            if (_rb != null) {
+                Destroy(_rb);
             }
         }
 
         void OnEnable() {
-            allBodies.Add(this);
             ContactModificationManager.Instance.Register(this);
             ContactModificationManager.Instance.UpdateBodyLayer(this);
         }
 
         void OnDisable() {
-            allBodies.Remove(this);
             ContactModificationManager.Instance.UnRegister(this);
         }
 
@@ -562,7 +596,7 @@ namespace SadnessMonday.BetterPhysics {
         #region custom stuff
 
         public Vector3 AddForceWithLimit(Vector3 force, ForceMode mode, SpeedLimit limit) {
-            rb.AddForce(force, mode);
+            _rb.AddForce(force, mode);
             ApplyLimit(limit);
             
             // TODO calculate the correct velocity diff here
@@ -574,7 +608,7 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public Vector3 AddForceWithLimits(Vector3 force, ForceMode mode, IEnumerable<SpeedLimit> limits) {
-            rb.AddForce(force, mode);
+            _rb.AddForce(force, mode);
             foreach (var limit in limits) ApplyLimit(limit);
             
             // TODO calculate the correct velocity diff here
@@ -627,10 +661,10 @@ namespace SadnessMonday.BetterPhysics {
         Vector3 AddRelativeForceWithLocalAxisLimit(Vector3 localForce, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
             // Convert everything to local
             Vector3 localVelocity = LocalVelocity;
-            Vector3 worldVelocity = rb.velocity;
+            Vector3 worldVelocity = _rb.velocity;
 
             // Do the math in local space
-            Vector3 expectedLocalChange = CalculateVelocityChange(localForce, rb.mass, mode);
+            Vector3 expectedLocalChange = CalculateVelocityChange(localForce, _rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limited, min, max);
             // Debug.Log($"Current local vel is {localVelocity:F8}, Expected local change is {expectedLocalChange:F8}, Clamped new local velocity is {newLocalVelocity:F8}");
 
@@ -638,29 +672,29 @@ namespace SadnessMonday.BetterPhysics {
             Vector3 newWorldVelocity = rotation * newLocalVelocity;
             Vector3 worldChange = newWorldVelocity - worldVelocity;
 
-            rb.velocity = newWorldVelocity;
+            _rb.velocity = newWorldVelocity;
             return worldChange;
         }
 
 
         Vector3 AddForceWithLocalAxisLimit(Vector3 worldForce, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
-            Vector3 worldVelocity = rb.velocity;
+            Vector3 worldVelocity = _rb.velocity;
 
             // Convert everything to local
-            Quaternion inverseRot = Quaternion.Inverse(rb.rotation);
+            Quaternion inverseRot = Quaternion.Inverse(_rb.rotation);
             Vector3 localForce = inverseRot * worldForce;
             Vector3 localVelocity = inverseRot * worldVelocity;
 
             // Do the math in local space
-            Vector3 expectedLocalChange = CalculateVelocityChange(localForce, rb.mass, mode);
+            Vector3 expectedLocalChange = CalculateVelocityChange(localForce, _rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limited, min, max);
             // print($"Clamped new local velocity is {newLocalVelocity}");
 
             // Convert back to worldspace
-            Vector3 newWorldVelocity = rb.rotation * newLocalVelocity;
+            Vector3 newWorldVelocity = _rb.rotation * newLocalVelocity;
             Vector3 worldChange = newWorldVelocity - worldVelocity;
 
-            rb.velocity = newWorldVelocity;
+            _rb.velocity = newWorldVelocity;
             return worldChange;
         }
 
@@ -672,12 +706,12 @@ namespace SadnessMonday.BetterPhysics {
          */
         Vector3 AddRelativeForceWithWorldAxisLimit(Vector3 localForce, in Bool3 limited, in Vector3 min, in Vector3 max,
             ForceMode mode = ForceMode.Force) {
-            Vector3 expectedChange = CalculateVelocityChange(localForce, rb.mass, mode);
+            Vector3 expectedChange = CalculateVelocityChange(localForce, _rb.mass, mode);
             Vector3 newLocalVelocity = SoftClamp(LocalVelocity, expectedChange, limited, min, max);
 
             Vector3 newWorldVelocity = rotation * newLocalVelocity;
-            Vector3 change = newWorldVelocity - rb.velocity;
-            rb.velocity = rotation * newLocalVelocity;
+            Vector3 change = newWorldVelocity - _rb.velocity;
+            _rb.velocity = rotation * newLocalVelocity;
 
             return change;
         }
@@ -688,10 +722,10 @@ namespace SadnessMonday.BetterPhysics {
          * Return the actual world space velocity change that occurred
          */
         Vector3 AddForceWithWorldAxisLimit(Vector3 force, in Bool3 limited, in Vector3 min, in Vector3 max, ForceMode mode = ForceMode.Force) {
-            Vector3 expectedChange = CalculateVelocityChange(force, rb.mass, mode);
-            Vector3 currentVelocity = rb.velocity;
+            Vector3 expectedChange = CalculateVelocityChange(force, _rb.mass, mode);
+            Vector3 currentVelocity = _rb.velocity;
             Vector3 newVelocity = SoftClamp(currentVelocity, expectedChange, limited, min, max);
-            rb.velocity = newVelocity;
+            _rb.velocity = newVelocity;
 
             // Return the actual diff
             return newVelocity - currentVelocity;
@@ -753,14 +787,14 @@ namespace SadnessMonday.BetterPhysics {
 
         Vector3 AddForceWithOmnidirectionalLimit(Vector3 force, float limit, ForceMode mode = ForceMode.Force) {
             Vector3 velocityChange = CalculateVelocityChangeWithSoftLimit(Velocity, force, limit, mode);
-            rb.velocity += velocityChange;
+            _rb.velocity += velocityChange;
             return velocityChange;
         }
 
         Vector3 AddRelativeForceWithOmnidirectionalLimit(Vector3 force, float limit, ForceMode mode = ForceMode.Force) {
             Vector3 localChange = CalculateVelocityChangeWithSoftLimit(this.LocalVelocity, force, limit, mode);
             Vector3 worldChange = rotation * localChange;
-            rb.velocity += worldChange;
+            _rb.velocity += worldChange;
 
             return worldChange;
         }
@@ -768,18 +802,18 @@ namespace SadnessMonday.BetterPhysics {
         public void AddForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
             // rb.AddForce(force, mode);
             Vector3 velocityChange = CalculateVelocityChange(force, mass, mode);
-            exemptedVelocityChange += velocityChange;
+            _exemptedVelocityChange += velocityChange;
         }
 
         public void AddRelativeForceWithoutLimit(Vector3 force, ForceMode mode = ForceMode.Force) {
-            force = rb.rotation * force;
+            force = _rb.rotation * force;
             AddForceWithoutLimit(force, mode);
         }
 
         private Vector3 CalculateVelocityChangeWithSoftLimit(in Vector3 currentVelocity, in Vector3 force,
             float speedLimit, ForceMode mode = ForceMode.Force) {
             // velocityChange is how much we would be adding to the velocity if we were to just add it normally.
-            Vector3 velocityChange = CalculateVelocityChange(force, rb.mass, mode);
+            Vector3 velocityChange = CalculateVelocityChange(force, _rb.mass, mode);
             if (speedLimit < 0 || float.IsPositiveInfinity(speedLimit)) {
                 // Speed limit < 0 counts as no limit.
                 return velocityChange;

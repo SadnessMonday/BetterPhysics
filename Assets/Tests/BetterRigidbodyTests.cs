@@ -111,7 +111,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             }
 
             public void Prepare(BetterRigidbody brb) {
-                brb.limits = new List<SpeedLimit>(limits);
+                brb.SetLimits(limits);
                 brb.rotation = Quaternion.Euler(Orientation);
                 if (_hasStartLocalVelocity) {
                     brb.LocalVelocity = StartLocalVel;
@@ -231,7 +231,7 @@ namespace SadnessMonday.BetterPhysics.Tests {
             brb.useGravity = false;
             brb.drag = 0;
             brb.angularDrag = 0;
-            brb.limits.AddRange(limits);
+            brb.AddLimits(limits);
 
             return brb;
         }

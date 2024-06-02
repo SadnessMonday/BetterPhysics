@@ -11279,16 +11279,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   limits:
-  - limitType: 1
-    directionality: 0
-    scalarLimit: 50
-    asymmetrical: 0
-    min: {x: 0, y: 0, z: 0}
-    max: {x: 0, y: 0, z: 0}
-    axisLimited:
-      x: 0
-      y: 0
-      z: 0
   - limitType: 2
     directionality: 0
     scalarLimit: 100
@@ -11299,6 +11289,16 @@ MonoBehaviour:
       x: 0
       y: 0
       z: 1
+  - limitType: 1
+    directionality: 0
+    scalarLimit: 50
+    asymmetrical: 0
+    min: {x: 0, y: 0, z: 0}
+    max: {x: 0, y: 0, z: 0}
+    axisLimited:
+      x: 0
+      y: 0
+      z: 0
   layerInteractions: []
   physicsLayer: 0
 --- !u!54 &5929806113257075019
