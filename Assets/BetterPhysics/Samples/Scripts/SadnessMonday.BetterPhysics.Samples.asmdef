@@ -1,8 +1,9 @@
 {
     "name": "SadnessMonday.BetterPhysics.Samples",
-    "rootNamespace": "",
+    "rootNamespace": "SadnessMonday.BetterPhysics.Samples",
     "references": [
-        "GUID:7002a6504f67e4ae9a50c0e365d2c40a"
+        "GUID:7002a6504f67e4ae9a50c0e365d2c40a",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

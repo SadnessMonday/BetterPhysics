@@ -2,7 +2,8 @@
     "name": "SadnessMonday.BetterPhysics",
     "rootNamespace": "SadnessMonday.BetterPhysics",
     "references": [
-        "Unity.Collections"
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

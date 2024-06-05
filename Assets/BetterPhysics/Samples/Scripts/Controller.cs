@@ -3,8 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-namespace SadnessMonday.BetterPhysics.Utilities
-{
+namespace SadnessMonday.BetterPhysics.Samples {
     [RequireComponent(typeof(BetterRigidbody))]
     public class Controller : MonoBehaviour
     {
@@ -28,13 +27,13 @@ namespace SadnessMonday.BetterPhysics.Utilities
 
 #if ENABLE_INPUT_SYSTEM && NEW_INPUT_SYSTEM_INSTALLED
             Keyboard k = Keyboard.current;
-            if (k[Key.W]) moveInput += Vector3.forward;
-            if (k[Key.A]) moveInput += Vector3.left;
-            if (k[Key.S]) moveInput += Vector3.back;
-            if (k[Key.D]) moveInput += Vector3.right;
+            if (k[Key.W].IsPressed()) moveInput += Vector3.forward;
+            if (k[Key.A].IsPressed()) moveInput += Vector3.left;
+            if (k[Key.S].IsPressed()) moveInput += Vector3.back;
+            if (k[Key.D].IsPressed()) moveInput += Vector3.right;
 
-            if (k[Key.O]) rotateInput -= 1;
-            if (k[Key.P]) rotateInput += 1;
+            if (k[Key.O].IsPressed()) rotateInput -= 1;
+            if (k[Key.P].IsPressed()) rotateInput += 1;
 #else
             if (Input.GetKey(KeyCode.W)) moveInput += Flat ? Vector3.forward : Vector3.up;
             if (Input.GetKey(KeyCode.A)) moveInput += Vector3.left;
