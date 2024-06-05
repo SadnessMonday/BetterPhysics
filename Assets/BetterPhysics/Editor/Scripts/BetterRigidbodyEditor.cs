@@ -46,7 +46,7 @@ namespace SadnessMonday.BetterPhysics.Editor {
             }
 
             int oldLayer = layerField.intValue;
-            int newLayer = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNames.ToArray());
+            int newLayer = EditorGUILayout.Popup("Physics Layer:", layerField.intValue, BetterPhysicsSettings.Instance.AllLayerNamesNumbered.ToArray());
             if (oldLayer != newLayer && serializedObject.targetObject is BetterRigidbody brb) {
                 brb.PhysicsLayer = newLayer;
                 layerField.intValue = newLayer;

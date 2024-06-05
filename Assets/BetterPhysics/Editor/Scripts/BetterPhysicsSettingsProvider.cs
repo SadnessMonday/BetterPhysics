@@ -54,11 +54,8 @@ namespace SadnessMonday.BetterPhysics.Editor {
 
             layerNameList.onCanRemoveCallback += list => list.count > InteractionLayer.BuiltinLayerCount;
             layerNameList.onCanAddCallback += list => list.count < InteractionLayer.MaxLayerCount;
-            // layerNameList.onAddCallback += list => {
-            //     string layerName = $"User Layer {list.count - 1}";
-            //     var element = list.serializedProperty.GetArrayElementAtIndex(list.count - 1);
-            //     element.stringValue = layerName;
-            // };
+            layerNameList.drawHeaderCallback += rect => GUI.Label(rect, "Physics Layers");
+
 
             layerNameList.onAddCallback += list => {
                 // add a new element and give it an appropriate nam

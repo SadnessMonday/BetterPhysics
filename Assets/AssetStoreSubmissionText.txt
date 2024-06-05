@@ -1,0 +1,3 @@
+Due to a known issue in Burst, a Burst-related error may appear and the Unity Editor may need to be restarted after importing the asset if the Burst version changes.
+
+See https://forum.unity.com/threads/feedback-on-issue-with-burst-dependencies-in-assets.1599069/

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -103,6 +104,38 @@ namespace SadnessMonday.BetterPhysics.Layers {
         private Dictionary<Vector2Int, InteractionConfiguration> _interactionsLookup = new();
 
         public IReadOnlyList<string> AllLayerNames => layerNamesStorage;
+        public IReadOnlyList<string> AllLayerNamesNumbered => new NumberedLayerList(layerNamesStorage);
+        
+        private readonly struct NumberedLayerList : IReadOnlyList<string> {
+            private readonly List<string> backingList;
+            
+            public NumberedLayerList(List<string> backingList) {
+                this.backingList = backingList;
+                this.Count = backingList.Count;
+            }
+            
+            public IEnumerator<string> GetEnumerator() {
+                for (int i = 0; i < backingList.Count; i++) {
+                    yield return $"{i}: {backingList[i]}";
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() {
+                return GetEnumerator();
+            }
+
+            public int Count { get; }
+
+            public string this[int index] {
+                get {
+                    if (index < 0) throw new IndexOutOfRangeException();
+
+                    if (index >= backingList.Count) return $"{index} : <undefined layer>";
+                    
+                    return $"{index} : {backingList[index]}";
+                }
+            } 
+        }
 
         private void Awake() {
             if (_instance == null) _instance = this;
