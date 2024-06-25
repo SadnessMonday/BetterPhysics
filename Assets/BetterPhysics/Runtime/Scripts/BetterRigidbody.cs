@@ -2,19 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SadnessMonday.BetterPhysics.Layers;
+using SadnessMonday.BetterPhysics.Utilities;
 using Unity.Collections;
 using UnityEngine;
+
 using static SadnessMonday.BetterPhysics.Utilities.ForceUtilities;
+using static SadnessMonday.BetterPhysics.Utilities.MathUtilities;
 
 namespace SadnessMonday.BetterPhysics {
     [RequireComponent(typeof(Rigidbody))]
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(10001)] // We need to run _late_ so we get a chance to modify velocity.
     public class BetterRigidbody : MonoBehaviour {
+        private static readonly List<SpeedLimit> DeferredHardLimits = new();
+        
         public delegate void PhysicsLayerChangeHandler(BetterRigidbody source, int oldLayer, int newLayer);
 
         public event PhysicsLayerChangeHandler OnPhysicsLayerChanged;
-        private static readonly List<SpeedLimit> DeferredHardLimits = new();
         
         private Rigidbody _rb;
         // Exempt from local limits
@@ -729,20 +733,6 @@ namespace SadnessMonday.BetterPhysics {
 
             // Return the actual diff
             return newVelocity - currentVelocity;
-        }
-
-        static float DirectionalClamp(float value, float a, float b) {
-            if (a > b) {
-                // B is smaller
-                if (value < b) return b;
-                if (value > a) return a;
-                return value;
-            }
-
-            // A is smaller
-            if (value < a) return a;
-            if (value > b) return b;
-            return value;
         }
 
         static Vector3 SoftClamp(in Vector3 currentVelocity, in Vector3 expectedChange, in Bool3 limited, in Vector3 min, in Vector3 max) {
