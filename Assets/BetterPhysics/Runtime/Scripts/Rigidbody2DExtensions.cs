@@ -57,5 +57,19 @@ namespace SadnessMonday.BetterPhysics {
             return rb.angularDrag = damping;
 #endif
         }
+
+        public static Vector2 GetLocalLinearVelocity(this Rigidbody2D rb) {
+            Vector2 worldVelocity = rb.GetLinearVelocity();
+            Quaternion correction = Quaternion.Euler(0, 0, -rb.rotation);
+            return correction * worldVelocity;
+        }
+
+        public static void SetLocalLinearVelocity(this Rigidbody2D rb, Vector2 localLinearVelocity) {
+            rb.SetLinearVelocity(rb.GetRotationAsQuaternion() * localLinearVelocity);
+        }
+
+        public static Quaternion GetRotationAsQuaternion(this Rigidbody2D rb) {
+            return Quaternion.Euler(0, 0, rb.rotation);
+        }
     }
 }

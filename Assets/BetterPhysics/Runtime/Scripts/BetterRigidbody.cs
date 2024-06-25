@@ -81,14 +81,14 @@ namespace SadnessMonday.BetterPhysics {
                         break;
                     case LimitType.Soft:
                         // Apply soft limits immediately
-                        ApplyLimit(limit);
+                        ApplySoftLimit(limit);
                         break;
                 }
             }
 
             // Apply the deferred hard limits.
             foreach (SpeedLimit limit in DeferredHardLimits) {
-                ApplyLimit(limit);
+                ApplyHardLimit(limit);
             }
         }
 
@@ -231,7 +231,6 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         internal int GetRigidbodyInstanceID() => _rb.GetInstanceID();
-        internal Rigidbody WrappedRigidbody => GetComponent<Rigidbody>();
 
         public Vector3 Velocity {
             get => _rb.GetLinearVelocity();
