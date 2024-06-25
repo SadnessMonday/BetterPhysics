@@ -71,5 +71,9 @@ namespace SadnessMonday.BetterPhysics {
         public static Quaternion GetRotationAsQuaternion(this Rigidbody2D rb) {
             return Quaternion.Euler(0, 0, rb.rotation);
         }
+
+        public static Quaternion GetInverseRotationAsQuaternion(this Rigidbody2D rb) {
+            return Quaternion.Euler(0, 0, -rb.rotation);
+        }
     }
 }

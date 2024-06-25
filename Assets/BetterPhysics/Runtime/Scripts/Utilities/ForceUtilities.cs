@@ -65,7 +65,8 @@ namespace SadnessMonday.BetterPhysics.Utilities {
 
         public static Vector2 CalculateNewtons(in Vector2 oldVelocity, in Vector2 newVelocity, float mass, float deltaTime) {
             Vector2 diff = newVelocity - oldVelocity;
-            return diff / deltaTime * mass;
+
+            return (diff * mass) / deltaTime;
         }
     }
 }

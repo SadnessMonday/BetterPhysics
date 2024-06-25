@@ -35,7 +35,7 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public Vector2 LocalVelocity {
-            get => Quaternion.Inverse(_rb.GetRotationAsQuaternion()) * _rb.GetLinearVelocity();
+            get => _rb.GetInverseRotationAsQuaternion() * _rb.GetLinearVelocity();
             set => _rb.SetLinearVelocity(_rb.rotation * value);
         }
 
@@ -178,12 +178,12 @@ namespace SadnessMonday.BetterPhysics {
                     }
 
                     // Convert everything to local
-                    Quaternion inverseRot = Quaternion.Inverse(_rb.GetRotationAsQuaternion());
+                    Quaternion inverseRot = _rb.GetInverseRotationAsQuaternion();
                     Vector2 localForce = inverseRot * accumulatedNewtons;
                     Vector2 localVelocity = inverseRot * currentVelocity;
 
                     // Do the math in local space
-                    Vector2 expectedLocalChange = CalculateVelocityChange(localForce, _rb.mass, ForceMode.Force);
+                    Vector2 expectedLocalChange = CalculateVelocityChange(localForce, _rb.mass, ForceMode2D.Force);
                     Vector2 newLocalVelocity = SoftClamp(localVelocity, expectedLocalChange, limit.AxisLimited, min, max);
                     // print($"Clamped new local velocity is {newLocalVelocity}");
 
