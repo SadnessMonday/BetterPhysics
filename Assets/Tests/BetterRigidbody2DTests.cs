@@ -113,15 +113,20 @@ namespace SadnessMonday.BetterPhysics.Tests {
             public IEnumerator Prepare(BetterRigidbody2D brb) {
                 brb.rotation = Orientation;
                 if (_hasStartLocalVelocity) {
+                    // Debug.Log($"Setting start local velocity {StartLocalVel}");
                     brb.LocalVelocity = StartLocalVel;
+                    // Debug.Log($"Result {brb.velocity} {brb.LocalVelocity}");
                 }
 
                 if (_hasStartWorldVelocity) {
+                    // Debug.Log($"Setting start world velocity {StartVel}");
                     brb.Velocity = StartVel;
+                    // Debug.Log($"Result {brb.velocity} {brb.LocalVelocity}");
                 }
 
                 yield return new WaitForFixedUpdate();
                 brb.SetLimits(limits);
+                yield return new WaitForFixedUpdate();
             }
 
             public void ApplyForce(BetterRigidbody2D brb) {
@@ -236,19 +241,23 @@ namespace SadnessMonday.BetterPhysics.Tests {
             brb.velocity = Vector2.zero;
             brb.angularVelocity = 0;
             brb.AddLimits(limits);
-
+            // Debug.Log($"Setting up {brb.GetInstanceID()} with velocity {brb.velocity} and local velocity {brb.LocalVelocity}");
             return brb;
         }
 
         // A Test behaves as an ordinary method
         [UnityTest]
         public IEnumerator SoftLimitsTest([ValueSource(nameof(SoftLimitsCases))] AddForceTestArgs args) {
-            BetterRigidbody2D brb = PrepareBody();
+            BetterRigidbody2D brb = PrepareBody();            
+            // Debug.Log($"About to prepare {brb.GetInstanceID()} with velocity {brb.velocity} and local velocity {brb.LocalVelocity}");
             // set up limits etc
             yield return args.Prepare(brb);
-            
+            // Debug.Log($"Finished preparing {brb.GetInstanceID()} with velocity {brb.velocity} and local velocity {brb.LocalVelocity}");
+
             args.ApplyForce(brb);
+            // Debug.Log($"Added a force to {brb.GetInstanceID()} now it has velocity {brb.velocity} and local velocity {brb.LocalVelocity}");
             yield return new WaitForFixedUpdate();
+            // Debug.Log($"After waiting one fixedupdate, {brb.GetInstanceID()} has velocity {brb.velocity} and local velocity {brb.LocalVelocity}");
 
             if (args.ExpectsLocalVelocity) {
                 AreEqual(args.ExpectedVelocity, brb.LocalVelocity);

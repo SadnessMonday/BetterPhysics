@@ -22,7 +22,7 @@ namespace SadnessMonday.BetterPhysics.Utilities {
                 case ForceMode.VelocityChange:
                     return force;
                 default:
-                    throw new System.Exception($"Unknown force mode " + mode);
+                    throw new System.Exception($"Unknown force mode {mode}");
             }
         }
 
@@ -37,7 +37,7 @@ namespace SadnessMonday.BetterPhysics.Utilities {
                 case ForceMode.VelocityChange:
                     return force / Time.fixedDeltaTime * mass;
                 default:
-                    throw new System.Exception($"Unknown force mode " + mode);
+                    throw new System.Exception($"Unknown force mode {mode}");
             }
         }
         
@@ -48,7 +48,7 @@ namespace SadnessMonday.BetterPhysics.Utilities {
                 case ForceMode2D.Impulse:
                     return force / mass;
                 default:
-                    throw new System.Exception($"Unknown force mode " + mode);
+                    throw new System.Exception($"Unknown force mode {mode}");
             }
         }
 
@@ -59,14 +59,16 @@ namespace SadnessMonday.BetterPhysics.Utilities {
                 case ForceMode2D.Impulse:
                     return force * mass;
                 default:
-                    throw new System.Exception($"Unknown force mode " + mode);
+                    throw new System.Exception($"Unknown force mode {mode}");
             }
         }
 
         public static Vector2 CalculateNewtons(in Vector2 oldVelocity, in Vector2 newVelocity, float mass, float deltaTime) {
             Vector2 diff = newVelocity - oldVelocity;
 
-            return (diff * mass) / deltaTime;
+            var calculatedNewtons = (diff * mass) / deltaTime;
+            Debug.Log($"Frame {Time.fixedTime} Calculated newtons for a diff of {diff} with mass {mass} are {calculatedNewtons}");
+            return calculatedNewtons;
         }
     }
 }

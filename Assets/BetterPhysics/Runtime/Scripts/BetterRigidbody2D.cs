@@ -36,7 +36,7 @@ namespace SadnessMonday.BetterPhysics {
 
         public Vector2 LocalVelocity {
             get => _rb.GetInverseRotationAsQuaternion() * _rb.GetLinearVelocity();
-            set => _rb.SetLinearVelocity(_rb.rotation * value);
+            set => _rb.SetLinearVelocity(_rb.GetRotationAsQuaternion() * value);
         }
 
         public void SetLimits(IEnumerable<SpeedLimit> limits) {
@@ -84,6 +84,7 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         private void FixedUpdate() {
+            // Debug.Log($"{GetInstanceID()} Frame {Time.fixedTime} Velocity after the simulation {velocityAfterSim} Velocity now: {_rb.velocity}");
             accumulatedForce = CalculateNewtons(velocityAfterSim, _rb.velocity, _rb.mass, Time.fixedDeltaTime);
 
             if (!_rb.isKinematic) {
@@ -250,6 +251,7 @@ namespace SadnessMonday.BetterPhysics {
         IEnumerator MeasureVelocity() {
             while (true) {
                 yield return YieldIns;
+                // Debug.Log($"Frame {Time.fixedTime} Velocity measured after the simulation {velocityAfterSim}");
                 velocityAfterSim = _rb.velocity;
             }
         }
