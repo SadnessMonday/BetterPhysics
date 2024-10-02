@@ -32,6 +32,7 @@ Open the package manager in Unity, press the + button at the top right, select "
 ## Community & Discussion
 
 Want help with this asset? Want to just talk about it? Come join us on our [Discord Server](https://discord.gg/Nq2et6jzGt)
+Or reach out directly at <sadnessmonday@gmail.com>
 
 ## Support
 BetterPhysics is a *free* open-source project that I am developing in my free time. If you like it you can support me by donating:
