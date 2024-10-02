@@ -20,9 +20,9 @@ openupm add com.dbrizov.naughtyattributes
 ```
 1. You can also install via git url by adding this entry in your **manifest.json**
 ```
-"com.dbrizov.naughtyattributes": "https://github.com/SadnessMonday/BetterPhysics.git?path=/Assets/BetterPhysics"
+"com.sadnessmonday.betterphysics": "https://github.com/SadnessMonday/BetterPhysics.git?path=/Assets/BetterPhysics"
 ```
-3. You can also download it from the [Asset Store]([https://assetstore.unity.com/packages/tools/utilities/naughtyattributes-129996](https://assetstore.unity.com/packages/tools/physics/betterphysics-selective-kinematics-244370))
+2. You can also download it from the [Asset Store]([https://assetstore.unity.com/packages/tools/utilities/naughtyattributes-129996](https://assetstore.unity.com/packages/tools/physics/betterphysics-selective-kinematics-244370))
 
 ## Documentation
 - [Documentation](https://sadnessmonday.com/pages/betterphysics/)
