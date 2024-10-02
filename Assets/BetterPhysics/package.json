@@ -4,7 +4,9 @@
   "displayName": "BetterPhysics",
   "description": "Selective Kinematics and Speed Limits for Rigidbodies",
   "unity": "2022.3",
-  "dependencies": { },
+  "dependencies": {
+    "Unity.Collections": "2.4.1",
+  },
   "keywords": [
     "extensions",
     "extension",
