@@ -23,7 +23,8 @@ Open the package manager in Unity, press the + button at the top right, select "
 ```
 "com.sadnessmonday.betterphysics": "https://github.com/SadnessMonday/BetterPhysics.git?path=/Assets/BetterPhysics"
 ```
-### 3. You can also download it from the [Asset Store]([https://assetstore.unity.com/packages/tools/utilities/naughtyattributes-129996](https://assetstore.unity.com/packages/tools/physics/betterphysics-selective-kinematics-244370))
+### 3. You can also download it from the Unity Asset Store
+[Asset Store Link](https://assetstore.unity.com/packages/tools/physics/betterphysics-selective-kinematics-244370)
 
 ## Documentation
 - [Documentation](https://sadnessmonday.com/pages/betterphysics/)
