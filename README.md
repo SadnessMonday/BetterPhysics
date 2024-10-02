@@ -1,5 +1,5 @@
 # BetterPhysics
-[![Unity 6000.0+](https://img.shields.io/badge/unity-6000.0%2B-blue.svg)](https://unity3d.com/get-unity/download)
+[![Unity 2022.2+](https://img.shields.io/badge/unity-2022.2%2B-blue.svg)](https://unity3d.com/get-unity/download)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/dbrizov/NaughtyAttributes/blob/master/LICENSE)
 
 BetterPhysics improves the functionality of Rigidbody Physics in Unity. Bring complex physics systems to life quickly without messing around with complicated physics code.
