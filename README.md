@@ -14,11 +14,7 @@ Configurable Rigidbody Speed Limits allow you to enforce flexible limits to your
 Unity **2022.2** or later versions. Don't forget to include the SadnessMonday.BetterPhysics namespace.
 
 ## Installation
-1. The package is available on the [openupm registry](https://openupm.com). You can install it via [openupm-cli](https://github.com/openupm/openupm-cli).
-```
-openupm add com.dbrizov.naughtyattributes
-```
-1. You can also install via git url by adding this entry in your **manifest.json**
+1. You can install via git url by adding this entry in your **manifest.json**
 ```
 "com.sadnessmonday.betterphysics": "https://github.com/SadnessMonday/BetterPhysics.git?path=/Assets/BetterPhysics"
 ```
