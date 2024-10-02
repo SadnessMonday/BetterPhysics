@@ -14,11 +14,16 @@ Configurable Rigidbody Speed Limits allow you to enforce flexible limits to your
 Unity **2022.2** or later versions. Don't forget to include the SadnessMonday.BetterPhysics namespace.
 
 ## Installation
-1. You can install via git url by adding this entry in your **manifest.json**
+### 1. You can install directly from the Package Manager in Unity:
+
+Open the package manager in Unity, press the + button at the top right, select "Add package from git URL" and use the following URL:
+`https://github.com/SadnessMonday/BetterPhysics.git?path=/Assets/BetterPhysics`
+
+### 2. You can also install by adding this entry in your **manifest.json**
 ```
 "com.sadnessmonday.betterphysics": "https://github.com/SadnessMonday/BetterPhysics.git?path=/Assets/BetterPhysics"
 ```
-2. You can also download it from the [Asset Store]([https://assetstore.unity.com/packages/tools/utilities/naughtyattributes-129996](https://assetstore.unity.com/packages/tools/physics/betterphysics-selective-kinematics-244370))
+### 3. You can also download it from the [Asset Store]([https://assetstore.unity.com/packages/tools/utilities/naughtyattributes-129996](https://assetstore.unity.com/packages/tools/physics/betterphysics-selective-kinematics-244370))
 
 ## Documentation
 - [Documentation](https://sadnessmonday.com/pages/betterphysics/)
