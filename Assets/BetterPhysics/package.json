@@ -5,7 +5,7 @@
   "description": "Selective Kinematics and Speed Limits for Rigidbodies",
   "unity": "2022.3",
   "dependencies": {
-    "Unity.Collections": "2.4.1",
+    "com.unity.collections": "2.4.1",
   },
   "keywords": [
     "extensions",
