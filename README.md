@@ -29,6 +29,6 @@ Open the package manager in Unity, press the + button at the top right, select "
 - [Documentation](https://sadnessmonday.com/pages/betterphysics/)
 
 ## Support
-BetterPhysics is an open-source project that I am developing in my free time. If you like it you can support me by donating.
+BetterPhysics is a *free* open-source project that I am developing in my free time. If you like it you can support me by donating:
 
-- [ko-fi]([https://paypal.me/dbrizov](https://ko-fi.com/praetorblue))
+- [ko-fi](https://ko-fi.com/praetorblue)
