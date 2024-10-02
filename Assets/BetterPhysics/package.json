@@ -1,9 +1,9 @@
 {
-  "name": "com.jschiff.unity-extensions",
+  "name": "com.sadnessmonday.betterphysics",
   "version": "1.0.0",
-  "displayName": "JSchiff Extensions",
-  "description": "Handy extension methods and utility classes to make Unity easier to work with",
-  "unity": "2019.4",
+  "displayName": "BetterPhysics",
+  "description": "Selective Kinematics and Speed Limits for Rigidbodies",
+  "unity": "2022.3",
   "dependencies": { },
   "keywords": [
     "extensions",
@@ -13,6 +13,6 @@
   ],
   "author": {
     "name": "Jeremy Schiff",
-    "url": "jschiff.com"
+    "url": "sadnessmonday.com"
   }
 }
