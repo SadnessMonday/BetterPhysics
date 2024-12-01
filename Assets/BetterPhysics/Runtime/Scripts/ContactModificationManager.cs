@@ -12,7 +12,7 @@ namespace SadnessMonday.BetterPhysics {
         private static ContactModificationManager _instance;
         public static ContactModificationManager Instance {
             get {
-                if (!ReferenceEquals(null, _instance)) return _instance;
+                if (_instance != null) return _instance;
 
                 GameObject go = new("BetterPhysics");
                 _instance = go.AddComponent<ContactModificationManager>();
