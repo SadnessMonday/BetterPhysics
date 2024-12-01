@@ -25,7 +25,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
 #if UNITY_EDITOR
                     _instance = GetLayerSettingsAssetInEditor();
 #else    
-                    _instance = Resources.Load(DefaultLayerAssetName);
+                    _instance = Resources.Load<BetterPhysicsSettings>(DefaultSettingsAssetName);
 #endif
 
                     if (ReferenceEquals(_instance, null)) {
