@@ -266,7 +266,7 @@ namespace SadnessMonday.BetterPhysics.Layers {
         
         #if UNITY_EDITOR
         public void UpdateLayerInteractionMatrix(Vector2Int key, InteractionType interactionType) {
-            Debug.Log($"Updating interaction matrix on {this.GetInstanceID()}");
+            // Debug.Log($"Updating interaction matrix on {this.GetInstanceID()}");
             key.Normalize(ref interactionType);
             if (DefinedLayerCount <= key.x || DefinedLayerCount <= key.y) {
                 throw new BetterPhysicsException("Cannot set an interaction with an undefined layer");
@@ -304,10 +304,6 @@ namespace SadnessMonday.BetterPhysics.Layers {
             SetLayerInteraction(key, interactionType);
         }
         #endif
-
-        private void SetLayerInteractionUnsafe(Vector2Int key, InteractionType interactionType) {
-            
-        }
 
         public void SetLayerInteraction(Vector2Int key, InteractionType interactionType) {
             // Debug.Log($"Attempting to set interaction {key.x}/{key.y} to {interactionType}");
