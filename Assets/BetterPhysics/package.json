@@ -1,6 +1,6 @@
 {
   "name": "com.sadnessmonday.betterphysics",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "displayName": "BetterPhysics",
   "description": "Selective Kinematics and Speed Limits for Rigidbodies",
   "unity": "2022.3",
