@@ -576,12 +576,14 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         void OnEnable() {
-            ContactModificationManager.Instance.Register(this);
-            ContactModificationManager.Instance.UpdateBodyLayer(this);
+            var instance = ContactModificationManager.Instance;
+            instance.Register(this);
+            instance.UpdateBodyLayer(this);
         }
 
         void OnDisable() {
-            ContactModificationManager.Instance.UnRegister(this);
+            var instance = ContactModificationManager.WeakInstance;
+            if (instance != null) instance.UnRegister(this);
         }
 
         void OnDrawGizmosSelected() { }

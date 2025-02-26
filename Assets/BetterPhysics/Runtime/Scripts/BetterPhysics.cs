@@ -3,7 +3,7 @@ using SadnessMonday.BetterPhysics.Layers;
 
 namespace SadnessMonday.BetterPhysics {
     public class BetterPhysics {
-        public const string BetterPhysicsVersion = "1.0.4";
+        public const string BetterPhysicsVersion = "1.0.5";
 
         public static int DefinedLayerCount => BetterPhysicsSettings.Instance.DefinedLayerCount;
         

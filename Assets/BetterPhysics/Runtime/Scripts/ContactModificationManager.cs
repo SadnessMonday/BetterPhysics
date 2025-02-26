@@ -22,6 +22,13 @@ namespace SadnessMonday.BetterPhysics {
             }
         }
 
+        /// <summary>
+        /// Fetch the instance but don't create one if it doesn't exist
+        ///
+        /// We use this during cleanup to make sure a new instance is not created during cleanup.
+        /// </summary>
+        public static ContactModificationManager WeakInstance => _instance;
+
         private Dictionary<int, IDictionary<int, OneWayLayerInteraction>> _perRigidbodyData;
         
         // Tracks which BetterRigidbody is in which layer
