@@ -57,11 +57,11 @@ namespace SadnessMonday.BetterPhysics {
         public int LimitCount => limits.Count;
 
         private void FixedUpdate() {
-            if (!_rb.isKinematic) {
+            if (!_rb.isKinematic && _exemptedVelocityChange != Vector3.zero) {
                 // Apply exempted newtons directly to the velocity
                 _rb.AddLinearVelocity(_exemptedVelocityChange);
+                _exemptedVelocityChange = Vector3.zero;
             }
-            _exemptedVelocityChange = Vector3.zero;
             
             ApplyLimits();
         }
@@ -176,7 +176,8 @@ namespace SadnessMonday.BetterPhysics {
             switch (limit.Directionality) {
                 case Directionality.Omnidirectional:
                     Vector3 clampedVelocity = Vector3.ClampMagnitude(expectedNewVelocity, limit.ScalarLimit);
-                    
+
+                    if (currentVelocity == clampedVelocity && accumulatedNewtons == 0) return;
                     // We're hard clamping so remove all accumulated force
                     _rb.AddForce(-accumulatedNewtons);
                     _rb.SetLinearVelocity(clampedVelocity);
@@ -193,6 +194,8 @@ namespace SadnessMonday.BetterPhysics {
                             clampedNewVelocity[i] = Mathf.Clamp(clampedNewVelocity[i], -max[i], max[i]);
                         }
                     }
+
+                    if (currentVelocity == clampedVelocity && accumulatedNewtons == 0) return;
                     
                     // We're hard clamping so remove all accumulated force
                     _rb.AddForce(-accumulatedNewtons);
@@ -215,6 +218,8 @@ namespace SadnessMonday.BetterPhysics {
                     }
 
                     Vector3 clampedWorldVelocity = _rb.rotation * clampedLocalVelocity;
+
+                    if (currentVelocity == clampedWorldVelocity && accumulatedNewtons == 0) return;
 
                     // We're hard clamping so remove all accumulated force
                     _rb.AddForce(-accumulatedNewtons);
