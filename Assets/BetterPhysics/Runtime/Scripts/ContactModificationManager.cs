@@ -29,10 +29,18 @@ namespace SadnessMonday.BetterPhysics {
         /// </summary>
         public static ContactModificationManager WeakInstance => _instance;
 
+#if UNITY_6000_4_OR_NEWER
+        private Dictionary<EntityId, IDictionary<int, OneWayLayerInteraction>> _perRigidbodyData;
+#else
         private Dictionary<int, IDictionary<int, OneWayLayerInteraction>> _perRigidbodyData;
-        
+#endif
+
         // Tracks which BetterRigidbody is in which layer
+#if UNITY_6000_4_OR_NEWER
+        private Dictionary<EntityId, int> _rigidbodyLayerMapping;
+#else
         private Dictionary<int, int> _rigidbodyLayerMapping;
+#endif
         
         private BetterPhysicsSettings _settings;
 
@@ -54,8 +62,13 @@ namespace SadnessMonday.BetterPhysics {
             for (int i = 0; i < contactPairs.Length; i++) {
                 var pair = contactPairs[i];
                 
+#if UNITY_6000_4_OR_NEWER
+                EntityId bodyAId = pair.bodyEntityId;
+                EntityId bodyBId = pair.otherBodyEntityId;
+#else
                 int bodyAId = pair.bodyInstanceID;
                 int bodyBId = pair.otherBodyInstanceID;
+#endif
                 
                 if (!_rigidbodyLayerMapping.TryGetValue(bodyAId, out int layerA)) {
                     // Debug.Log($"Body A {bodyAId} is not a registered BRB");
@@ -138,7 +151,11 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public void Register(BetterRigidbody body) {
+#if UNITY_6000_4_OR_NEWER
+            var rbInstanceId = body.GetEntityId();
+#else
             var rbInstanceId = body.GetRigidbodyInstanceID();
+#endif
             _rigidbodyLayerMapping[rbInstanceId] = body.PhysicsLayer;
             _perRigidbodyData[rbInstanceId] = body.SerializedInteractions;
             
@@ -146,27 +163,43 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public void UnRegister(BetterRigidbody body) {
+#if UNITY_6000_4_OR_NEWER
+            var rbInstanceId = body.GetEntityId();
+#else
             var rbInstanceId = body.GetRigidbodyInstanceID();
+#endif
             _perRigidbodyData.Remove(rbInstanceId);
             _rigidbodyLayerMapping.Remove(rbInstanceId);
         }
 
         public void ResetCustomInteractions(BetterRigidbody body) {
+#if UNITY_6000_4_OR_NEWER
+            var rbInstanceId = body.GetEntityId();
+#else
             var rbInstanceId = body.GetRigidbodyInstanceID();
+#endif
             if (_perRigidbodyData.TryGetValue(rbInstanceId, out var data)) {
                 data.Clear();
             }
         }
 
         public void SetCustomInteraction(BetterRigidbody body, OneWayLayerInteraction interaction) {
+#if UNITY_6000_4_OR_NEWER
+            var rbInstanceId = body.GetEntityId();
+#else
             var rbInstanceId = body.GetRigidbodyInstanceID();
+#endif
             if (_perRigidbodyData.TryGetValue(rbInstanceId, out var data)) {
                 data[interaction.receiver] = interaction;
             }
         }
 
         public bool RemoveCustomInteraction(BetterRigidbody body, int receiverLayer) {
+#if UNITY_6000_4_OR_NEWER
+            var rbInstanceId = body.GetEntityId();
+#else
             var rbInstanceId = body.GetRigidbodyInstanceID();
+#endif
             if (_perRigidbodyData.TryGetValue(rbInstanceId, out var data)) {
                 return data.Remove(receiverLayer);
             }
@@ -175,7 +208,11 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public bool TryGetCustomInteraction(BetterRigidbody body, int receiverLayer, out OneWayLayerInteraction interaction) {
+#if UNITY_6000_4_OR_NEWER
+            var rbInstanceId = body.GetEntityId();
+#else
             var rbInstanceId = body.GetRigidbodyInstanceID();
+#endif
             if (_perRigidbodyData.TryGetValue(rbInstanceId, out var data)) {
                 return data.TryGetValue(receiverLayer, out interaction);
             }
@@ -185,7 +222,11 @@ namespace SadnessMonday.BetterPhysics {
         }
 
         public void UpdateBodyLayer(BetterRigidbody body) {
+#if UNITY_6000_4_OR_NEWER
+            var rbInstanceId = body.GetEntityId();
+#else
             var rbInstanceId = body.GetRigidbodyInstanceID();
+#endif
             _rigidbodyLayerMapping.Remove(rbInstanceId);
             _rigidbodyLayerMapping[rbInstanceId] = body.PhysicsLayer;
         }
